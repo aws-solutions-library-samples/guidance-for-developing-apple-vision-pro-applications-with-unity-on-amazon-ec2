@@ -1,6 +1,6 @@
+# Unity Build Pipeline with Jenkins and EC2 Mac
 [![Build](https://github.com/aws-samples/jenkins-unity-build-on-aws/actions/workflows/build.yml/badge.svg)](https://github.com/aws-samples/jenkins-unity-build-on-aws/actions/workflows/build.yml)
 
-# Unity Build Pipeline with Jenkins and EC2 Mac
 This is a starter kit for Unity build pipeline with Jenkins and EC2 Linux/Mac instances on AWS.
 
 Features include:
