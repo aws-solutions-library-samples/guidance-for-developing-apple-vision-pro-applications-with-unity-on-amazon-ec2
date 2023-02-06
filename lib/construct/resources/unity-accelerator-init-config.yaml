@@ -1,0 +1,35 @@
+#cloud-config
+# We use cloud-init config to allow run the commands every time the instance reboots.
+# https://cloudinit.readthedocs.io/en/latest/reference/examples.html
+
+# Execute on every reboot https://dev.classmethod.jp/articles/execute_userdata_on_restart/
+cloud_config_modules:
+ - [runcmd, always]
+cloud_final_modules:
+ - [scripts-user, always]
+
+# runcmd creates a sh file and pass it to script-user module (only on the first boot by default).
+# You need to also execute runcmd module on every reboot to reflect changes.
+# https://cloudinit.readthedocs.io/en/latest/reference/modules.html#runcmd
+runcmd:
+  - |
+    #!/bin/bash
+    echo Initializing... $(date)
+
+    # Install docker and other dependencies
+    yum update -y
+    yum install -y git docker
+    systemctl enable docker
+    systemctl start docker
+    usermod -aG docker ec2-user
+    chmod 777 /var/run/docker.sock
+
+    # Start Unity Accelerator using Docker https://docs.unity3d.com/Manual/UnityAccelerator.html#docker
+    # Sometimes (e.g. reboot) the docker container is already running. We remove any existing container here.
+    docker rm -f accelerator
+    
+    # You can change login credential for Accelerator Web UI here. (PASSWORD, USER)
+    docker run --name accelerator -p 80:80 -p 10080:10080 --env PASSWORD=passw0rd --env USER=admin -v "/home/ec2-user/agent:/agent" -d --restart unless-stopped unitytechnologies/accelerator:latest
+
+    # They are not necessary but useful for debugging
+    yum install -y tmux htop

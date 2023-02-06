@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?><flow-definition>
+    <actions/>
+    <description/>
+    <keepDependencies>false</keepDependencies>
+    <properties/>
+    <triggers/>
+    <definition class="org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition">
+        <script>
+pipeline {
+    agent {
+        label 'small'
+    }
+
+    parameters {
+        string(name: 'InstanceId', defaultValue: '', description: '')
+    }
+    
+    stages {
+        stage('Create an AMI and update the launch template and ASG') {
+            steps {
+                script {
+                   writeFile(file: 'instanceId.txt', text:  params.InstanceId)
+                }
+
+                sh '''#!/bin/bash
+                set -xe
+                INSTANCE_ID=$(cat instanceId.txt)
+                AMI_NAME=ami-$(date +"%Y%m%d%H%M")
+                AMI_ID=$(aws ec2 create-image --instance-id $INSTANCE_ID --name $AMI_NAME --tag-specifications 'ResourceType=image,Tags=[{Key=AgentType,Value=linux}]' --region $AWS_REGION --query 'ImageId' --output text)
+                STATE="pending"
+                aws ec2 describe-images --image-ids $AMI_ID --region $AWS_REGION --query 'Images[0].State' --output text
+                while [ $STATE = "pending" ]
+                do
+                   STATE=$(aws ec2 describe-images --image-ids $AMI_ID --region $AWS_REGION --query 'Images[0].State' --output text)
+                   sleep 10
+                done
+                
+                aws ec2 terminate-instances --instance-ids $INSTANCE_ID --region $AWS_REGION
+
+                if [ $STATE = "failed" ]; then
+                    echo "creating AMI ${AMI_ID} failed"
+                    exit 1
+                fi
+
+                LAUNCH_TEMPLATE_ID=$FLEET_LAUNCH_TEMPLATE_ID_LINUX_FLEET
+                ASG_NAME=$FLEET_ASG_NAME_LINUX_FLEET
+                aws ec2 create-launch-template-version --launch-template-data '{"ImageId":"'"${AMI_ID}"'"}' --launch-template-id $LAUNCH_TEMPLATE_ID --source-version '$Latest' --region $AWS_REGION
+
+                aws autoscaling describe-auto-scaling-groups --auto-scaling-group-names $ASG_NAME --region $AWS_REGION --query 'AutoScalingGroups[0].MixedInstancesPolicy' | jq '.LaunchTemplate.LaunchTemplateSpecification.Version = "$Latest"' | jq 'del(.LaunchTemplate.LaunchTemplateSpecification.LaunchTemplateName)' > conf.json
+                aws autoscaling update-auto-scaling-group --auto-scaling-group-name $ASG_NAME --mixed-instances-policy file://conf.json --region $AWS_REGION
+                '''
+            }
+        }
+    }
+}
+        </script>
+        <sandbox>true</sandbox>
+    </definition>
+</flow-definition>

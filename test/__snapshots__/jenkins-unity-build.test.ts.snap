@@ -1,0 +1,3063 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Snapshot test 1`] = `
+{
+  "Outputs": {
+    "JenkinsMacAgent1InstanceId39041E59": {
+      "Value": {
+        "Ref": "JenkinsMacAgent1Instance609468B3",
+      },
+    },
+    "JenkinsMasterServiceLoadBalancerDNS8A32739E": {
+      "Value": {
+        "Fn::GetAtt": [
+          "JenkinsMasterServiceLB6A63DD53",
+          "DNSName",
+        ],
+      },
+    },
+    "JenkinsMasterServiceServiceURL6DCB4BEE": {
+      "Value": {
+        "Fn::Join": [
+          "",
+          [
+            "http://",
+            {
+              "Fn::GetAtt": [
+                "JenkinsMasterServiceLB6A63DD53",
+                "DNSName",
+              ],
+            },
+          ],
+        ],
+      },
+    },
+    "UnityAcceleratorEndpointC89B3A26": {
+      "Value": {
+        "Fn::Join": [
+          "",
+          [
+            {
+              "Fn::GetAtt": [
+                "NamespaceServiceCABDF534",
+                "Name",
+              ],
+            },
+            ".build:10080",
+          ],
+        ],
+      },
+    },
+    "UnityAcceleratorInstanceIdC7EEEEA7": {
+      "Value": {
+        "Ref": "UnityAccelerator945220AA",
+      },
+    },
+  },
+  "Parameters": {
+    "BootstrapVersion": {
+      "Default": "/cdk-bootstrap/hnb659fds/version",
+      "Description": "Version of the CDK Bootstrap resources in this environment, automatically retrieved from SSM Parameter Store. [cdk:skip]",
+      "Type": "AWS::SSM::Parameter::Value<String>",
+    },
+    "SsmParameterValueawsserviceamiamazonlinuxlatestamzn2amihvmx8664gp2C96584B6F00A464EAD1953AFF4B05118Parameter": {
+      "Default": "/aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2",
+      "Type": "AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>",
+    },
+  },
+  "Resources": {
+    "ArtifactBucket7410C9EF": {
+      "DeletionPolicy": "Delete",
+      "Properties": {
+        "BucketEncryption": {
+          "ServerSideEncryptionConfiguration": [
+            {
+              "ServerSideEncryptionByDefault": {
+                "SSEAlgorithm": "AES256",
+              },
+            },
+          ],
+        },
+        "LoggingConfiguration": {
+          "DestinationBucketName": {
+            "Ref": "LogBucketCC3B17E8",
+          },
+          "LogFilePrefix": "artifact-bucket-access-logs",
+        },
+        "PublicAccessBlockConfiguration": {
+          "BlockPublicAcls": true,
+          "BlockPublicPolicy": true,
+          "IgnorePublicAcls": true,
+          "RestrictPublicBuckets": true,
+        },
+        "Tags": [
+          {
+            "Key": "aws-cdk:auto-delete-objects",
+            "Value": "true",
+          },
+        ],
+      },
+      "Type": "AWS::S3::Bucket",
+      "UpdateReplacePolicy": "Delete",
+    },
+    "ArtifactBucketAutoDeleteObjectsCustomResource0BB47FD6": {
+      "DeletionPolicy": "Delete",
+      "DependsOn": [
+        "ArtifactBucketPolicy4B4B7752",
+      ],
+      "Properties": {
+        "BucketName": {
+          "Ref": "ArtifactBucket7410C9EF",
+        },
+        "ServiceToken": {
+          "Fn::GetAtt": [
+            "CustomS3AutoDeleteObjectsCustomResourceProviderHandler9D90184F",
+            "Arn",
+          ],
+        },
+      },
+      "Type": "Custom::S3AutoDeleteObjects",
+      "UpdateReplacePolicy": "Delete",
+    },
+    "ArtifactBucketPolicy4B4B7752": {
+      "Properties": {
+        "Bucket": {
+          "Ref": "ArtifactBucket7410C9EF",
+        },
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": "s3:*",
+              "Condition": {
+                "Bool": {
+                  "aws:SecureTransport": "false",
+                },
+              },
+              "Effect": "Deny",
+              "Principal": {
+                "AWS": "*",
+              },
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "ArtifactBucket7410C9EF",
+                    "Arn",
+                  ],
+                },
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      {
+                        "Fn::GetAtt": [
+                          "ArtifactBucket7410C9EF",
+                          "Arn",
+                        ],
+                      },
+                      "/*",
+                    ],
+                  ],
+                },
+              ],
+            },
+            {
+              "Action": [
+                "s3:GetBucket*",
+                "s3:List*",
+                "s3:DeleteObject*",
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "AWS": {
+                  "Fn::GetAtt": [
+                    "CustomS3AutoDeleteObjectsCustomResourceProviderRole3B1BD092",
+                    "Arn",
+                  ],
+                },
+              },
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "ArtifactBucket7410C9EF",
+                    "Arn",
+                  ],
+                },
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      {
+                        "Fn::GetAtt": [
+                          "ArtifactBucket7410C9EF",
+                          "Arn",
+                        ],
+                      },
+                      "/*",
+                    ],
+                  ],
+                },
+              ],
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+      },
+      "Type": "AWS::S3::BucketPolicy",
+    },
+    "CustomS3AutoDeleteObjectsCustomResourceProviderHandler9D90184F": {
+      "DependsOn": [
+        "CustomS3AutoDeleteObjectsCustomResourceProviderRole3B1BD092",
+      ],
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-us-east-2",
+          },
+          "S3Key": "2332a8953f2d92ebffdc01cf20d5a2fb5bf2ef29764cda4186f01c55edee8c73.zip",
+        },
+        "Description": {
+          "Fn::Join": [
+            "",
+            [
+              "Lambda function for auto-deleting objects in ",
+              {
+                "Ref": "LogBucketCC3B17E8",
+              },
+              " S3 bucket.",
+            ],
+          ],
+        },
+        "Handler": "__entrypoint__.handler",
+        "MemorySize": 128,
+        "Role": {
+          "Fn::GetAtt": [
+            "CustomS3AutoDeleteObjectsCustomResourceProviderRole3B1BD092",
+            "Arn",
+          ],
+        },
+        "Runtime": "nodejs14.x",
+        "Timeout": 900,
+      },
+      "Type": "AWS::Lambda::Function",
+    },
+    "CustomS3AutoDeleteObjectsCustomResourceProviderRole3B1BD092": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "lambda.amazonaws.com",
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "ManagedPolicyArns": [
+          {
+            "Fn::Sub": "arn:\${AWS::Partition}:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Role",
+    },
+    "EC2KeyNameManagerLambdaBE629145": {
+      "DependsOn": [
+        "EC2KeyPairManagerRoleB243C519",
+      ],
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-us-east-2",
+          },
+          "S3Key": "4b53adc667dcab419bec9e03553dce125d10f1d9c6ac1d2c082001b9332f150f.zip",
+        },
+        "Description": "Custom CFN resource: Manage EC2 Key Pairs",
+        "FunctionName": "TestStack-CFN-Resource-Custom-EC2-Key-Pair",
+        "Handler": "index.handler",
+        "Role": {
+          "Fn::GetAtt": [
+            "EC2KeyPairManagerRoleB243C519",
+            "Arn",
+          ],
+        },
+        "Runtime": "nodejs14.x",
+        "Timeout": 180,
+      },
+      "Type": "AWS::Lambda::Function",
+    },
+    "EC2KeyPairManagerPolicyEBBC1576": {
+      "Properties": {
+        "Description": "Used by Lambda CFN-Resource-Custom-EC2-Key-Pair, which is a custom CFN resource, managing EC2 Key Pairs",
+        "ManagedPolicyName": "TestStack-CFN-Resource-Custom-EC2-Key-Pair",
+        "Path": "/",
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": "ec2:DescribeKeyPairs",
+              "Effect": "Allow",
+              "Resource": "*",
+            },
+            {
+              "Action": [
+                "ec2:CreateKeyPair",
+                "ec2:CreateTags",
+                "ec2:ImportKeyPair",
+              ],
+              "Condition": {
+                "StringLike": {
+                  "aws:RequestTag/CreatedByCfnCustomResource": "CFN::Resource::Custom::EC2-Key-Pair",
+                },
+              },
+              "Effect": "Allow",
+              "Resource": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "arn:",
+                    {
+                      "Ref": "AWS::Partition",
+                    },
+                    ":ec2:*:*:key-pair/*",
+                  ],
+                ],
+              },
+            },
+            {
+              "Action": [
+                "ec2:CreateTags",
+                "ec2:DeleteKeyPair",
+                "ec2:DeleteTags",
+              ],
+              "Condition": {
+                "StringLike": {
+                  "ec2:ResourceTag/CreatedByCfnCustomResource": "CFN::Resource::Custom::EC2-Key-Pair",
+                },
+              },
+              "Effect": "Allow",
+              "Resource": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "arn:",
+                    {
+                      "Ref": "AWS::Partition",
+                    },
+                    ":ec2:*:*:key-pair/*",
+                  ],
+                ],
+              },
+            },
+            {
+              "Action": "secretsmanager:ListSecrets",
+              "Effect": "Allow",
+              "Resource": "*",
+            },
+            {
+              "Action": [
+                "secretsmanager:CreateSecret",
+                "secretsmanager:TagResource",
+              ],
+              "Condition": {
+                "StringLike": {
+                  "aws:RequestTag/CreatedByCfnCustomResource": "CFN::Resource::Custom::EC2-Key-Pair",
+                },
+              },
+              "Effect": "Allow",
+              "Resource": "*",
+            },
+            {
+              "Action": [
+                "secretsmanager:DeleteResourcePolicy",
+                "secretsmanager:DeleteSecret",
+                "secretsmanager:DescribeSecret",
+                "secretsmanager:GetResourcePolicy",
+                "secretsmanager:GetSecretValue",
+                "secretsmanager:ListSecretVersionIds",
+                "secretsmanager:PutResourcePolicy",
+                "secretsmanager:PutSecretValue",
+                "secretsmanager:RestoreSecret",
+                "secretsmanager:UntagResource",
+                "secretsmanager:UpdateSecret",
+                "secretsmanager:UpdateSecretVersionStage",
+              ],
+              "Condition": {
+                "StringLike": {
+                  "secretsmanager:ResourceTag/CreatedByCfnCustomResource": "CFN::Resource::Custom::EC2-Key-Pair",
+                },
+              },
+              "Effect": "Allow",
+              "Resource": "*",
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+      },
+      "Type": "AWS::IAM::ManagedPolicy",
+    },
+    "EC2KeyPairManagerRoleB243C519": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "lambda.amazonaws.com",
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "Description": "Used by Lambda CFN-Resource-Custom-EC2-Key-Pair, which is a custom CFN resource, managing EC2 Key Pairs",
+        "ManagedPolicyArns": [
+          {
+            "Ref": "EC2KeyPairManagerPolicyEBBC1576",
+          },
+          {
+            "Fn::Join": [
+              "",
+              [
+                "arn:",
+                {
+                  "Ref": "AWS::Partition",
+                },
+                ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+              ],
+            ],
+          },
+        ],
+        "RoleName": "TestStack-CFN-Resource-Custom-EC2-Key-Pair",
+      },
+      "Type": "AWS::IAM::Role",
+    },
+    "JenkinsLinuxAgentFleetASG75788F44": {
+      "Properties": {
+        "MaxSize": "1",
+        "MinSize": "1",
+        "MixedInstancesPolicy": {
+          "InstancesDistribution": {
+            "OnDemandBaseCapacity": 0,
+            "OnDemandPercentageAboveBaseCapacity": 0,
+            "SpotAllocationStrategy": "price-capacity-optimized",
+          },
+          "LaunchTemplate": {
+            "LaunchTemplateSpecification": {
+              "LaunchTemplateId": {
+                "Ref": "JenkinsLinuxAgentLaunchTemplate14EE0ADC",
+              },
+              "Version": {
+                "Fn::GetAtt": [
+                  "JenkinsLinuxAgentLaunchTemplate14EE0ADC",
+                  "LatestVersionNumber",
+                ],
+              },
+            },
+            "Overrides": [
+              {
+                "InstanceType": "c5.xlarge",
+              },
+              {
+                "InstanceType": "c5a.xlarge",
+              },
+              {
+                "InstanceType": "c5n.xlarge",
+              },
+              {
+                "InstanceType": "c4.xlarge",
+              },
+            ],
+          },
+        },
+        "VPCZoneIdentifier": [
+          {
+            "Ref": "VpcPrivateSubnet1Subnet536B997A",
+          },
+          {
+            "Ref": "VpcPrivateSubnet2Subnet3788AAA1",
+          },
+        ],
+      },
+      "Type": "AWS::AutoScaling::AutoScalingGroup",
+      "UpdatePolicy": {
+        "AutoScalingScheduledAction": {
+          "IgnoreUnmodifiedGroupSizeProperties": true,
+        },
+      },
+    },
+    "JenkinsLinuxAgentLaunchTemplate14EE0ADC": {
+      "Properties": {
+        "LaunchTemplateData": {
+          "BlockDeviceMappings": [
+            {
+              "DeviceName": "/dev/xvda",
+              "Ebs": {
+                "Encrypted": true,
+                "Throughput": 200,
+                "VolumeSize": 300,
+                "VolumeType": "gp3",
+              },
+            },
+          ],
+          "IamInstanceProfile": {
+            "Arn": {
+              "Fn::GetAtt": [
+                "JenkinsLinuxAgentLaunchTemplateProfile56F6A661",
+                "Arn",
+              ],
+            },
+          },
+          "ImageId": {
+            "Ref": "SsmParameterValueawsserviceamiamazonlinuxlatestamzn2amihvmx8664gp2C96584B6F00A464EAD1953AFF4B05118Parameter",
+          },
+          "KeyName": {
+            "Fn::GetAtt": [
+              "KeyPairEC2KeyPairTestStackagentsshkeyB7B10C45",
+              "KeyPairName",
+            ],
+          },
+          "SecurityGroupIds": [
+            {
+              "Fn::GetAtt": [
+                "JenkinsLinuxAgentSecurityGroup04FA787D",
+                "GroupId",
+              ],
+            },
+          ],
+          "TagSpecifications": [
+            {
+              "ResourceType": "instance",
+              "Tags": [
+                {
+                  "Key": "Name",
+                  "Value": "TestStack/JenkinsLinuxAgent/LaunchTemplate",
+                },
+              ],
+            },
+            {
+              "ResourceType": "volume",
+              "Tags": [
+                {
+                  "Key": "Name",
+                  "Value": "TestStack/JenkinsLinuxAgent/LaunchTemplate",
+                },
+              ],
+            },
+          ],
+          "UserData": {
+            "Fn::Base64": "#!/bin/bash
+rm -rf /usr/local/aws
+rm /usr/local/bin/aws
+curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+unzip awscliv2.zip
+./aws/install
+yum update -y
+yum install -y java-17-amazon-corretto-headless git docker jq
+systemctl enable docker
+systemctl start docker
+usermod -aG docker ec2-user
+chmod 777 /var/run/docker.sock
+curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.rpm.sh | bash
+yum install -y git-lfs
+docker pull unityci/editor:2021.3.14f1-ios-1.0
+yum install -y tmux htop",
+          },
+        },
+        "TagSpecifications": [
+          {
+            "ResourceType": "launch-template",
+            "Tags": [
+              {
+                "Key": "Name",
+                "Value": "TestStack/JenkinsLinuxAgent/LaunchTemplate",
+              },
+            ],
+          },
+        ],
+      },
+      "Type": "AWS::EC2::LaunchTemplate",
+    },
+    "JenkinsLinuxAgentLaunchTemplateProfile56F6A661": {
+      "Properties": {
+        "Roles": [
+          {
+            "Ref": "JenkinsLinuxAgentRoleC583C5E9",
+          },
+        ],
+      },
+      "Type": "AWS::IAM::InstanceProfile",
+    },
+    "JenkinsLinuxAgentRoleC583C5E9": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "ec2.amazonaws.com",
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "ManagedPolicyArns": [
+          {
+            "Fn::Join": [
+              "",
+              [
+                "arn:",
+                {
+                  "Ref": "AWS::Partition",
+                },
+                ":iam::aws:policy/AmazonSSMManagedInstanceCore",
+              ],
+            ],
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Role",
+    },
+    "JenkinsLinuxAgentRoleDefaultPolicy836C304C": {
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "s3:GetObject*",
+                "s3:GetBucket*",
+                "s3:List*",
+                "s3:DeleteObject*",
+                "s3:PutObject",
+                "s3:PutObjectLegalHold",
+                "s3:PutObjectRetention",
+                "s3:PutObjectTagging",
+                "s3:PutObjectVersionTagging",
+                "s3:Abort*",
+              ],
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "ArtifactBucket7410C9EF",
+                    "Arn",
+                  ],
+                },
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      {
+                        "Fn::GetAtt": [
+                          "ArtifactBucket7410C9EF",
+                          "Arn",
+                        ],
+                      },
+                      "/*",
+                    ],
+                  ],
+                },
+              ],
+            },
+            {
+              "Action": [
+                "ec2:DescribeImages",
+                "autoscaling:DetachInstances",
+              ],
+              "Effect": "Allow",
+              "Resource": "*",
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "PolicyName": "JenkinsLinuxAgentRoleDefaultPolicy836C304C",
+        "Roles": [
+          {
+            "Ref": "JenkinsLinuxAgentRoleC583C5E9",
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Policy",
+    },
+    "JenkinsLinuxAgentSecurityGroup04FA787D": {
+      "Properties": {
+        "GroupDescription": "TestStack/JenkinsLinuxAgent/SecurityGroup",
+        "SecurityGroupEgress": [
+          {
+            "CidrIp": "0.0.0.0/0",
+            "Description": "Allow all outbound traffic by default",
+            "IpProtocol": "-1",
+          },
+        ],
+        "VpcId": {
+          "Ref": "Vpc8378EB38",
+        },
+      },
+      "Type": "AWS::EC2::SecurityGroup",
+    },
+    "JenkinsLinuxAgentSecurityGroupfromTestStackJenkinsMasterServiceSecurityGroup509810082216B75EBD": {
+      "Properties": {
+        "Description": "from TestStackJenkinsMasterServiceSecurityGroup50981008:22",
+        "FromPort": 22,
+        "GroupId": {
+          "Fn::GetAtt": [
+            "JenkinsLinuxAgentSecurityGroup04FA787D",
+            "GroupId",
+          ],
+        },
+        "IpProtocol": "tcp",
+        "SourceSecurityGroupId": {
+          "Fn::GetAtt": [
+            "JenkinsMasterServiceSecurityGroupC408306B",
+            "GroupId",
+          ],
+        },
+        "ToPort": 22,
+      },
+      "Type": "AWS::EC2::SecurityGroupIngress",
+    },
+    "JenkinsLinuxAgentSmallFleetASG9671C0E4": {
+      "Properties": {
+        "MaxSize": "1",
+        "MinSize": "1",
+        "MixedInstancesPolicy": {
+          "InstancesDistribution": {
+            "OnDemandBaseCapacity": 0,
+            "OnDemandPercentageAboveBaseCapacity": 0,
+            "SpotAllocationStrategy": "price-capacity-optimized",
+          },
+          "LaunchTemplate": {
+            "LaunchTemplateSpecification": {
+              "LaunchTemplateId": {
+                "Ref": "JenkinsLinuxAgentSmallLaunchTemplateEE7A973D",
+              },
+              "Version": {
+                "Fn::GetAtt": [
+                  "JenkinsLinuxAgentSmallLaunchTemplateEE7A973D",
+                  "LatestVersionNumber",
+                ],
+              },
+            },
+            "Overrides": [
+              {
+                "InstanceType": "t3.small",
+              },
+            ],
+          },
+        },
+        "VPCZoneIdentifier": [
+          {
+            "Ref": "VpcPrivateSubnet1Subnet536B997A",
+          },
+          {
+            "Ref": "VpcPrivateSubnet2Subnet3788AAA1",
+          },
+        ],
+      },
+      "Type": "AWS::AutoScaling::AutoScalingGroup",
+      "UpdatePolicy": {
+        "AutoScalingScheduledAction": {
+          "IgnoreUnmodifiedGroupSizeProperties": true,
+        },
+      },
+    },
+    "JenkinsLinuxAgentSmallLaunchTemplateEE7A973D": {
+      "Properties": {
+        "LaunchTemplateData": {
+          "BlockDeviceMappings": [
+            {
+              "DeviceName": "/dev/xvda",
+              "Ebs": {
+                "Encrypted": true,
+                "Throughput": 200,
+                "VolumeSize": 20,
+                "VolumeType": "gp3",
+              },
+            },
+          ],
+          "IamInstanceProfile": {
+            "Arn": {
+              "Fn::GetAtt": [
+                "JenkinsLinuxAgentSmallLaunchTemplateProfile6D16D303",
+                "Arn",
+              ],
+            },
+          },
+          "ImageId": {
+            "Ref": "SsmParameterValueawsserviceamiamazonlinuxlatestamzn2amihvmx8664gp2C96584B6F00A464EAD1953AFF4B05118Parameter",
+          },
+          "KeyName": {
+            "Fn::GetAtt": [
+              "KeyPairEC2KeyPairTestStackagentsshkeyB7B10C45",
+              "KeyPairName",
+            ],
+          },
+          "SecurityGroupIds": [
+            {
+              "Fn::GetAtt": [
+                "JenkinsLinuxAgentSmallSecurityGroupA0746C5C",
+                "GroupId",
+              ],
+            },
+          ],
+          "TagSpecifications": [
+            {
+              "ResourceType": "instance",
+              "Tags": [
+                {
+                  "Key": "Name",
+                  "Value": "TestStack/JenkinsLinuxAgentSmall/LaunchTemplate",
+                },
+              ],
+            },
+            {
+              "ResourceType": "volume",
+              "Tags": [
+                {
+                  "Key": "Name",
+                  "Value": "TestStack/JenkinsLinuxAgentSmall/LaunchTemplate",
+                },
+              ],
+            },
+          ],
+          "UserData": {
+            "Fn::Base64": "#!/bin/bash
+rm -rf /usr/local/aws
+rm /usr/local/bin/aws
+curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+unzip awscliv2.zip
+./aws/install
+yum update -y
+yum install -y java-17-amazon-corretto-headless git docker jq
+systemctl enable docker
+systemctl start docker
+usermod -aG docker ec2-user
+chmod 777 /var/run/docker.sock
+curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.rpm.sh | bash
+yum install -y git-lfs
+docker pull unityci/editor:2021.3.14f1-ios-1.0
+yum install -y tmux htop",
+          },
+        },
+        "TagSpecifications": [
+          {
+            "ResourceType": "launch-template",
+            "Tags": [
+              {
+                "Key": "Name",
+                "Value": "TestStack/JenkinsLinuxAgentSmall/LaunchTemplate",
+              },
+            ],
+          },
+        ],
+      },
+      "Type": "AWS::EC2::LaunchTemplate",
+    },
+    "JenkinsLinuxAgentSmallLaunchTemplateProfile6D16D303": {
+      "Properties": {
+        "Roles": [
+          {
+            "Ref": "JenkinsLinuxAgentSmallRoleF5CAF5C8",
+          },
+        ],
+      },
+      "Type": "AWS::IAM::InstanceProfile",
+    },
+    "JenkinsLinuxAgentSmallRoleDefaultPolicy5066E9D1": {
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "autoscaling:DescribeAutoScalingGroups",
+                "autoscaling:UpdateAutoScalingGroup",
+                "ec2:CreateImage",
+                "ec2:CreateTags",
+                "ec2:DescribeImages",
+                "ec2:CreateLaunchTemplateVersion",
+                "ec2:RunInstances",
+                "ec2:TerminateInstances",
+              ],
+              "Effect": "Allow",
+              "Resource": "*",
+            },
+            {
+              "Action": "iam:PassRole",
+              "Condition": {
+                "StringEquals": {
+                  "iam:PassedToService": [
+                    "ec2.amazonaws.com",
+                  ],
+                },
+              },
+              "Effect": "Allow",
+              "Resource": "*",
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "PolicyName": "JenkinsLinuxAgentSmallRoleDefaultPolicy5066E9D1",
+        "Roles": [
+          {
+            "Ref": "JenkinsLinuxAgentSmallRoleF5CAF5C8",
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Policy",
+    },
+    "JenkinsLinuxAgentSmallRoleF5CAF5C8": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "ec2.amazonaws.com",
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "ManagedPolicyArns": [
+          {
+            "Fn::Join": [
+              "",
+              [
+                "arn:",
+                {
+                  "Ref": "AWS::Partition",
+                },
+                ":iam::aws:policy/AmazonSSMManagedInstanceCore",
+              ],
+            ],
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Role",
+    },
+    "JenkinsLinuxAgentSmallSecurityGroupA0746C5C": {
+      "Properties": {
+        "GroupDescription": "TestStack/JenkinsLinuxAgentSmall/SecurityGroup",
+        "SecurityGroupEgress": [
+          {
+            "CidrIp": "0.0.0.0/0",
+            "Description": "Allow all outbound traffic by default",
+            "IpProtocol": "-1",
+          },
+        ],
+        "VpcId": {
+          "Ref": "Vpc8378EB38",
+        },
+      },
+      "Type": "AWS::EC2::SecurityGroup",
+    },
+    "JenkinsLinuxAgentSmallSecurityGroupfromTestStackJenkinsMasterServiceSecurityGroup50981008229160FE0E": {
+      "Properties": {
+        "Description": "from TestStackJenkinsMasterServiceSecurityGroup50981008:22",
+        "FromPort": 22,
+        "GroupId": {
+          "Fn::GetAtt": [
+            "JenkinsLinuxAgentSmallSecurityGroupA0746C5C",
+            "GroupId",
+          ],
+        },
+        "IpProtocol": "tcp",
+        "SourceSecurityGroupId": {
+          "Fn::GetAtt": [
+            "JenkinsMasterServiceSecurityGroupC408306B",
+            "GroupId",
+          ],
+        },
+        "ToPort": 22,
+      },
+      "Type": "AWS::EC2::SecurityGroupIngress",
+    },
+    "JenkinsMacAgent1DedicatedHostA0E9B9BB": {
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "AvailabilityZone": {
+          "Fn::Select": [
+            1,
+            {
+              "Fn::GetAZs": "",
+            },
+          ],
+        },
+        "InstanceType": "mac1.metal",
+      },
+      "Type": "AWS::EC2::Host",
+      "UpdateReplacePolicy": "Retain",
+    },
+    "JenkinsMacAgent1Instance609468B3": {
+      "DependsOn": [
+        "JenkinsMacAgent1InstanceInstanceRoleDefaultPolicy7D35E4C4",
+        "JenkinsMacAgent1InstanceInstanceRole37F9A48B",
+      ],
+      "Properties": {
+        "AvailabilityZone": {
+          "Fn::Select": [
+            1,
+            {
+              "Fn::GetAZs": "",
+            },
+          ],
+        },
+        "BlockDeviceMappings": [
+          {
+            "DeviceName": "/dev/sda1",
+            "Ebs": {
+              "Encrypted": true,
+              "VolumeSize": 200,
+              "VolumeType": "gp3",
+            },
+          },
+        ],
+        "HostId": {
+          "Fn::GetAtt": [
+            "JenkinsMacAgent1DedicatedHostA0E9B9BB",
+            "HostId",
+          ],
+        },
+        "IamInstanceProfile": {
+          "Ref": "JenkinsMacAgent1InstanceInstanceProfileD673B46F",
+        },
+        "ImageId": "ami-013846afc111c94b0",
+        "InstanceType": "mac1.metal",
+        "KeyName": {
+          "Fn::GetAtt": [
+            "KeyPairEC2KeyPairTestStackagentsshkeyB7B10C45",
+            "KeyPairName",
+          ],
+        },
+        "SecurityGroupIds": [
+          {
+            "Fn::GetAtt": [
+              "JenkinsMacAgent1InstanceInstanceSecurityGroupFD9F49AE",
+              "GroupId",
+            ],
+          },
+        ],
+        "SubnetId": {
+          "Ref": "VpcPrivateSubnet2Subnet3788AAA1",
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "TestStack/JenkinsMacAgent1/Instance",
+          },
+        ],
+        "Tenancy": "host",
+        "UserData": {
+          "Fn::Base64": "#!/bin/zsh
+#install openjdk@17
+su ec2-user -c '/usr/local/bin/brew install openjdk@17 jq'
+ln -sfn /usr/local/opt/openjdk@17/libexec/openjdk.jdk /Library/Java/JavaVirtualMachines/openjdk-17.jdk
+java -version
+
+# resize disk to match the ebs volume
+# https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-mac-instances.html#mac-instance-increase-volume
+PDISK=$(diskutil list physical external | head -n1 | cut -d" " -f1)
+APFSCONT=$(diskutil list physical external | grep "Apple_APFS" | tr -s " " | cut -d" " -f8)
+yes | diskutil repairDisk $PDISK
+diskutil apfs resizeContainer $APFSCONT 0
+
+# Start the ARD Agent
+# https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-mac-instances.html#connect-to-mac-instance
+/System/Library/CoreServices/RemoteManagement/ARDAgent.app/Contents/Resources/kickstart -activate -configure -access -on -restart -agent -privs -all
+    ",
+        },
+      },
+      "Type": "AWS::EC2::Instance",
+    },
+    "JenkinsMacAgent1InstanceInstanceProfileD673B46F": {
+      "Properties": {
+        "Roles": [
+          {
+            "Ref": "JenkinsMacAgent1InstanceInstanceRole37F9A48B",
+          },
+        ],
+      },
+      "Type": "AWS::IAM::InstanceProfile",
+    },
+    "JenkinsMacAgent1InstanceInstanceRole37F9A48B": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "ec2.amazonaws.com",
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "ManagedPolicyArns": [
+          {
+            "Fn::Join": [
+              "",
+              [
+                "arn:",
+                {
+                  "Ref": "AWS::Partition",
+                },
+                ":iam::aws:policy/AmazonSSMManagedInstanceCore",
+              ],
+            ],
+          },
+        ],
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "TestStack/JenkinsMacAgent1/Instance",
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Role",
+    },
+    "JenkinsMacAgent1InstanceInstanceRoleDefaultPolicy7D35E4C4": {
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "s3:GetObject*",
+                "s3:GetBucket*",
+                "s3:List*",
+                "s3:DeleteObject*",
+                "s3:PutObject",
+                "s3:PutObjectLegalHold",
+                "s3:PutObjectRetention",
+                "s3:PutObjectTagging",
+                "s3:PutObjectVersionTagging",
+                "s3:Abort*",
+              ],
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "ArtifactBucket7410C9EF",
+                    "Arn",
+                  ],
+                },
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      {
+                        "Fn::GetAtt": [
+                          "ArtifactBucket7410C9EF",
+                          "Arn",
+                        ],
+                      },
+                      "/*",
+                    ],
+                  ],
+                },
+              ],
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "PolicyName": "JenkinsMacAgent1InstanceInstanceRoleDefaultPolicy7D35E4C4",
+        "Roles": [
+          {
+            "Ref": "JenkinsMacAgent1InstanceInstanceRole37F9A48B",
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Policy",
+    },
+    "JenkinsMacAgent1InstanceInstanceSecurityGroupFD9F49AE": {
+      "Properties": {
+        "GroupDescription": "TestStack/JenkinsMacAgent1/Instance/InstanceSecurityGroup",
+        "SecurityGroupEgress": [
+          {
+            "CidrIp": "0.0.0.0/0",
+            "Description": "Allow all outbound traffic by default",
+            "IpProtocol": "-1",
+          },
+        ],
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "TestStack/JenkinsMacAgent1/Instance",
+          },
+        ],
+        "VpcId": {
+          "Ref": "Vpc8378EB38",
+        },
+      },
+      "Type": "AWS::EC2::SecurityGroup",
+    },
+    "JenkinsMacAgent1InstanceInstanceSecurityGroupfromTestStackJenkinsMasterServiceSecurityGroup5098100822949DBDC0": {
+      "Properties": {
+        "Description": "from TestStackJenkinsMasterServiceSecurityGroup50981008:22",
+        "FromPort": 22,
+        "GroupId": {
+          "Fn::GetAtt": [
+            "JenkinsMacAgent1InstanceInstanceSecurityGroupFD9F49AE",
+            "GroupId",
+          ],
+        },
+        "IpProtocol": "tcp",
+        "SourceSecurityGroupId": {
+          "Fn::GetAtt": [
+            "JenkinsMasterServiceSecurityGroupC408306B",
+            "GroupId",
+          ],
+        },
+        "ToPort": 22,
+      },
+      "Type": "AWS::EC2::SecurityGroupIngress",
+    },
+    "JenkinsMasterClusterAC897532": {
+      "Properties": {
+        "ClusterSettings": [
+          {
+            "Name": "containerInsights",
+            "Value": "enabled",
+          },
+        ],
+      },
+      "Type": "AWS::ECS::Cluster",
+    },
+    "JenkinsMasterServiceF7391AC1": {
+      "DependsOn": [
+        "JenkinsMasterServiceLBPublicListenerECSGroupFE3FDF30",
+        "JenkinsMasterServiceLBPublicListenerD674B4E4",
+      ],
+      "Properties": {
+        "Cluster": {
+          "Ref": "JenkinsMasterClusterAC897532",
+        },
+        "DeploymentConfiguration": {
+          "DeploymentCircuitBreaker": {
+            "Enable": true,
+            "Rollback": true,
+          },
+          "MaximumPercent": 200,
+          "MinimumHealthyPercent": 100,
+        },
+        "DeploymentController": {
+          "Type": "ECS",
+        },
+        "DesiredCount": 1,
+        "EnableECSManagedTags": false,
+        "EnableExecuteCommand": true,
+        "HealthCheckGracePeriodSeconds": 60,
+        "LaunchType": "FARGATE",
+        "LoadBalancers": [
+          {
+            "ContainerName": "main",
+            "ContainerPort": 8080,
+            "TargetGroupArn": {
+              "Ref": "JenkinsMasterServiceLBPublicListenerECSGroupFE3FDF30",
+            },
+          },
+        ],
+        "NetworkConfiguration": {
+          "AwsvpcConfiguration": {
+            "AssignPublicIp": "DISABLED",
+            "SecurityGroups": [
+              {
+                "Fn::GetAtt": [
+                  "JenkinsMasterServiceSecurityGroupC408306B",
+                  "GroupId",
+                ],
+              },
+            ],
+            "Subnets": [
+              {
+                "Ref": "VpcPrivateSubnet1Subnet536B997A",
+              },
+              {
+                "Ref": "VpcPrivateSubnet2Subnet3788AAA1",
+              },
+            ],
+          },
+        },
+        "TaskDefinition": {
+          "Ref": "JenkinsMasterTaskDefinition12093379",
+        },
+      },
+      "Type": "AWS::ECS::Service",
+    },
+    "JenkinsMasterServiceLB6A63DD53": {
+      "DependsOn": [
+        "LogBucketAutoDeleteObjectsCustomResource7762F42C",
+        "LogBucketPolicy900DBE48",
+        "LogBucketCC3B17E8",
+        "VpcPublicSubnet1DefaultRoute3DA9E72A",
+        "VpcPublicSubnet1RouteTableAssociation97140677",
+        "VpcPublicSubnet2DefaultRoute97F91067",
+        "VpcPublicSubnet2RouteTableAssociationDD5762D8",
+      ],
+      "Properties": {
+        "LoadBalancerAttributes": [
+          {
+            "Key": "deletion_protection.enabled",
+            "Value": "false",
+          },
+          {
+            "Key": "access_logs.s3.enabled",
+            "Value": "true",
+          },
+          {
+            "Key": "access_logs.s3.bucket",
+            "Value": {
+              "Ref": "LogBucketCC3B17E8",
+            },
+          },
+          {
+            "Key": "access_logs.s3.prefix",
+            "Value": "jenkinsAlbAccessLog",
+          },
+        ],
+        "Scheme": "internet-facing",
+        "SecurityGroups": [
+          {
+            "Fn::GetAtt": [
+              "JenkinsMasterServiceLBSecurityGroup2F0839CC",
+              "GroupId",
+            ],
+          },
+        ],
+        "Subnets": [
+          {
+            "Ref": "VpcPublicSubnet1Subnet5C2D37C4",
+          },
+          {
+            "Ref": "VpcPublicSubnet2Subnet691E08A3",
+          },
+        ],
+        "Type": "application",
+      },
+      "Type": "AWS::ElasticLoadBalancingV2::LoadBalancer",
+    },
+    "JenkinsMasterServiceLBPublicListenerD674B4E4": {
+      "DependsOn": [
+        "LogBucketAutoDeleteObjectsCustomResource7762F42C",
+        "LogBucketPolicy900DBE48",
+        "LogBucketCC3B17E8",
+      ],
+      "Properties": {
+        "DefaultActions": [
+          {
+            "TargetGroupArn": {
+              "Ref": "JenkinsMasterServiceLBPublicListenerECSGroupFE3FDF30",
+            },
+            "Type": "forward",
+          },
+        ],
+        "LoadBalancerArn": {
+          "Ref": "JenkinsMasterServiceLB6A63DD53",
+        },
+        "Port": 80,
+        "Protocol": "HTTP",
+      },
+      "Type": "AWS::ElasticLoadBalancingV2::Listener",
+    },
+    "JenkinsMasterServiceLBPublicListenerECSGroupFE3FDF30": {
+      "DependsOn": [
+        "LogBucketAutoDeleteObjectsCustomResource7762F42C",
+        "LogBucketPolicy900DBE48",
+        "LogBucketCC3B17E8",
+      ],
+      "Properties": {
+        "HealthCheckIntervalSeconds": 15,
+        "HealthCheckPath": "/login",
+        "HealthyThresholdCount": 2,
+        "Matcher": {
+          "HttpCode": "200",
+        },
+        "Port": 80,
+        "Protocol": "HTTP",
+        "TargetGroupAttributes": [
+          {
+            "Key": "stickiness.enabled",
+            "Value": "false",
+          },
+          {
+            "Key": "deregistration_delay.timeout_seconds",
+            "Value": "10",
+          },
+        ],
+        "TargetType": "ip",
+        "UnhealthyThresholdCount": 4,
+        "VpcId": {
+          "Ref": "Vpc8378EB38",
+        },
+      },
+      "Type": "AWS::ElasticLoadBalancingV2::TargetGroup",
+    },
+    "JenkinsMasterServiceLBSecurityGroup2F0839CC": {
+      "DependsOn": [
+        "LogBucketAutoDeleteObjectsCustomResource7762F42C",
+        "LogBucketPolicy900DBE48",
+        "LogBucketCC3B17E8",
+      ],
+      "Properties": {
+        "GroupDescription": "Automatically created Security Group for ELB TestStackJenkinsMasterServiceLB96798AB6",
+        "SecurityGroupIngress": [
+          {
+            "CidrIp": "127.0.0.1/32",
+            "Description": "from 127.0.0.1/32:80",
+            "FromPort": 80,
+            "IpProtocol": "tcp",
+            "ToPort": 80,
+          },
+          {
+            "CidrIp": {
+              "Fn::GetAtt": [
+                "Vpc8378EB38",
+                "CidrBlock",
+              ],
+            },
+            "Description": {
+              "Fn::Join": [
+                "",
+                [
+                  "from ",
+                  {
+                    "Fn::GetAtt": [
+                      "Vpc8378EB38",
+                      "CidrBlock",
+                    ],
+                  },
+                  ":80",
+                ],
+              ],
+            },
+            "FromPort": 80,
+            "IpProtocol": "tcp",
+            "ToPort": 80,
+          },
+        ],
+        "VpcId": {
+          "Ref": "Vpc8378EB38",
+        },
+      },
+      "Type": "AWS::EC2::SecurityGroup",
+    },
+    "JenkinsMasterServiceLBSecurityGrouptoTestStackJenkinsMasterServiceSecurityGroup509810088080E3541A5A": {
+      "DependsOn": [
+        "LogBucketAutoDeleteObjectsCustomResource7762F42C",
+        "LogBucketPolicy900DBE48",
+        "LogBucketCC3B17E8",
+      ],
+      "Properties": {
+        "Description": "Load balancer to target",
+        "DestinationSecurityGroupId": {
+          "Fn::GetAtt": [
+            "JenkinsMasterServiceSecurityGroupC408306B",
+            "GroupId",
+          ],
+        },
+        "FromPort": 8080,
+        "GroupId": {
+          "Fn::GetAtt": [
+            "JenkinsMasterServiceLBSecurityGroup2F0839CC",
+            "GroupId",
+          ],
+        },
+        "IpProtocol": "tcp",
+        "ToPort": 8080,
+      },
+      "Type": "AWS::EC2::SecurityGroupEgress",
+    },
+    "JenkinsMasterServiceSecurityGroupC408306B": {
+      "Properties": {
+        "GroupDescription": "TestStack/JenkinsMaster/Service/Service/SecurityGroup",
+        "SecurityGroupEgress": [
+          {
+            "CidrIp": "0.0.0.0/0",
+            "Description": "Allow all outbound traffic by default",
+            "IpProtocol": "-1",
+          },
+        ],
+        "VpcId": {
+          "Ref": "Vpc8378EB38",
+        },
+      },
+      "Type": "AWS::EC2::SecurityGroup",
+    },
+    "JenkinsMasterServiceSecurityGroupfromTestStackJenkinsMasterServiceLBSecurityGroup5E6D7A6B808074170F31": {
+      "Properties": {
+        "Description": "Load balancer to target",
+        "FromPort": 8080,
+        "GroupId": {
+          "Fn::GetAtt": [
+            "JenkinsMasterServiceSecurityGroupC408306B",
+            "GroupId",
+          ],
+        },
+        "IpProtocol": "tcp",
+        "SourceSecurityGroupId": {
+          "Fn::GetAtt": [
+            "JenkinsMasterServiceLBSecurityGroup2F0839CC",
+            "GroupId",
+          ],
+        },
+        "ToPort": 8080,
+      },
+      "Type": "AWS::EC2::SecurityGroupIngress",
+    },
+    "JenkinsMasterStorageAccessPoint1BB88191": {
+      "Properties": {
+        "FileSystemId": {
+          "Ref": "JenkinsMasterStorageF0282409",
+        },
+        "PosixUser": {
+          "Gid": "1000",
+          "Uid": "1000",
+        },
+        "RootDirectory": {
+          "CreationInfo": {
+            "OwnerGid": "1000",
+            "OwnerUid": "1000",
+            "Permissions": "755",
+          },
+          "Path": "/jenkins-home",
+        },
+      },
+      "Type": "AWS::EFS::AccessPoint",
+    },
+    "JenkinsMasterStorageEfsMountTarget173EF4842": {
+      "Properties": {
+        "FileSystemId": {
+          "Ref": "JenkinsMasterStorageF0282409",
+        },
+        "SecurityGroups": [
+          {
+            "Fn::GetAtt": [
+              "JenkinsMasterStorageEfsSecurityGroupC93EE732",
+              "GroupId",
+            ],
+          },
+        ],
+        "SubnetId": {
+          "Ref": "VpcPrivateSubnet1Subnet536B997A",
+        },
+      },
+      "Type": "AWS::EFS::MountTarget",
+    },
+    "JenkinsMasterStorageEfsMountTarget251C29654": {
+      "Properties": {
+        "FileSystemId": {
+          "Ref": "JenkinsMasterStorageF0282409",
+        },
+        "SecurityGroups": [
+          {
+            "Fn::GetAtt": [
+              "JenkinsMasterStorageEfsSecurityGroupC93EE732",
+              "GroupId",
+            ],
+          },
+        ],
+        "SubnetId": {
+          "Ref": "VpcPrivateSubnet2Subnet3788AAA1",
+        },
+      },
+      "Type": "AWS::EFS::MountTarget",
+    },
+    "JenkinsMasterStorageEfsSecurityGroupC93EE732": {
+      "Properties": {
+        "GroupDescription": "TestStack/JenkinsMaster/Storage/EfsSecurityGroup",
+        "SecurityGroupEgress": [
+          {
+            "CidrIp": "0.0.0.0/0",
+            "Description": "Allow all outbound traffic by default",
+            "IpProtocol": "-1",
+          },
+        ],
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "TestStack/JenkinsMaster/Storage",
+          },
+        ],
+        "VpcId": {
+          "Ref": "Vpc8378EB38",
+        },
+      },
+      "Type": "AWS::EC2::SecurityGroup",
+    },
+    "JenkinsMasterStorageEfsSecurityGroupfromTestStackJenkinsMasterServiceSecurityGroup5098100820497567261A": {
+      "Properties": {
+        "Description": "from TestStackJenkinsMasterServiceSecurityGroup50981008:2049",
+        "FromPort": 2049,
+        "GroupId": {
+          "Fn::GetAtt": [
+            "JenkinsMasterStorageEfsSecurityGroupC93EE732",
+            "GroupId",
+          ],
+        },
+        "IpProtocol": "tcp",
+        "SourceSecurityGroupId": {
+          "Fn::GetAtt": [
+            "JenkinsMasterServiceSecurityGroupC408306B",
+            "GroupId",
+          ],
+        },
+        "ToPort": 2049,
+      },
+      "Type": "AWS::EC2::SecurityGroupIngress",
+    },
+    "JenkinsMasterStorageF0282409": {
+      "DeletionPolicy": "Delete",
+      "Properties": {
+        "Encrypted": true,
+        "FileSystemTags": [
+          {
+            "Key": "Name",
+            "Value": "TestStack/JenkinsMaster/Storage",
+          },
+        ],
+        "PerformanceMode": "generalPurpose",
+      },
+      "Type": "AWS::EFS::FileSystem",
+      "UpdateReplacePolicy": "Delete",
+    },
+    "JenkinsMasterTaskDefinition12093379": {
+      "Properties": {
+        "ContainerDefinitions": [
+          {
+            "Environment": [
+              {
+                "Name": "UNITY_ACCELERATOR_URL",
+                "Value": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      {
+                        "Fn::GetAtt": [
+                          "NamespaceServiceCABDF534",
+                          "Name",
+                        ],
+                      },
+                      ".build:10080",
+                    ],
+                  ],
+                },
+              },
+              {
+                "Name": "AWS_REGION",
+                "Value": "us-east-2",
+              },
+              {
+                "Name": "ARTIFACT_BUCKET_NAME",
+                "Value": {
+                  "Ref": "ArtifactBucket7410C9EF",
+                },
+              },
+              {
+                "Name": "FLEET_ASG_NAME_LINUX_FLEET",
+                "Value": {
+                  "Ref": "JenkinsLinuxAgentFleetASG75788F44",
+                },
+              },
+              {
+                "Name": "FLEET_LAUNCH_TEMPLATE_ID_LINUX_FLEET",
+                "Value": {
+                  "Ref": "JenkinsLinuxAgentLaunchTemplate14EE0ADC",
+                },
+              },
+              {
+                "Name": "FLEET_ASG_NAME_LINUX_FLEET_SMALL",
+                "Value": {
+                  "Ref": "JenkinsLinuxAgentSmallFleetASG9671C0E4",
+                },
+              },
+              {
+                "Name": "FLEET_LAUNCH_TEMPLATE_ID_LINUX_FLEET_SMALL",
+              },
+              {
+                "Name": "ECR_REPOSITORY_URL",
+                "Value": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      {
+                        "Fn::Select": [
+                          4,
+                          {
+                            "Fn::Split": [
+                              ":",
+                              {
+                                "Fn::GetAtt": [
+                                  "Repository22E53BBD",
+                                  "Arn",
+                                ],
+                              },
+                            ],
+                          },
+                        ],
+                      },
+                      ".dkr.ecr.",
+                      {
+                        "Fn::Select": [
+                          3,
+                          {
+                            "Fn::Split": [
+                              ":",
+                              {
+                                "Fn::GetAtt": [
+                                  "Repository22E53BBD",
+                                  "Arn",
+                                ],
+                              },
+                            ],
+                          },
+                        ],
+                      },
+                      ".",
+                      {
+                        "Ref": "AWS::URLSuffix",
+                      },
+                      "/",
+                      {
+                        "Ref": "Repository22E53BBD",
+                      },
+                    ],
+                  ],
+                },
+              },
+              {
+                "Name": "ECR_REGISTRY_URL",
+                "Value": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "https://",
+                      {
+                        "Ref": "AWS::AccountId",
+                      },
+                      ".dkr.ecr.us-east-2.amazonaws.com",
+                    ],
+                  ],
+                },
+              },
+              {
+                "Name": "PLUGINS_FORCE_UPGRADE",
+                "Value": "true",
+              },
+              {
+                "Name": "ECR_ROLE_ARN",
+                "Value": {
+                  "Fn::GetAtt": [
+                    "JenkinsMasterTaskDefinitionTaskRole0D5723F3",
+                    "Arn",
+                  ],
+                },
+              },
+              {
+                "Name": "MAC_HOST_MAC0",
+                "Value": {
+                  "Fn::GetAtt": [
+                    "JenkinsMacAgent1Instance609468B3",
+                    "PrivateIp",
+                  ],
+                },
+              },
+              {
+                "Name": "JENKINS_URL",
+                "Value": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "http://",
+                      {
+                        "Fn::GetAtt": [
+                          "JenkinsMasterServiceLB6A63DD53",
+                          "DNSName",
+                        ],
+                      },
+                    ],
+                  ],
+                },
+              },
+            ],
+            "Essential": true,
+            "Image": {
+              "Fn::Sub": "\${AWS::AccountId}.dkr.ecr.us-east-2.\${AWS::URLSuffix}/cdk-hnb659fds-container-assets-\${AWS::AccountId}-us-east-2:6afaf31700022333f037ba227bf8754acfa83763e231ceb7e7ddb9cb86567baf",
+            },
+            "LinuxParameters": {
+              "Capabilities": {},
+              "InitProcessEnabled": true,
+            },
+            "LogConfiguration": {
+              "LogDriver": "awslogs",
+              "Options": {
+                "awslogs-group": {
+                  "Ref": "JenkinsMasterTaskDefinitionmainLogGroup457966E3",
+                },
+                "awslogs-region": "us-east-2",
+                "awslogs-stream-prefix": "jenkins-master",
+              },
+            },
+            "MountPoints": [
+              {
+                "ContainerPath": "/var/jenkins_home",
+                "ReadOnly": false,
+                "SourceVolume": "shared",
+              },
+            ],
+            "Name": "main",
+            "PortMappings": [
+              {
+                "ContainerPort": 8080,
+                "Protocol": "tcp",
+              },
+            ],
+            "Secrets": [
+              {
+                "Name": "PRIVATE_KEY",
+                "ValueFrom": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition",
+                      },
+                      ":secretsmanager:us-east-2:",
+                      {
+                        "Ref": "AWS::AccountId",
+                      },
+                      ":secret:ec2-ssh-key/TestStack-agent-ssh-key/private",
+                    ],
+                  ],
+                },
+              },
+            ],
+          },
+        ],
+        "Cpu": "1024",
+        "ExecutionRoleArn": {
+          "Fn::GetAtt": [
+            "JenkinsMasterTaskDefinitionExecutionRoleE2A2DDE2",
+            "Arn",
+          ],
+        },
+        "Family": "TestStackJenkinsMasterTaskDefinition6FE73240",
+        "Memory": "2048",
+        "NetworkMode": "awsvpc",
+        "RequiresCompatibilities": [
+          "FARGATE",
+        ],
+        "TaskRoleArn": {
+          "Fn::GetAtt": [
+            "JenkinsMasterTaskDefinitionTaskRole0D5723F3",
+            "Arn",
+          ],
+        },
+        "Volumes": [
+          {
+            "EFSVolumeConfiguration": {
+              "AuthorizationConfig": {
+                "AccessPointId": {
+                  "Ref": "JenkinsMasterStorageAccessPoint1BB88191",
+                },
+                "IAM": "ENABLED",
+              },
+              "FilesystemId": {
+                "Ref": "JenkinsMasterStorageF0282409",
+              },
+              "TransitEncryption": "ENABLED",
+            },
+            "Name": "shared",
+          },
+        ],
+      },
+      "Type": "AWS::ECS::TaskDefinition",
+    },
+    "JenkinsMasterTaskDefinitionExecutionRoleDefaultPolicyBBE4D287": {
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "ecr:BatchCheckLayerAvailability",
+                "ecr:GetDownloadUrlForLayer",
+                "ecr:BatchGetImage",
+              ],
+              "Effect": "Allow",
+              "Resource": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "arn:",
+                    {
+                      "Ref": "AWS::Partition",
+                    },
+                    ":ecr:us-east-2:",
+                    {
+                      "Ref": "AWS::AccountId",
+                    },
+                    ":repository/",
+                    {
+                      "Fn::Sub": "cdk-hnb659fds-container-assets-\${AWS::AccountId}-us-east-2",
+                    },
+                  ],
+                ],
+              },
+            },
+            {
+              "Action": "ecr:GetAuthorizationToken",
+              "Effect": "Allow",
+              "Resource": "*",
+            },
+            {
+              "Action": [
+                "logs:CreateLogStream",
+                "logs:PutLogEvents",
+              ],
+              "Effect": "Allow",
+              "Resource": {
+                "Fn::GetAtt": [
+                  "JenkinsMasterTaskDefinitionmainLogGroup457966E3",
+                  "Arn",
+                ],
+              },
+            },
+            {
+              "Action": [
+                "secretsmanager:GetSecretValue",
+                "secretsmanager:DescribeSecret",
+              ],
+              "Effect": "Allow",
+              "Resource": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "arn:",
+                    {
+                      "Ref": "AWS::Partition",
+                    },
+                    ":secretsmanager:us-east-2:",
+                    {
+                      "Ref": "AWS::AccountId",
+                    },
+                    ":secret:ec2-ssh-key/TestStack-agent-ssh-key/private-??????",
+                  ],
+                ],
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "PolicyName": "JenkinsMasterTaskDefinitionExecutionRoleDefaultPolicyBBE4D287",
+        "Roles": [
+          {
+            "Ref": "JenkinsMasterTaskDefinitionExecutionRoleE2A2DDE2",
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Policy",
+    },
+    "JenkinsMasterTaskDefinitionExecutionRoleE2A2DDE2": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "ecs-tasks.amazonaws.com",
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+      },
+      "Type": "AWS::IAM::Role",
+    },
+    "JenkinsMasterTaskDefinitionTaskRole0D5723F3": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "ecs-tasks.amazonaws.com",
+              },
+            },
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "AWS": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition",
+                      },
+                      ":iam::",
+                      {
+                        "Ref": "AWS::AccountId",
+                      },
+                      ":root",
+                    ],
+                  ],
+                },
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+      },
+      "Type": "AWS::IAM::Role",
+    },
+    "JenkinsMasterTaskDefinitionTaskRoleDefaultPolicy17548315": {
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "ssmmessages:CreateControlChannel",
+                "ssmmessages:CreateDataChannel",
+                "ssmmessages:OpenControlChannel",
+                "ssmmessages:OpenDataChannel",
+              ],
+              "Effect": "Allow",
+              "Resource": "*",
+            },
+            {
+              "Action": "logs:DescribeLogGroups",
+              "Effect": "Allow",
+              "Resource": "*",
+            },
+            {
+              "Action": [
+                "logs:CreateLogStream",
+                "logs:DescribeLogStreams",
+                "logs:PutLogEvents",
+              ],
+              "Effect": "Allow",
+              "Resource": "*",
+            },
+            {
+              "Action": [
+                "ec2:DescribeSpotFleetInstances",
+                "ec2:ModifySpotFleetRequest",
+                "ec2:CreateTags",
+                "ec2:DescribeRegions",
+                "ec2:DescribeInstances",
+                "ec2:TerminateInstances",
+                "ec2:DescribeInstanceStatus",
+                "ec2:DescribeSpotFleetRequests",
+                "autoscaling:DescribeAutoScalingGroups",
+                "autoscaling:UpdateAutoScalingGroup",
+                "iam:ListInstanceProfiles",
+                "iam:ListRoles",
+              ],
+              "Effect": "Allow",
+              "Resource": "*",
+            },
+            {
+              "Action": "iam:PassRole",
+              "Condition": {
+                "StringEquals": {
+                  "iam:PassedToService": [
+                    "ec2.amazonaws.com",
+                  ],
+                },
+              },
+              "Effect": "Allow",
+              "Resource": {
+                "Fn::GetAtt": [
+                  "JenkinsMasterTaskDefinitionTaskRole0D5723F3",
+                  "Arn",
+                ],
+              },
+            },
+            {
+              "Action": [
+                "ecr:BatchCheckLayerAvailability",
+                "ecr:GetDownloadUrlForLayer",
+                "ecr:BatchGetImage",
+              ],
+              "Effect": "Allow",
+              "Resource": {
+                "Fn::GetAtt": [
+                  "Repository22E53BBD",
+                  "Arn",
+                ],
+              },
+            },
+            {
+              "Action": "ecr:GetAuthorizationToken",
+              "Effect": "Allow",
+              "Resource": "*",
+            },
+            {
+              "Action": [
+                "s3:GetObject*",
+                "s3:GetBucket*",
+                "s3:List*",
+                "s3:DeleteObject*",
+                "s3:PutObject",
+                "s3:PutObjectLegalHold",
+                "s3:PutObjectRetention",
+                "s3:PutObjectTagging",
+                "s3:PutObjectVersionTagging",
+                "s3:Abort*",
+              ],
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "ArtifactBucket7410C9EF",
+                    "Arn",
+                  ],
+                },
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      {
+                        "Fn::GetAtt": [
+                          "ArtifactBucket7410C9EF",
+                          "Arn",
+                        ],
+                      },
+                      "/*",
+                    ],
+                  ],
+                },
+              ],
+            },
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Resource": {
+                "Fn::GetAtt": [
+                  "JenkinsMasterTaskDefinitionTaskRole0D5723F3",
+                  "Arn",
+                ],
+              },
+            },
+            {
+              "Action": [
+                "elasticfilesystem:ClientMount",
+                "elasticfilesystem:ClientWrite",
+                "elasticfilesystem:ClientRootAccess",
+              ],
+              "Effect": "Allow",
+              "Resource": {
+                "Fn::GetAtt": [
+                  "JenkinsMasterStorageF0282409",
+                  "Arn",
+                ],
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "PolicyName": "JenkinsMasterTaskDefinitionTaskRoleDefaultPolicy17548315",
+        "Roles": [
+          {
+            "Ref": "JenkinsMasterTaskDefinitionTaskRole0D5723F3",
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Policy",
+    },
+    "JenkinsMasterTaskDefinitionmainLogGroup457966E3": {
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "RetentionInDays": 180,
+      },
+      "Type": "AWS::Logs::LogGroup",
+      "UpdateReplacePolicy": "Retain",
+    },
+    "KeyPairEC2KeyPairTestStackagentsshkeyB7B10C45": {
+      "DeletionPolicy": "Delete",
+      "Properties": {
+        "Description": "",
+        "ExposePublicKey": false,
+        "KmsPrivate": "alias/aws/secretsmanager",
+        "KmsPublic": "alias/aws/secretsmanager",
+        "Name": "TestStack-agent-ssh-key",
+        "PublicKey": "",
+        "PublicKeyFormat": "OPENSSH",
+        "RemoveKeySecretsAfterDays": 0,
+        "SecretPrefix": "ec2-ssh-key/",
+        "ServiceToken": {
+          "Fn::GetAtt": [
+            "EC2KeyNameManagerLambdaBE629145",
+            "Arn",
+          ],
+        },
+        "StackName": "TestStack",
+        "StorePublicKey": true,
+        "Tags": {
+          "CreatedByCfnCustomResource": "CFN::Resource::Custom::EC2-Key-Pair",
+        },
+      },
+      "Type": "Custom::EC2-Key-Pair",
+      "UpdateReplacePolicy": "Delete",
+    },
+    "LogBucketAutoDeleteObjectsCustomResource7762F42C": {
+      "DeletionPolicy": "Delete",
+      "DependsOn": [
+        "LogBucketPolicy900DBE48",
+      ],
+      "Properties": {
+        "BucketName": {
+          "Ref": "LogBucketCC3B17E8",
+        },
+        "ServiceToken": {
+          "Fn::GetAtt": [
+            "CustomS3AutoDeleteObjectsCustomResourceProviderHandler9D90184F",
+            "Arn",
+          ],
+        },
+      },
+      "Type": "Custom::S3AutoDeleteObjects",
+      "UpdateReplacePolicy": "Delete",
+    },
+    "LogBucketCC3B17E8": {
+      "DeletionPolicy": "Delete",
+      "Properties": {
+        "AccessControl": "LogDeliveryWrite",
+        "BucketEncryption": {
+          "ServerSideEncryptionConfiguration": [
+            {
+              "ServerSideEncryptionByDefault": {
+                "SSEAlgorithm": "AES256",
+              },
+            },
+          ],
+        },
+        "PublicAccessBlockConfiguration": {
+          "BlockPublicAcls": true,
+          "BlockPublicPolicy": true,
+          "IgnorePublicAcls": true,
+          "RestrictPublicBuckets": true,
+        },
+        "Tags": [
+          {
+            "Key": "aws-cdk:auto-delete-objects",
+            "Value": "true",
+          },
+        ],
+      },
+      "Type": "AWS::S3::Bucket",
+      "UpdateReplacePolicy": "Delete",
+    },
+    "LogBucketPolicy900DBE48": {
+      "Properties": {
+        "Bucket": {
+          "Ref": "LogBucketCC3B17E8",
+        },
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": "s3:*",
+              "Condition": {
+                "Bool": {
+                  "aws:SecureTransport": "false",
+                },
+              },
+              "Effect": "Deny",
+              "Principal": {
+                "AWS": "*",
+              },
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "LogBucketCC3B17E8",
+                    "Arn",
+                  ],
+                },
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      {
+                        "Fn::GetAtt": [
+                          "LogBucketCC3B17E8",
+                          "Arn",
+                        ],
+                      },
+                      "/*",
+                    ],
+                  ],
+                },
+              ],
+            },
+            {
+              "Action": [
+                "s3:GetBucket*",
+                "s3:List*",
+                "s3:DeleteObject*",
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "AWS": {
+                  "Fn::GetAtt": [
+                    "CustomS3AutoDeleteObjectsCustomResourceProviderRole3B1BD092",
+                    "Arn",
+                  ],
+                },
+              },
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "LogBucketCC3B17E8",
+                    "Arn",
+                  ],
+                },
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      {
+                        "Fn::GetAtt": [
+                          "LogBucketCC3B17E8",
+                          "Arn",
+                        ],
+                      },
+                      "/*",
+                    ],
+                  ],
+                },
+              ],
+            },
+            {
+              "Action": [
+                "s3:PutObject",
+                "s3:PutObjectLegalHold",
+                "s3:PutObjectRetention",
+                "s3:PutObjectTagging",
+                "s3:PutObjectVersionTagging",
+                "s3:Abort*",
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "AWS": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition",
+                      },
+                      ":iam::033677994240:root",
+                    ],
+                  ],
+                },
+              },
+              "Resource": {
+                "Fn::Join": [
+                  "",
+                  [
+                    {
+                      "Fn::GetAtt": [
+                        "LogBucketCC3B17E8",
+                        "Arn",
+                      ],
+                    },
+                    "/jenkinsAlbAccessLog/AWSLogs/",
+                    {
+                      "Ref": "AWS::AccountId",
+                    },
+                    "/*",
+                  ],
+                ],
+              },
+            },
+            {
+              "Action": "s3:PutObject",
+              "Condition": {
+                "StringEquals": {
+                  "s3:x-amz-acl": "bucket-owner-full-control",
+                },
+              },
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "delivery.logs.amazonaws.com",
+              },
+              "Resource": {
+                "Fn::Join": [
+                  "",
+                  [
+                    {
+                      "Fn::GetAtt": [
+                        "LogBucketCC3B17E8",
+                        "Arn",
+                      ],
+                    },
+                    "/jenkinsAlbAccessLog/AWSLogs/",
+                    {
+                      "Ref": "AWS::AccountId",
+                    },
+                    "/*",
+                  ],
+                ],
+              },
+            },
+            {
+              "Action": "s3:GetBucketAcl",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "delivery.logs.amazonaws.com",
+              },
+              "Resource": {
+                "Fn::GetAtt": [
+                  "LogBucketCC3B17E8",
+                  "Arn",
+                ],
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+      },
+      "Type": "AWS::S3::BucketPolicy",
+    },
+    "Namespace9B63B8C8": {
+      "Properties": {
+        "Name": "build",
+        "Vpc": {
+          "Ref": "Vpc8378EB38",
+        },
+      },
+      "Type": "AWS::ServiceDiscovery::PrivateDnsNamespace",
+    },
+    "NamespaceServiceCABDF534": {
+      "Properties": {
+        "DnsConfig": {
+          "DnsRecords": [
+            {
+              "TTL": 60,
+              "Type": "A",
+            },
+          ],
+          "NamespaceId": {
+            "Fn::GetAtt": [
+              "Namespace9B63B8C8",
+              "Id",
+            ],
+          },
+          "RoutingPolicy": "MULTIVALUE",
+        },
+        "Name": "accelerator",
+        "NamespaceId": {
+          "Fn::GetAtt": [
+            "Namespace9B63B8C8",
+            "Id",
+          ],
+        },
+      },
+      "Type": "AWS::ServiceDiscovery::Service",
+    },
+    "NamespaceServiceInstanceB7EA89DA": {
+      "Properties": {
+        "InstanceAttributes": {
+          "AWS_INSTANCE_IPV4": {
+            "Fn::GetAtt": [
+              "UnityAccelerator945220AA",
+              "PrivateIp",
+            ],
+          },
+          "AWS_INSTANCE_PORT": "80",
+        },
+        "InstanceId": "TestStackNamespaceServiceInstance3F6349C3",
+        "ServiceId": {
+          "Fn::GetAtt": [
+            "NamespaceServiceCABDF534",
+            "Id",
+          ],
+        },
+      },
+      "Type": "AWS::ServiceDiscovery::Instance",
+    },
+    "Repository22E53BBD": {
+      "DeletionPolicy": "Delete",
+      "Properties": {
+        "ImageScanningConfiguration": {
+          "ScanOnPush": true,
+        },
+      },
+      "Type": "AWS::ECR::Repository",
+      "UpdateReplacePolicy": "Delete",
+    },
+    "UnityAccelerator945220AA": {
+      "DependsOn": [
+        "UnityAcceleratorInstanceRoleCB5BC0EE",
+      ],
+      "Properties": {
+        "AvailabilityZone": {
+          "Fn::Select": [
+            0,
+            {
+              "Fn::GetAZs": "",
+            },
+          ],
+        },
+        "BlockDeviceMappings": [
+          {
+            "DeviceName": "/dev/xvda",
+            "Ebs": {
+              "Encrypted": true,
+              "VolumeSize": 300,
+              "VolumeType": "gp3",
+            },
+          },
+        ],
+        "IamInstanceProfile": {
+          "Ref": "UnityAcceleratorInstanceProfile73C75DCC",
+        },
+        "ImageId": {
+          "Ref": "SsmParameterValueawsserviceamiamazonlinuxlatestamzn2amihvmx8664gp2C96584B6F00A464EAD1953AFF4B05118Parameter",
+        },
+        "InstanceType": "t3.large",
+        "SecurityGroupIds": [
+          {
+            "Fn::GetAtt": [
+              "UnityAcceleratorInstanceSecurityGroup3E6ABE00",
+              "GroupId",
+            ],
+          },
+        ],
+        "SubnetId": {
+          "Ref": "VpcPrivateSubnet1Subnet536B997A",
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "TestStack/UnityAccelerator/Default",
+          },
+        ],
+        "UserData": {
+          "Fn::Base64": "#cloud-config
+
+
+
+
+cloud_config_modules:
+ - [runcmd, always]
+cloud_final_modules:
+ - [scripts-user, always]
+
+
+
+
+runcmd:
+  - |
+    #!/bin/bash
+    echo Initializing... $(date)
+
+    
+    yum update -y
+    yum install -y git docker
+    systemctl enable docker
+    systemctl start docker
+    usermod -aG docker ec2-user
+    chmod 777 /var/run/docker.sock
+
+    
+    
+    docker rm -f accelerator
+    
+    
+    docker run --name accelerator -p 80:80 -p 10080:10080 --env PASSWORD=passw0rd --env USER=admin -v "/home/ec2-user/agent:/agent" -d --restart unless-stopped unitytechnologies/accelerator:latest
+
+    
+    yum install -y tmux htop
+",
+        },
+      },
+      "Type": "AWS::EC2::Instance",
+    },
+    "UnityAcceleratorInstanceProfile73C75DCC": {
+      "Properties": {
+        "Roles": [
+          {
+            "Ref": "UnityAcceleratorInstanceRoleCB5BC0EE",
+          },
+        ],
+      },
+      "Type": "AWS::IAM::InstanceProfile",
+    },
+    "UnityAcceleratorInstanceRoleCB5BC0EE": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "ec2.amazonaws.com",
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "ManagedPolicyArns": [
+          {
+            "Fn::Join": [
+              "",
+              [
+                "arn:",
+                {
+                  "Ref": "AWS::Partition",
+                },
+                ":iam::aws:policy/AmazonSSMManagedInstanceCore",
+              ],
+            ],
+          },
+        ],
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "TestStack/UnityAccelerator/Default",
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Role",
+    },
+    "UnityAcceleratorInstanceSecurityGroup3E6ABE00": {
+      "Properties": {
+        "GroupDescription": "TestStack/UnityAccelerator/Default/InstanceSecurityGroup",
+        "SecurityGroupEgress": [
+          {
+            "CidrIp": "0.0.0.0/0",
+            "Description": "Allow all outbound traffic by default",
+            "IpProtocol": "-1",
+          },
+        ],
+        "SecurityGroupIngress": [
+          {
+            "CidrIp": {
+              "Fn::GetAtt": [
+                "Vpc8378EB38",
+                "CidrBlock",
+              ],
+            },
+            "Description": {
+              "Fn::Join": [
+                "",
+                [
+                  "from ",
+                  {
+                    "Fn::GetAtt": [
+                      "Vpc8378EB38",
+                      "CidrBlock",
+                    ],
+                  },
+                  ":10080",
+                ],
+              ],
+            },
+            "FromPort": 10080,
+            "IpProtocol": "tcp",
+            "ToPort": 10080,
+          },
+        ],
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "TestStack/UnityAccelerator/Default",
+          },
+        ],
+        "VpcId": {
+          "Ref": "Vpc8378EB38",
+        },
+      },
+      "Type": "AWS::EC2::SecurityGroup",
+    },
+    "Vpc8378EB38": {
+      "Properties": {
+        "CidrBlock": "10.0.0.0/16",
+        "EnableDnsHostnames": true,
+        "EnableDnsSupport": true,
+        "InstanceTenancy": "default",
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "TestStack/Vpc",
+          },
+        ],
+      },
+      "Type": "AWS::EC2::VPC",
+    },
+    "VpcIGWD7BA715C": {
+      "Properties": {
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "TestStack/Vpc",
+          },
+        ],
+      },
+      "Type": "AWS::EC2::InternetGateway",
+    },
+    "VpcPrivateSubnet1DefaultRouteBE02A9ED": {
+      "Properties": {
+        "DestinationCidrBlock": "0.0.0.0/0",
+        "NatGatewayId": {
+          "Ref": "VpcPublicSubnet1NATGateway4D7517AA",
+        },
+        "RouteTableId": {
+          "Ref": "VpcPrivateSubnet1RouteTableB2C5B500",
+        },
+      },
+      "Type": "AWS::EC2::Route",
+    },
+    "VpcPrivateSubnet1RouteTableAssociation70C59FA6": {
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "VpcPrivateSubnet1RouteTableB2C5B500",
+        },
+        "SubnetId": {
+          "Ref": "VpcPrivateSubnet1Subnet536B997A",
+        },
+      },
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+    },
+    "VpcPrivateSubnet1RouteTableB2C5B500": {
+      "Properties": {
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "TestStack/Vpc/PrivateSubnet1",
+          },
+        ],
+        "VpcId": {
+          "Ref": "Vpc8378EB38",
+        },
+      },
+      "Type": "AWS::EC2::RouteTable",
+    },
+    "VpcPrivateSubnet1Subnet536B997A": {
+      "Properties": {
+        "AvailabilityZone": {
+          "Fn::Select": [
+            0,
+            {
+              "Fn::GetAZs": "",
+            },
+          ],
+        },
+        "CidrBlock": "10.0.128.0/18",
+        "MapPublicIpOnLaunch": false,
+        "Tags": [
+          {
+            "Key": "aws-cdk:subnet-name",
+            "Value": "Private",
+          },
+          {
+            "Key": "aws-cdk:subnet-type",
+            "Value": "Private",
+          },
+          {
+            "Key": "Name",
+            "Value": "TestStack/Vpc/PrivateSubnet1",
+          },
+        ],
+        "VpcId": {
+          "Ref": "Vpc8378EB38",
+        },
+      },
+      "Type": "AWS::EC2::Subnet",
+    },
+    "VpcPrivateSubnet2DefaultRoute060D2087": {
+      "Properties": {
+        "DestinationCidrBlock": "0.0.0.0/0",
+        "NatGatewayId": {
+          "Ref": "VpcPublicSubnet1NATGateway4D7517AA",
+        },
+        "RouteTableId": {
+          "Ref": "VpcPrivateSubnet2RouteTableA678073B",
+        },
+      },
+      "Type": "AWS::EC2::Route",
+    },
+    "VpcPrivateSubnet2RouteTableA678073B": {
+      "Properties": {
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "TestStack/Vpc/PrivateSubnet2",
+          },
+        ],
+        "VpcId": {
+          "Ref": "Vpc8378EB38",
+        },
+      },
+      "Type": "AWS::EC2::RouteTable",
+    },
+    "VpcPrivateSubnet2RouteTableAssociationA89CAD56": {
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "VpcPrivateSubnet2RouteTableA678073B",
+        },
+        "SubnetId": {
+          "Ref": "VpcPrivateSubnet2Subnet3788AAA1",
+        },
+      },
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+    },
+    "VpcPrivateSubnet2Subnet3788AAA1": {
+      "Properties": {
+        "AvailabilityZone": {
+          "Fn::Select": [
+            1,
+            {
+              "Fn::GetAZs": "",
+            },
+          ],
+        },
+        "CidrBlock": "10.0.192.0/18",
+        "MapPublicIpOnLaunch": false,
+        "Tags": [
+          {
+            "Key": "aws-cdk:subnet-name",
+            "Value": "Private",
+          },
+          {
+            "Key": "aws-cdk:subnet-type",
+            "Value": "Private",
+          },
+          {
+            "Key": "Name",
+            "Value": "TestStack/Vpc/PrivateSubnet2",
+          },
+        ],
+        "VpcId": {
+          "Ref": "Vpc8378EB38",
+        },
+      },
+      "Type": "AWS::EC2::Subnet",
+    },
+    "VpcPublicSubnet1DefaultRoute3DA9E72A": {
+      "DependsOn": [
+        "VpcVPCGWBF912B6E",
+      ],
+      "Properties": {
+        "DestinationCidrBlock": "0.0.0.0/0",
+        "GatewayId": {
+          "Ref": "VpcIGWD7BA715C",
+        },
+        "RouteTableId": {
+          "Ref": "VpcPublicSubnet1RouteTable6C95E38E",
+        },
+      },
+      "Type": "AWS::EC2::Route",
+    },
+    "VpcPublicSubnet1EIPD7E02669": {
+      "Properties": {
+        "Domain": "vpc",
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "TestStack/Vpc/PublicSubnet1",
+          },
+        ],
+      },
+      "Type": "AWS::EC2::EIP",
+    },
+    "VpcPublicSubnet1NATGateway4D7517AA": {
+      "DependsOn": [
+        "VpcPublicSubnet1DefaultRoute3DA9E72A",
+        "VpcPublicSubnet1RouteTableAssociation97140677",
+      ],
+      "Properties": {
+        "AllocationId": {
+          "Fn::GetAtt": [
+            "VpcPublicSubnet1EIPD7E02669",
+            "AllocationId",
+          ],
+        },
+        "SubnetId": {
+          "Ref": "VpcPublicSubnet1Subnet5C2D37C4",
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "TestStack/Vpc/PublicSubnet1",
+          },
+        ],
+      },
+      "Type": "AWS::EC2::NatGateway",
+    },
+    "VpcPublicSubnet1RouteTable6C95E38E": {
+      "Properties": {
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "TestStack/Vpc/PublicSubnet1",
+          },
+        ],
+        "VpcId": {
+          "Ref": "Vpc8378EB38",
+        },
+      },
+      "Type": "AWS::EC2::RouteTable",
+    },
+    "VpcPublicSubnet1RouteTableAssociation97140677": {
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "VpcPublicSubnet1RouteTable6C95E38E",
+        },
+        "SubnetId": {
+          "Ref": "VpcPublicSubnet1Subnet5C2D37C4",
+        },
+      },
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+    },
+    "VpcPublicSubnet1Subnet5C2D37C4": {
+      "Properties": {
+        "AvailabilityZone": {
+          "Fn::Select": [
+            0,
+            {
+              "Fn::GetAZs": "",
+            },
+          ],
+        },
+        "CidrBlock": "10.0.0.0/18",
+        "MapPublicIpOnLaunch": true,
+        "Tags": [
+          {
+            "Key": "aws-cdk:subnet-name",
+            "Value": "Public",
+          },
+          {
+            "Key": "aws-cdk:subnet-type",
+            "Value": "Public",
+          },
+          {
+            "Key": "Name",
+            "Value": "TestStack/Vpc/PublicSubnet1",
+          },
+        ],
+        "VpcId": {
+          "Ref": "Vpc8378EB38",
+        },
+      },
+      "Type": "AWS::EC2::Subnet",
+    },
+    "VpcPublicSubnet2DefaultRoute97F91067": {
+      "DependsOn": [
+        "VpcVPCGWBF912B6E",
+      ],
+      "Properties": {
+        "DestinationCidrBlock": "0.0.0.0/0",
+        "GatewayId": {
+          "Ref": "VpcIGWD7BA715C",
+        },
+        "RouteTableId": {
+          "Ref": "VpcPublicSubnet2RouteTable94F7E489",
+        },
+      },
+      "Type": "AWS::EC2::Route",
+    },
+    "VpcPublicSubnet2RouteTable94F7E489": {
+      "Properties": {
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "TestStack/Vpc/PublicSubnet2",
+          },
+        ],
+        "VpcId": {
+          "Ref": "Vpc8378EB38",
+        },
+      },
+      "Type": "AWS::EC2::RouteTable",
+    },
+    "VpcPublicSubnet2RouteTableAssociationDD5762D8": {
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "VpcPublicSubnet2RouteTable94F7E489",
+        },
+        "SubnetId": {
+          "Ref": "VpcPublicSubnet2Subnet691E08A3",
+        },
+      },
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+    },
+    "VpcPublicSubnet2Subnet691E08A3": {
+      "Properties": {
+        "AvailabilityZone": {
+          "Fn::Select": [
+            1,
+            {
+              "Fn::GetAZs": "",
+            },
+          ],
+        },
+        "CidrBlock": "10.0.64.0/18",
+        "MapPublicIpOnLaunch": true,
+        "Tags": [
+          {
+            "Key": "aws-cdk:subnet-name",
+            "Value": "Public",
+          },
+          {
+            "Key": "aws-cdk:subnet-type",
+            "Value": "Public",
+          },
+          {
+            "Key": "Name",
+            "Value": "TestStack/Vpc/PublicSubnet2",
+          },
+        ],
+        "VpcId": {
+          "Ref": "Vpc8378EB38",
+        },
+      },
+      "Type": "AWS::EC2::Subnet",
+    },
+    "VpcVPCGWBF912B6E": {
+      "Properties": {
+        "InternetGatewayId": {
+          "Ref": "VpcIGWD7BA715C",
+        },
+        "VpcId": {
+          "Ref": "Vpc8378EB38",
+        },
+      },
+      "Type": "AWS::EC2::VPCGatewayAttachment",
+    },
+  },
+  "Rules": {
+    "CheckBootstrapVersion": {
+      "Assertions": [
+        {
+          "Assert": {
+            "Fn::Not": [
+              {
+                "Fn::Contains": [
+                  [
+                    "1",
+                    "2",
+                    "3",
+                    "4",
+                    "5",
+                  ],
+                  {
+                    "Ref": "BootstrapVersion",
+                  },
+                ],
+              },
+            ],
+          },
+          "AssertDescription": "CDK bootstrap stack version 6 required. Please run 'cdk bootstrap' with a recent version of the CDK CLI.",
+        },
+      ],
+    },
+  },
+}
+`;

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?><flow-definition>
+    <actions/>
+    <description/>
+    <keepDependencies>false</keepDependencies>
+    <properties/>
+    <triggers/>
+    <definition class="org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition">
+        <script>
+pipeline {
+    agent none
+
+    stages {
+        stage('Test all types of agents') {
+            parallel {
+                stage('Docker Test') {
+                    agent {
+                        docker {
+                            image 'alpine'
+                            label 'linux'
+                        }
+                    }
+                    steps {
+                        echo 'Hello from Docker!'
+                    }
+                }
+                stage('Mac Test') {
+                    agent {
+                        label 'mac'
+                    }
+                    steps {
+                        echo 'Hello from Mac!'
+                    }
+                }
+                stage('Linux Test') {
+                    agent {
+                        label 'linux'
+                    }
+                    steps {
+                        echo 'Hello from Linux!'
+                    }
+                }
+                stage('Linux Small Test') {
+                    agent {
+                        label 'small'
+                    }
+                    steps {
+                        echo 'Hello from Small!'
+                    }
+                }
+            }
+        }
+    }
+}
+        </script>
+        <sandbox>true</sandbox>
+    </definition>
+</flow-definition>

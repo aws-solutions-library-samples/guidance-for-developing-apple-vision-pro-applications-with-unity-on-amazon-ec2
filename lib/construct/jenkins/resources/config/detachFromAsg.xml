@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?><flow-definition>
+    <actions/>
+    <description/>
+    <keepDependencies>false</keepDependencies>
+    <properties/>
+    <triggers/>
+    <definition class="org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition">
+        <script>
+def skipThisJob = "false"
+
+pipeline {
+    agent {
+        label 'linux'
+    }
+
+    stages {
+        stage('Check if we need to create AMI from this instance') {
+            steps {
+                sh '''#!/bin/bash
+                set -xe
+                SKIP_UPDATE=false
+
+                # Determine if we need to create a new AMI (if not, set SKIP_UPDATE true)
+                # We are using bash script to make the environment simple, but you can use Python or any other way you like.
+
+                # timestamp of N minites before now.
+                # If there is any AMI with creationDate later than this timestamp, skip this job.
+                RECENT_TIME=$(date -d "-10 minutes" +%s)
+                
+                PENDING_COUNT=$(aws ec2 describe-images --region $AWS_REGION --filters 'Name=tag:AgentType,Values=linux' 'Name=state,Values=pending' | jq '.Images | length')
+
+                # We escape backslashes to \\ for Groovy, and angle brackets to &lt;,&gt; for xml here
+                # c.f. parse datetime by jq: https://github.com/stedolan/jq/issues/1409#issuecomment-702769388
+                RECENT_COUNT=$(aws ec2 describe-images --region $AWS_REGION --filters 'Name=tag:AgentType,Values=linux' 'Name=state,Values=available' | jq '.Images | [.[].CreationDate | sub("(?&lt;time&gt;.*)\\\\..*Z"; "\\(.time)Z") | fromdate] | map(select (. > '"${RECENT_TIME}"')) | length')
+
+                if [ $PENDING_COUNT != '0' ]; then
+                    # there is already an AMI which is being created
+                    SKIP_UPDATE=true
+                elif [ $RECENT_COUNT != '0' ]; then
+                    # there is already an AMI created recently enough
+                    SKIP_UPDATE=true
+                fi
+
+                echo $SKIP_UPDATE > skip.txt
+                '''
+
+                script {
+                    skipThisJob = readFile 'skip.txt'
+                    skipThisJob = skipThisJob.trim()
+                }
+            }
+        }
+        stage('Detach instance and invoke the create-ami job') {
+            when {
+                expression {
+                    skipThisJob == "false"
+                }
+            }
+            steps {
+                sh '''#!/bin/bash
+                set -xe
+                INSTANCE_ID=$(wget -q -O - http://169.254.169.254/latest/meta-data/instance-id)
+                aws autoscaling detach-instances --instance-ids $INSTANCE_ID --auto-scaling-group-name $FLEET_ASG_NAME_LINUX_FLEET --no-should-decrement-desired-capacity --region $AWS_REGION
+                echo $INSTANCE_ID > id.txt
+                '''
+
+                script {
+                    env.INSTANCE_ID = readFile 'id.txt'
+                }
+
+                build job: 'create-ami', wait: false, parameters: [[$class: 'StringParameterValue', name: 'InstanceId', value: env.INSTANCE_ID]]
+            }
+        }
+    }
+}
+        </script>
+        <sandbox>true</sandbox>
+    </definition>
+</flow-definition>
