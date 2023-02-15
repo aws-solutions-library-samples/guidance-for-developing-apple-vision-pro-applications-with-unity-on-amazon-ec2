@@ -46,6 +46,17 @@ pipeline {
                 ASG_NAME=$FLEET_ASG_NAME_LINUX_FLEET
                 aws ec2 create-launch-template-version --launch-template-data '{"ImageId":"'"${AMI_ID}"'"}' --launch-template-id $LAUNCH_TEMPLATE_ID --source-version '$Latest' --region $AWS_REGION
 
+                # # enable FSR for the AMI
+                # SNAPSHOT_ID=$(aws ec2 describe-images --image-ids $AMI_ID --query 'Images[0].BlockDeviceMappings[0].Ebs.SnapshotId' --output text)
+                # aws ec2 enable-fast-snapshot-restores --availability-zones "us-east-2a" "us-east-2b" --source-snapshot-ids $SNAPSHOT_ID
+                # # poll fsr state and wait until it's ready
+                # NUM_READY=$(aws ec2 describe-fast-snapshot-restores --filters Name=snapshot-id,Values=$SNAPSHOT_ID Name=state,Values=enabled --query "FastSnapshotRestores[].State" | jq 'length')
+                # # wait until there should be enough credits
+                # # filled with MIN (10, (1024 ÷ snapshot_size_gib)) per hour
+                # # e.g. when snapshot_size equals 500GB, you should wait for at least 30 minutes.
+                # # https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebs-fast-snapshot-restore.html#volume-creation-credits
+                # # After enough credit is fileld, replace the launch template.
+
                 aws autoscaling describe-auto-scaling-groups --auto-scaling-group-names $ASG_NAME --region $AWS_REGION --query 'AutoScalingGroups[0].MixedInstancesPolicy' | jq '.LaunchTemplate.LaunchTemplateSpecification.Version = "$Latest"' | jq 'del(.LaunchTemplate.LaunchTemplateSpecification.LaunchTemplateName)' > conf.json
                 aws autoscaling update-auto-scaling-group --auto-scaling-group-name $ASG_NAME --mixed-instances-policy file://conf.json --region $AWS_REGION
                 '''

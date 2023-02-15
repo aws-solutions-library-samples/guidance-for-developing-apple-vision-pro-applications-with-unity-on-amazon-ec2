@@ -1783,7 +1783,7 @@ diskutil apfs resizeContainer $APFSCONT 0
             ],
             "Essential": true,
             "Image": {
-              "Fn::Sub": "\${AWS::AccountId}.dkr.ecr.us-east-2.\${AWS::URLSuffix}/cdk-hnb659fds-container-assets-\${AWS::AccountId}-us-east-2:ae52a90885272fd5601833edc0ba04e9a5dac706d8829549f5cf410742adbb17",
+              "Fn::Sub": "\${AWS::AccountId}.dkr.ecr.us-east-2.\${AWS::URLSuffix}/cdk-hnb659fds-container-assets-\${AWS::AccountId}-us-east-2:8b95d1192589ab2d63edbecebc2b4882eab5d54e57f840c28cbc38b7954c4288",
             },
             "LinuxParameters": {
               "Capabilities": {},
