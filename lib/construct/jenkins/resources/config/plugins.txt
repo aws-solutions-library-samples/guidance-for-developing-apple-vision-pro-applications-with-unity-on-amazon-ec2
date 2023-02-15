@@ -7,3 +7,4 @@ docker-workflow:563.vd5d2e5c4007f
 artifact-manager-s3:670.v0558a_cb_c82c2
 jobcacher:323.vcb_cb_98b_4e96a
 amazon-ecr:1.107.ve50d37906739
+timestamper:1.21
