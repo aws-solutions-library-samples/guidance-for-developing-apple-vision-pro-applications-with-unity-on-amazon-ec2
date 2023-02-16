@@ -494,8 +494,8 @@ exports[`Snapshot test 1`] = `
               "DeviceName": "/dev/xvda",
               "Ebs": {
                 "Encrypted": true,
-                "Throughput": 200,
-                "VolumeSize": 300,
+                "Throughput": 150,
+                "VolumeSize": 30,
                 "VolumeType": "gp3",
               },
             },
@@ -547,21 +547,59 @@ exports[`Snapshot test 1`] = `
           ],
           "UserData": {
             "Fn::Base64": "#!/bin/bash
+# update AWS CLI
 rm -rf /usr/local/aws
 rm /usr/local/bin/aws
 curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
 unzip awscliv2.zip
 ./aws/install
+
 yum update -y
-yum install -y java-17-amazon-corretto-headless git docker jq
+yum install -y git jq
+
+# mount EBS volume
+AZ=$(curl -s http://169.254.169.254/latest/dynamic/instance-identity/document | jq -r .availabilityZone)
+INSTANCE_ID=$(wget -q -O - http://169.254.169.254/latest/meta-data/instance-id)
+REGION=$(wget -q -O - http://169.254.169.254/latest/meta-data/placement/region)
+VOLUME_ID=$(aws ec2 describe-volumes --filters Name=tag:Kind,Values=TestStack-JenkinsLinuxAgent Name=availability-zone,Values=$AZ Name=status,Values=available --query 'Volumes[0].VolumeId' --output text --region $REGION)
+
+JENKINS_DIR="/data"
+mkdir $JENKINS_DIR
+chmod 777 $JENKINS_DIR
+
+if [ "$VOLUME_ID" ];then
+    echo "found volume \${VOLUME}"
+    DEVICE_NAME="/dev/xvdf"
+    aws ec2 attach-volume --device $DEVICE_NAME --instance-id $INSTANCE_ID --volume-id $VOLUME_ID --region $REGION
+    sleep 10
+    VNAME=$(readlink $DEVICE_NAME)
+    RES=$(file -s /dev/$VNAME)
+
+    if [[ "$RES" =~ .*": data" ]]; then
+        mkfs -t xfs $DEVICE_NAME
+    fi
+
+    mount $DEVICE_NAME $JENKINS_DIR
+    chmod 777 $JENKINS_DIR
+
+    UUID=$(blkid | grep $VNAME | sed 's/.*UUID="\\(.*\\)"\\s.*/\\1/')
+    printf "\\nUUID=\${UUID}  \${JENKINS_DIR}  xfs  defaults,nofail  0  2\\n" >> /etc/fstab
+fi
+
+# install docker
+yum install -y docker
 systemctl enable docker
 systemctl start docker
 usermod -aG docker ec2-user
 chmod 777 /var/run/docker.sock
+
+# install git lfs
 curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.rpm.sh | bash
-yum install -y git-lfs
-docker pull unityci/editor:2021.3.14f1-ios-1.0
-yum install -y tmux htop",
+yum install -y java-17-amazon-corretto-headless git-lfs
+
+# install tools for debug
+yum install -y tmux htop
+",
           },
         },
         "TagSpecifications": [
@@ -668,6 +706,339 @@ yum install -y tmux htop",
               "Effect": "Allow",
               "Resource": "*",
             },
+            {
+              "Action": "ec2:AttachVolume",
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition",
+                      },
+                      ":ec2:us-east-2:",
+                      {
+                        "Ref": "AWS::AccountId",
+                      },
+                      ":volume/",
+                      {
+                        "Ref": "JenkinsLinuxAgentVolumev1004DCF206B",
+                      },
+                    ],
+                  ],
+                },
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition",
+                      },
+                      ":ec2:us-east-2:",
+                      {
+                        "Ref": "AWS::AccountId",
+                      },
+                      ":instance/*",
+                    ],
+                  ],
+                },
+              ],
+            },
+            {
+              "Action": "ec2:DetachVolume",
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition",
+                      },
+                      ":ec2:us-east-2:",
+                      {
+                        "Ref": "AWS::AccountId",
+                      },
+                      ":volume/",
+                      {
+                        "Ref": "JenkinsLinuxAgentVolumev1004DCF206B",
+                      },
+                    ],
+                  ],
+                },
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition",
+                      },
+                      ":ec2:us-east-2:",
+                      {
+                        "Ref": "AWS::AccountId",
+                      },
+                      ":instance/*",
+                    ],
+                  ],
+                },
+              ],
+            },
+            {
+              "Action": "ec2:AttachVolume",
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition",
+                      },
+                      ":ec2:us-east-2:",
+                      {
+                        "Ref": "AWS::AccountId",
+                      },
+                      ":volume/",
+                      {
+                        "Ref": "JenkinsLinuxAgentVolumev10160D220CD",
+                      },
+                    ],
+                  ],
+                },
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition",
+                      },
+                      ":ec2:us-east-2:",
+                      {
+                        "Ref": "AWS::AccountId",
+                      },
+                      ":instance/*",
+                    ],
+                  ],
+                },
+              ],
+            },
+            {
+              "Action": "ec2:DetachVolume",
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition",
+                      },
+                      ":ec2:us-east-2:",
+                      {
+                        "Ref": "AWS::AccountId",
+                      },
+                      ":volume/",
+                      {
+                        "Ref": "JenkinsLinuxAgentVolumev10160D220CD",
+                      },
+                    ],
+                  ],
+                },
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition",
+                      },
+                      ":ec2:us-east-2:",
+                      {
+                        "Ref": "AWS::AccountId",
+                      },
+                      ":instance/*",
+                    ],
+                  ],
+                },
+              ],
+            },
+            {
+              "Action": "ec2:AttachVolume",
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition",
+                      },
+                      ":ec2:us-east-2:",
+                      {
+                        "Ref": "AWS::AccountId",
+                      },
+                      ":volume/",
+                      {
+                        "Ref": "JenkinsLinuxAgentVolumev1108A60EC8D",
+                      },
+                    ],
+                  ],
+                },
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition",
+                      },
+                      ":ec2:us-east-2:",
+                      {
+                        "Ref": "AWS::AccountId",
+                      },
+                      ":instance/*",
+                    ],
+                  ],
+                },
+              ],
+            },
+            {
+              "Action": "ec2:DetachVolume",
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition",
+                      },
+                      ":ec2:us-east-2:",
+                      {
+                        "Ref": "AWS::AccountId",
+                      },
+                      ":volume/",
+                      {
+                        "Ref": "JenkinsLinuxAgentVolumev1108A60EC8D",
+                      },
+                    ],
+                  ],
+                },
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition",
+                      },
+                      ":ec2:us-east-2:",
+                      {
+                        "Ref": "AWS::AccountId",
+                      },
+                      ":instance/*",
+                    ],
+                  ],
+                },
+              ],
+            },
+            {
+              "Action": "ec2:AttachVolume",
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition",
+                      },
+                      ":ec2:us-east-2:",
+                      {
+                        "Ref": "AWS::AccountId",
+                      },
+                      ":volume/",
+                      {
+                        "Ref": "JenkinsLinuxAgentVolumev11166BF26DE",
+                      },
+                    ],
+                  ],
+                },
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition",
+                      },
+                      ":ec2:us-east-2:",
+                      {
+                        "Ref": "AWS::AccountId",
+                      },
+                      ":instance/*",
+                    ],
+                  ],
+                },
+              ],
+            },
+            {
+              "Action": "ec2:DetachVolume",
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition",
+                      },
+                      ":ec2:us-east-2:",
+                      {
+                        "Ref": "AWS::AccountId",
+                      },
+                      ":volume/",
+                      {
+                        "Ref": "JenkinsLinuxAgentVolumev11166BF26DE",
+                      },
+                    ],
+                  ],
+                },
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition",
+                      },
+                      ":ec2:us-east-2:",
+                      {
+                        "Ref": "AWS::AccountId",
+                      },
+                      ":instance/*",
+                    ],
+                  ],
+                },
+              ],
+            },
+            {
+              "Action": "ec2:DescribeVolumes",
+              "Effect": "Allow",
+              "Resource": "*",
+            },
           ],
           "Version": "2012-10-17",
         },
@@ -770,7 +1141,7 @@ yum install -y tmux htop",
               "DeviceName": "/dev/xvda",
               "Ebs": {
                 "Encrypted": true,
-                "Throughput": 200,
+                "Throughput": 150,
                 "VolumeSize": 20,
                 "VolumeType": "gp3",
               },
@@ -823,21 +1194,59 @@ yum install -y tmux htop",
           ],
           "UserData": {
             "Fn::Base64": "#!/bin/bash
+# update AWS CLI
 rm -rf /usr/local/aws
 rm /usr/local/bin/aws
 curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
 unzip awscliv2.zip
 ./aws/install
+
 yum update -y
-yum install -y java-17-amazon-corretto-headless git docker jq
+yum install -y git jq
+
+# mount EBS volume
+AZ=$(curl -s http://169.254.169.254/latest/dynamic/instance-identity/document | jq -r .availabilityZone)
+INSTANCE_ID=$(wget -q -O - http://169.254.169.254/latest/meta-data/instance-id)
+REGION=$(wget -q -O - http://169.254.169.254/latest/meta-data/placement/region)
+VOLUME_ID=$(aws ec2 describe-volumes --filters Name=tag:Kind,Values=TestStack-JenkinsLinuxAgentSmall Name=availability-zone,Values=$AZ Name=status,Values=available --query 'Volumes[0].VolumeId' --output text --region $REGION)
+
+JENKINS_DIR="/data"
+mkdir $JENKINS_DIR
+chmod 777 $JENKINS_DIR
+
+if [ "$VOLUME_ID" ];then
+    echo "found volume \${VOLUME}"
+    DEVICE_NAME="/dev/xvdf"
+    aws ec2 attach-volume --device $DEVICE_NAME --instance-id $INSTANCE_ID --volume-id $VOLUME_ID --region $REGION
+    sleep 10
+    VNAME=$(readlink $DEVICE_NAME)
+    RES=$(file -s /dev/$VNAME)
+
+    if [[ "$RES" =~ .*": data" ]]; then
+        mkfs -t xfs $DEVICE_NAME
+    fi
+
+    mount $DEVICE_NAME $JENKINS_DIR
+    chmod 777 $JENKINS_DIR
+
+    UUID=$(blkid | grep $VNAME | sed 's/.*UUID="\\(.*\\)"\\s.*/\\1/')
+    printf "\\nUUID=\${UUID}  \${JENKINS_DIR}  xfs  defaults,nofail  0  2\\n" >> /etc/fstab
+fi
+
+# install docker
+yum install -y docker
 systemctl enable docker
 systemctl start docker
 usermod -aG docker ec2-user
 chmod 777 /var/run/docker.sock
+
+# install git lfs
 curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.rpm.sh | bash
-yum install -y git-lfs
-docker pull unityci/editor:2021.3.14f1-ios-1.0
-yum install -y tmux htop",
+yum install -y java-17-amazon-corretto-headless git-lfs
+
+# install tools for debug
+yum install -y tmux htop
+",
           },
         },
         "TagSpecifications": [
@@ -973,6 +1382,114 @@ yum install -y tmux htop",
         "ToPort": 22,
       },
       "Type": "AWS::EC2::SecurityGroupIngress",
+    },
+    "JenkinsLinuxAgentVolumev1004DCF206B": {
+      "DeletionPolicy": "Delete",
+      "Properties": {
+        "AvailabilityZone": {
+          "Fn::Select": [
+            0,
+            {
+              "Fn::GetAZs": "",
+            },
+          ],
+        },
+        "Encrypted": true,
+        "Iops": 3000,
+        "MultiAttachEnabled": false,
+        "Size": 100,
+        "Tags": [
+          {
+            "Key": "Kind",
+            "Value": "TestStack-JenkinsLinuxAgent",
+          },
+        ],
+        "Throughput": 200,
+        "VolumeType": "gp3",
+      },
+      "Type": "AWS::EC2::Volume",
+      "UpdateReplacePolicy": "Delete",
+    },
+    "JenkinsLinuxAgentVolumev10160D220CD": {
+      "DeletionPolicy": "Delete",
+      "Properties": {
+        "AvailabilityZone": {
+          "Fn::Select": [
+            0,
+            {
+              "Fn::GetAZs": "",
+            },
+          ],
+        },
+        "Encrypted": true,
+        "Iops": 3000,
+        "MultiAttachEnabled": false,
+        "Size": 100,
+        "Tags": [
+          {
+            "Key": "Kind",
+            "Value": "TestStack-JenkinsLinuxAgent",
+          },
+        ],
+        "Throughput": 200,
+        "VolumeType": "gp3",
+      },
+      "Type": "AWS::EC2::Volume",
+      "UpdateReplacePolicy": "Delete",
+    },
+    "JenkinsLinuxAgentVolumev1108A60EC8D": {
+      "DeletionPolicy": "Delete",
+      "Properties": {
+        "AvailabilityZone": {
+          "Fn::Select": [
+            1,
+            {
+              "Fn::GetAZs": "",
+            },
+          ],
+        },
+        "Encrypted": true,
+        "Iops": 3000,
+        "MultiAttachEnabled": false,
+        "Size": 100,
+        "Tags": [
+          {
+            "Key": "Kind",
+            "Value": "TestStack-JenkinsLinuxAgent",
+          },
+        ],
+        "Throughput": 200,
+        "VolumeType": "gp3",
+      },
+      "Type": "AWS::EC2::Volume",
+      "UpdateReplacePolicy": "Delete",
+    },
+    "JenkinsLinuxAgentVolumev11166BF26DE": {
+      "DeletionPolicy": "Delete",
+      "Properties": {
+        "AvailabilityZone": {
+          "Fn::Select": [
+            1,
+            {
+              "Fn::GetAZs": "",
+            },
+          ],
+        },
+        "Encrypted": true,
+        "Iops": 3000,
+        "MultiAttachEnabled": false,
+        "Size": 100,
+        "Tags": [
+          {
+            "Key": "Kind",
+            "Value": "TestStack-JenkinsLinuxAgent",
+          },
+        ],
+        "Throughput": 200,
+        "VolumeType": "gp3",
+      },
+      "Type": "AWS::EC2::Volume",
+      "UpdateReplacePolicy": "Delete",
     },
     "JenkinsMacAgent1DedicatedHostA0E9B9BB": {
       "DeletionPolicy": "Retain",
@@ -1783,7 +2300,7 @@ diskutil apfs resizeContainer $APFSCONT 0
             ],
             "Essential": true,
             "Image": {
-              "Fn::Sub": "\${AWS::AccountId}.dkr.ecr.us-east-2.\${AWS::URLSuffix}/cdk-hnb659fds-container-assets-\${AWS::AccountId}-us-east-2:8b95d1192589ab2d63edbecebc2b4882eab5d54e57f840c28cbc38b7954c4288",
+              "Fn::Sub": "\${AWS::AccountId}.dkr.ecr.us-east-2.\${AWS::URLSuffix}/cdk-hnb659fds-container-assets-\${AWS::AccountId}-us-east-2:a23cc5bf64bcf0b617e911d2f6a10a232fa9f807b937968d989736d335d5521a",
             },
             "LinuxParameters": {
               "Capabilities": {},

@@ -17,6 +17,15 @@ import { Cluster } from 'aws-cdk-lib/aws-ecs';
 import * as ejs from 'ejs';
 import { writeFileSync } from 'fs';
 
+export interface LinuxAgentProps {
+  readonly fleetAsgName: string;
+  readonly label: string;
+  readonly name: string;
+  readonly minSize: number;
+  readonly maxSize: number;
+  readonly launchTemplateId?: string;
+}
+
 export interface MasterProps {
   readonly vpc: IVpc;
   readonly logBucket: IBucket;
@@ -28,13 +37,7 @@ export interface MasterProps {
   readonly containerRepository?: IRepository;
   readonly configOutputFilename?: string;
   readonly macAgents?: { ipAddress: string; name: string }[];
-  readonly linuxAgents?: {
-    fleetAsgName: string;
-    label: string;
-    name: string;
-    minSize: number;
-    launchTemplateId?: string;
-  }[];
+  readonly linuxAgents?: LinuxAgentProps[];
 }
 
 /**
@@ -76,7 +79,8 @@ export class Master extends Construct {
     });
 
     const fleetEnv = (agent: { name: string }) => `FLEET_ASG_NAME_${agent.name.toUpperCase().replace(/-/g, '_')}`;
-    const ltEnv = (agent: { name: string }) => `FLEET_LAUNCH_TEMPLATE_ID_${agent.name.toUpperCase().replace(/-/g, '_')}`;
+    const ltEnv = (agent: { name: string }) =>
+      `FLEET_LAUNCH_TEMPLATE_ID_${agent.name.toUpperCase().replace(/-/g, '_')}`;
     const macEnv = (agent: { name: string }) => `MAC_HOST_${agent.name.toUpperCase().replace(/-/g, '_')}`;
     const exportingEnvironment = {
       ...props.environmentVariables,
@@ -86,7 +90,7 @@ export class Master extends Construct {
         linuxAgents.flatMap((agent) => [
           [fleetEnv(agent), agent.fleetAsgName],
           [ltEnv(agent), agent.launchTemplateId],
-        ])
+        ]),
       ),
       // We need these values when we use a Docker Image from ECR repository for a Jenkins Docker Agent
       // https://itnext.io/how-to-run-jenkins-agents-with-cross-account-ecr-images-using-instance-roles-on-eks-2544b0fc6819
@@ -104,7 +108,7 @@ export class Master extends Construct {
       {},
       function (err, str) {
         writeFileSync(join(__dirname, 'resources', 'config', configOutputFilename), str);
-      }
+      },
     );
 
     const container = taskDefinition.addContainer('main', {
@@ -189,7 +193,7 @@ export class Master extends Construct {
           'iam:ListRoles',
         ],
         resources: ['*'],
-      })
+      }),
     );
 
     taskDefinition.addToTaskRolePolicy(
@@ -201,7 +205,7 @@ export class Master extends Construct {
             'iam:PassedToService': ['ec2.amazonaws.com'],
           },
         },
-      })
+      }),
     );
 
     props.containerRepository?.grantPull(taskDefinition.taskRole);
@@ -217,7 +221,7 @@ export class Master extends Construct {
       new PolicyStatement({
         actions: ['sts:AssumeRole'],
         principals: [new AccountRootPrincipal()],
-      })
+      }),
     );
 
     const port = protocol == ApplicationProtocol.HTTPS ? 443 : 80;
@@ -244,7 +248,12 @@ export class Master extends Construct {
       },
     });
 
-    fileSystem.grant(taskDefinition.taskRole, 'elasticfilesystem:ClientMount', 'elasticfilesystem:ClientWrite', 'elasticfilesystem:ClientRootAccess');
+    fileSystem.grant(
+      taskDefinition.taskRole,
+      'elasticfilesystem:ClientMount',
+      'elasticfilesystem:ClientWrite',
+      'elasticfilesystem:ClientRootAccess',
+    );
 
     const volumeName = 'shared';
 

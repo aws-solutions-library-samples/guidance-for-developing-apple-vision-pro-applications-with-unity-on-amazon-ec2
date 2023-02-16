@@ -105,7 +105,8 @@ export class JenkinsUnityBuildStack extends cdk.Stack {
       vpc,
       sshKeyName: keyPair.keyPairName,
       artifactBucket,
-      storageSizeGb: 300,
+      rootVolumeSizeGb: 30,
+      dataVolumeSizeGb: 100,
       // You may want to add several instance types to avoid from insufficient Spot capacity.
       instanceTypes: [
         ec2.InstanceType.of(InstanceClass.C5, InstanceSize.XLARGE),
@@ -120,6 +121,7 @@ export class JenkinsUnityBuildStack extends cdk.Stack {
           resources: ['*'],
         }),
       ],
+      fleetMaxSize: 4,
       // You can explicitly set a subnet agents will run in
       // subnets: [vpc.privateSubnets[0]],
     });
@@ -128,7 +130,8 @@ export class JenkinsUnityBuildStack extends cdk.Stack {
     const agentEc2Small = new AgentEC2(this, 'JenkinsLinuxAgentSmall', {
       vpc,
       sshKeyName: keyPair.keyPairName,
-      storageSizeGb: 20,
+      rootVolumeSizeGb: 20,
+      fleetMaxSize: 2,
       instanceTypes: [ec2.InstanceType.of(InstanceClass.T3, InstanceSize.SMALL)],
       policyStatements: [
         // policy required to run createAmi job.
@@ -192,6 +195,7 @@ export class JenkinsUnityBuildStack extends cdk.Stack {
       linuxAgents: [
         {
           minSize: 1,
+          maxSize: agentEc2.fleetMaxSize,
           fleetAsgName: agentEc2.fleetName,
           label: 'linux',
           name: 'linux-fleet',
@@ -199,6 +203,7 @@ export class JenkinsUnityBuildStack extends cdk.Stack {
         },
         {
           minSize: 1,
+          maxSize: agentEc2.fleetMaxSize,
           fleetAsgName: agentEc2Small.fleetName,
           label: 'small',
           name: 'linux-fleet-small',
