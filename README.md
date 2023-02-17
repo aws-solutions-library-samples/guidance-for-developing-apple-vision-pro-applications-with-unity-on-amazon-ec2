@@ -254,7 +254,7 @@ You can also refer to this [reference architecture](https://d1.awsstatic.com/arc
 When it comes to using spot instances, we must be aware of [spot interruptions](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/spot-interruptions.html) - the build jobs sometimes can be interrupted in the middle of build processes. They are well handled, however, by [Jenkins EC2 Fleet plugin](https://github.com/jenkinsci/ec2-fleet-plugin). The plugin detects spot interruptions and automatically reruns the suspended jobs.
 
 ### Automatically update AMI for build agents
-Since EC2 Linux spot instances are stateless, all the internal states of an instance (e.g. filesystem) are reset when an instance is terminated and launched (e.g. by scaling activities.) This can slow down build processes because many build systems cache intermediate artifacts in a build server's filesystem, assuming that they are shared between build jobs, which is not always the case on stateless servers.
+Since EC2 Linux spot instances are stateless, all the internal states of an instance (e.g. filesystem) are purged when an instance is terminated (e.g. by scaling activities.) This can slow down build processes because many build systems rely on caches of intermediate artifacts in a build server's filesystem, assuming that they are shared between build jobs, which is not always the case on stateless servers.
 
 We can share these caches between build jobs, however, even in our Linux spot based system by using [Amazon Machine Images (AMI)](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AMIs.html).
 An AMI contains a snapshot of an instance's filesystem ([Amazon EBS](https://aws.amazon.com/ebs/) snapshot.) If we create an AMI from an existing EC2 instance that was previously used for a Unity build job, any instance launched from the AMI will have warmed caches ready as soon as it is initialized.We can even create AMIs periodically to keep the caches updated.
@@ -272,6 +272,23 @@ All of the above considered, we include a sample Jenkins job to periodically cre
 ![AMI workflow](docs/imgs/ami-workflow.svg)
 
 The `detachFromAsg` job is supposed to be called periodically (e.g. by using [Jenkins cron job](https://www.jenkins.io/doc/book/pipeline/syntax/#cron-syntax)), and it tries to create an AMI and update the ASG if needed. You can refer to the implementation and integrate it with your own build system.
+
+The disadvantage of using AMI for caching, however, is that it takes some time to fully retrieve (hydrate) EBS snapshots, making higher I/O latency during the hydration. In some situation, the hydration process requires too long time to use it as a cache. One solution for the problem is to use Fast Snapshot Restore feature, allowing to hydrate the volume instantly without much I/O latency ([Addressing I/O latency when restoring Amazon EBS volumes from EBS Snapshots](https://aws.amazon.com/blogs/storage/addressing-i-o-latency-when-restoring-amazon-ebs-volumes-from-ebs-snapshots/)).
+
+There is another way to avoid the problem and solve the cache problem at the same time, which is described in the next section.
+
+### Maintain a pool of EBS volumes
+The problem of using AMI (and EBS snapshots) is the initial greater I/O latency because all the snapshot data are stored in S3 and loaded into volumes lazily.
+
+To avoid this problem, we keep a warm pool of EBS volumes and attach an available volume every time a new EC2 instance is added. 
+
+![EBS Pool](docs/imgs/ebs-pool.svg)
+
+When an instance is terminated, the volume is automatically detached from the instance, and it will be available for next instances.
+
+By this way, we do not have to use EBS snapshot hence free from the snapshot hydration. This method requires an EC2 instance to select an available EBS volume form the pool dynamically, attach it, and mount it as a file system. We do this in EC2 user data, and the implementation is included in this sample. See [agent-userdata.sh](./lib/construct/jenkins/resources/agent-userdata.sh). 
+
+Note that you need to properly estimate the required capacity for the pool. The number of volumes should be equal to the Auto Scaling Group (ASG)'s maximum capacity because otherwise some instance do not get available volume immediately, or some volumes are not used at all. The ASG capacity can be determined by how many build jobs you want to run concurrently. If it is too small, your job queue will soon piled up, or if it is too large, your infrastructure cost will be unnecessarily high. You may want to analyze the tradeoff and determine an optimized value for the ASG capacity.
 
 ## Clean up
 To avoid incurring future charges, clean up the resources you created.

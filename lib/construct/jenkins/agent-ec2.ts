@@ -24,6 +24,9 @@ export interface AgentProps {
   readonly rootVolumeSizeGb: number;
 
   /**
+   * The size of a data volume that is attached as a secondary volume to an instance.
+   * A data volume will be not deleted when an instance is terminated and reattached by new instances.
+   * 
    * @default No data volume is created.
    */
   readonly dataVolumeSizeGb?: number;
@@ -114,6 +117,7 @@ export class AgentEC2 extends Construct {
     });
 
     if (dataVolumeSizeGb !== undefined) {
+      // create a pool of EBS volumes
       const volumes = subnets
         .flatMap((subnet) => subnet.availabilityZone)
         .flatMap((az, azi) =>
