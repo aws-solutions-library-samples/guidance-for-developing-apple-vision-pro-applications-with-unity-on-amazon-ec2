@@ -315,7 +315,7 @@ By default, this pool is enabled for the agents with `linux` label. If you want 
 ## Clean up
 To avoid incurring future charges, clean up the resources you created.
 
-To remove all the AWS resources deployed by this sample, please follow the below steps;
+To remove all the AWS resources deployed by this sample, please follow the below steps:
 
 1. Set the minimum size of Jenkins Linux agent fleets to zero. You can set this via the Jenkins cloud configuration UI (Dashboard -> Manage Jenkins -> Nodes -> Configure Clouds). Please confirm all the Linux nodes are removed from Jenkins controller.
     * We need this operation because [Jenkins EC2 Fleet plugin](https://plugins.jenkins.io/ec2-fleet/) sets the scale-in protection policy of the fleets to enabled, which prevents CFn from deleting the instances.
@@ -325,7 +325,7 @@ To remove all the AWS resources deployed by this sample, please follow the below
     ```
 3. Release the EC2 Mac dedicated host manually. Detailed instructions are here: [Release Dedicated Hosts
 ](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/how-dedicated-hosts-work.html#dedicated-hosts-releasing). Note that sometimes a Mac dedicated host cannot be released immediately (e.g. 1-3 hours after terminating a Mac instance in the host or less than 24 hours after creating the host.) In this case, you have to wait and retry the operation.
-4. Please make sure to deregister all the unnecessary AMIs if you created any. [Deregister your AMI](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/deregister-ami.html)
+4. Please make sure to deregister all the unnecessary AMIs and EBS snapshots if you created any: [Deregister your AMI](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/deregister-ami.html)
 
 ## Security
 See [CONTRIBUTING](CONTRIBUTING.md#security-issue-notifications) for more information.
