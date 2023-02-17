@@ -10,7 +10,7 @@ import { AgentEC2 } from './construct/jenkins/agent-ec2';
 import { AgentMac } from './construct/jenkins/agent-mac';
 import { AgentKeyPair } from './construct/jenkins/key-pair';
 import { UnityAccelerator } from './construct/unity-accelerator';
-import { Stack } from 'aws-cdk-lib';
+import { Size, Stack } from 'aws-cdk-lib';
 import { InstanceClass, InstanceSize, IVpc, Vpc } from 'aws-cdk-lib/aws-ec2';
 import { PolicyStatement } from 'aws-cdk-lib/aws-iam';
 
@@ -105,8 +105,8 @@ export class JenkinsUnityBuildStack extends cdk.Stack {
       vpc,
       sshKeyName: keyPair.keyPairName,
       artifactBucket,
-      rootVolumeSizeGb: 30,
-      dataVolumeSizeGb: 100,
+      rootVolumeSize: Size.gibibytes(30),
+      dataVolumeSize: Size.gibibytes(100),
       // You may want to add several instance types to avoid from insufficient Spot capacity.
       instanceTypes: [
         ec2.InstanceType.of(InstanceClass.C5, InstanceSize.XLARGE),
@@ -130,7 +130,7 @@ export class JenkinsUnityBuildStack extends cdk.Stack {
     const agentEc2Small = new AgentEC2(this, 'JenkinsLinuxAgentSmall', {
       vpc,
       sshKeyName: keyPair.keyPairName,
-      rootVolumeSizeGb: 20,
+      rootVolumeSize: Size.gibibytes(20),
       fleetMaxSize: 2,
       instanceTypes: [ec2.InstanceType.of(InstanceClass.T3, InstanceSize.SMALL)],
       policyStatements: [
@@ -172,7 +172,7 @@ export class JenkinsUnityBuildStack extends cdk.Stack {
           // Some AZs don't support Mac instances and you will see an error on CFn deployment.
           // In that case, please change the index of privateSubnets (e.g. privateSubnets[0])
           subnet: vpc.privateSubnets[1],
-          storageSizeGb: 200,
+          storageSize: Size.gibibytes(200),
           instanceType: 'mac1.metal',
           sshKeyName: keyPair.keyPairName,
           amiId: props.macAmiId,

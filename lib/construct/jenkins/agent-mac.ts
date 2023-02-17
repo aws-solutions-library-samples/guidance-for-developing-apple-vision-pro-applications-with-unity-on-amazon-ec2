@@ -10,14 +10,14 @@ import { ManagedPolicy } from 'aws-cdk-lib/aws-iam';
 import { Construct } from 'constructs';
 import * as ec2 from 'aws-cdk-lib/aws-ec2';
 import { IBucket } from 'aws-cdk-lib/aws-s3';
-import { CfnOutput, RemovalPolicy } from 'aws-cdk-lib';
+import { CfnOutput, RemovalPolicy, Size } from 'aws-cdk-lib';
 
 export interface AgentMacProps {
   readonly vpc: IVpc;
   readonly sshKeyName: string;
   readonly artifactBucket?: IBucket;
   readonly amiId: string;
-  readonly storageSizeGb: number;
+  readonly storageSize: Size;
   readonly instanceType: 'mac1.metal' | 'mac2.metal';
   readonly subnet?: ec2.ISubnet;
 }
@@ -77,7 +77,7 @@ diskutil apfs resizeContainer $APFSCONT 0
       blockDevices: [
         {
           deviceName: '/dev/sda1',
-          volume: ec2.BlockDeviceVolume.ebs(props.storageSizeGb, {
+          volume: ec2.BlockDeviceVolume.ebs(props.storageSize.toGibibytes(), {
             encrypted: true,
             volumeType: EbsDeviceVolumeType.GP3,
           }),

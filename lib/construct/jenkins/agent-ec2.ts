@@ -21,7 +21,7 @@ export interface AgentProps {
   readonly artifactBucket?: IBucket;
   readonly instanceTypes: ec2.InstanceType[];
   readonly fleetMaxSize: number;
-  readonly rootVolumeSizeGb: number;
+  readonly rootVolumeSize: Size;
 
   /**
    * The size of a data volume that is attached as a secondary volume to an instance.
@@ -29,7 +29,7 @@ export interface AgentProps {
    * 
    * @default No data volume is created.
    */
-  readonly dataVolumeSizeGb?: number;
+  readonly dataVolumeSize?: Size;
 
   /**
    * @default deployed in vpc.privateSubnets
@@ -59,7 +59,7 @@ export class AgentEC2 extends Construct {
   constructor(scope: Construct, id: string, props: AgentProps) {
     super(scope, id);
 
-    const { vpc, subnets = vpc.privateSubnets, instanceTypes, dataVolumeSizeGb } = props;
+    const { vpc, subnets = vpc.privateSubnets, instanceTypes, dataVolumeSize } = props;
 
     const userData = ec2.UserData.forLinux();
 
@@ -76,7 +76,7 @@ export class AgentEC2 extends Construct {
       blockDevices: [
         {
           deviceName: '/dev/xvda',
-          volume: ec2.BlockDeviceVolume.ebs(props.rootVolumeSizeGb, {
+          volume: ec2.BlockDeviceVolume.ebs(props.rootVolumeSize.toGibibytes(), {
             volumeType: ec2.EbsDeviceVolumeType.GP3,
             encrypted: true,
           }),
@@ -116,7 +116,7 @@ export class AgentEC2 extends Construct {
       vpcSubnets: { subnets },
     });
 
-    if (dataVolumeSizeGb !== undefined) {
+    if (dataVolumeSize !== undefined) {
       // create a pool of EBS volumes
       const volumes = subnets
         .flatMap((subnet) => subnet.availabilityZone)
@@ -125,7 +125,7 @@ export class AgentEC2 extends Construct {
             (_, i) =>
               new ec2.Volume(this, `Volume-v1-${azi}-${i}`, {
                 availabilityZone: az,
-                size: Size.gibibytes(dataVolumeSizeGb),
+                size: Size.gibibytes(dataVolumeSize.toGibibytes()),
                 volumeType: ec2.EbsDeviceVolumeType.GP3,
                 throughput: 200,
                 iops: 3000,

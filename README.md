@@ -298,7 +298,7 @@ By this way, we do not have to use EBS snapshot hence free from the snapshot hyd
 
 Note that you need to properly estimate the required capacity for the pool. The number of volumes should be equal to the Auto Scaling Group (ASG)'s maximum capacity because otherwise some instance do not get available volume immediately, or some volumes are not used at all. The ASG capacity can be determined by how many build jobs you want to run concurrently. If it is too small, your job queue will soon piled up, or if it is too large, your infrastructure cost will be unnecessarily high. You may want to analyze the tradeoff and determine an optimized value for the ASG capacity.
 
-By default, this pool is enabled for the agents with `linux` label. If you want to disable it, open [`jenkins-unity-build-stack.ts`](lib/jenkins-unity-build-stack.ts) and change code as below. Since the Jenkins workspace will be placed in the root volume, you may want to increase the size of the volume at the same time.
+By default, this pool is enabled for the agents with `linux` label. If you want to disable it, open [`jenkins-unity-build-stack.ts`](lib/jenkins-unity-build-stack.ts) and change the code as below. Since the Jenkins workspace will be placed in the root volume after this change, you may want to increase the size of root volume at the same time.
 
 ```diff
   const agentEc2 = new AgentEC2(this, 'JenkinsLinuxAgent', {
@@ -306,10 +306,10 @@ By default, this pool is enabled for the agents with `linux` label. If you want 
     sshKeyName: keyPair.keyPairName,
     artifactBucket,
     // increase root volume size
--    rootVolumeSizeGb: 30,
-+    rootVolumeSizeGb: 200,
+-   rootVolumeSize: Size.gibibytes(30),
++   rootVolumeSize: Size.gibibytes(200),
     // remove dataVolumeSizeGb property
--    dataVolumeSizeGb: 200,
+-   dataVolumeSize: Size.gibibytes(200),
 ```
 
 ## Clean up
