@@ -149,11 +149,19 @@ After the deployment, you can test the system with the pre-installed Jenkins job
     * it invokes the `createAmi` job to actually create a AMI
 
 To build a Unity client or asset bundles, you can freely use Linux agents and Mac agents to implement your build pipeline.
-A sample Jenkinsfile to build an iOS client is [here](https://github.com/tmokmss/com.unity.multiplayer.samples.coop/blob/main/Jenkinsfile).
-Note that the above job requires you to prepare a Unity license and iOS signing certificates in order to run properly. 
+Available agent labels are the following:
+
+* `linux`: Agents of Amazon Linux 2. It is intended for heavy tasks.
+* `small`: Agents of Amazon Linux 2 but for smaller tasks (will run on t3.small).
+* `mac`: Agents of EC2 Mac instances.
+
+Additionally, both `linux` and `small` support the [Docker plugin](https://plugins.jenkins.io/docker-plugin/).
+
+A sample Jenkinsfile to build an iOS client using these agents is [here](https://github.com/tmokmss/com.unity.multiplayer.samples.coop/blob/main/Jenkinsfile).
+Note that this sample job requires you to prepare a Unity license and iOS signing certificates in order to run properly.
 
 It is also recommended to additionally use [Unity floating license server](https://unity.com/products/unity-build-server) to manage your Unity licenses.
-To deploy a license server, you can use this sample project: [TODO: リンク貼る]()
+To deploy a license server, you can use this sample project: [Unity Build Server with AWS CDK](https://github.com/aws-samples/unity-build-server-with-aws-cdk)
 
 ### Accessing Unity Accelerator
 You can make the build faster by using [Unity Accelerator](https://docs.unity3d.com/Manual/UnityAccelerator.html), which is already included and running in this sample.
@@ -289,6 +297,20 @@ When an instance is terminated, the volume is automatically detached from the in
 By this way, we do not have to use EBS snapshot hence free from the snapshot hydration. This method requires an EC2 instance to select an available EBS volume form the pool dynamically, attach it, and mount it as a file system. We do this in EC2 user data, and the implementation is included in this sample. See [agent-userdata.sh](./lib/construct/jenkins/resources/agent-userdata.sh). 
 
 Note that you need to properly estimate the required capacity for the pool. The number of volumes should be equal to the Auto Scaling Group (ASG)'s maximum capacity because otherwise some instance do not get available volume immediately, or some volumes are not used at all. The ASG capacity can be determined by how many build jobs you want to run concurrently. If it is too small, your job queue will soon piled up, or if it is too large, your infrastructure cost will be unnecessarily high. You may want to analyze the tradeoff and determine an optimized value for the ASG capacity.
+
+By default, this pool is enabled for the agents with `linux` label. If you want to disable it, open [`jenkins-unity-build-stack.ts`](lib/jenkins-unity-build-stack.ts) and change code as below. Since the Jenkins workspace will be placed in the root volume, you may want to increase the size of the volume at the same time.
+
+```diff
+  const agentEc2 = new AgentEC2(this, 'JenkinsLinuxAgent', {
+    vpc,
+    sshKeyName: keyPair.keyPairName,
+    artifactBucket,
+    // increase root volume size
+-    rootVolumeSizeGb: 30,
++    rootVolumeSizeGb: 200,
+    // remove dataVolumeSizeGb property
+-    dataVolumeSizeGb: 200,
+```
 
 ## Clean up
 To avoid incurring future charges, clean up the resources you created.
