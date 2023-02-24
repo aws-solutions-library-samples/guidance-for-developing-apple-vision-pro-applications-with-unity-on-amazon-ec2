@@ -43,11 +43,7 @@ It is recommended to update the password to a sufficiently strong one (the defau
           password: passw0rd
 ```
 
-Please open [bin/jenkins-unity-build.ts](./bin/jenkins-unity-build.ts) and find the property named `allowedCidrs`.
-This property specifies the CIDRs that can access the Jenkins web UI ALB.
-You should set this as narrowly as possible to prevent unwanted users from accessing your Jenkins control panel.
-
-To change the AWS region (the default is us-east-2 Ohio), please replace `region: us-east-2` in the file as below:
+Please open [bin/jenkins-unity-build.ts](./bin/jenkins-unity-build.ts). There are a few parameters you can configure.
 
 ```ts
 new JenkinsUnityBuildStack(app, 'JenkinsUnityBuildStack', {
@@ -55,13 +51,18 @@ new JenkinsUnityBuildStack(app, 'JenkinsUnityBuildStack', {
     region: 'us-east-2',
     // account: '123456789012',
   },
-  allowedCidrs: ['0.0.0.0/0'],
+  allowedCidrs: ['127.0.0.1/32'],
   // certificateArn: "",
 });
 ```
 
-For additional security, you can [create an AWS Certificate Manager certificate](https://docs.aws.amazon.com/acm/latest/userguide/gs-acm-request-public.html), and import it by setting `certificateArn` and `env.account` in the above code to protect the ALB with TLS.
-By default, Jenkins Web GUI can be accessed only via HTTP.
+The `allowedCidrs` property specifies IP address ranges that can access the Jenkins web UI ALB.
+You should set these ranges as narrowly as possible to prevent unwanted users from accessing your Jenkins UI.
+
+To change the AWS region (the default is us-east-2, Ohio), please replace `region: us-east-2` with another region.
+
+For additional security, you can [create an AWS Certificate Manager certificate](https://docs.aws.amazon.com/acm/latest/userguide/gs-acm-request-public.html), and import it by setting `certificateArn` and `env.account` in the above code to encrypt the data transferred through the ALB with TLS.
+By default, Jenkins Web GUI is accessed via HTTP.
 
 ### 2. Setup CDK
 After confirming the parameters, you can proceed to CDK deployment.
@@ -291,7 +292,9 @@ The `detachFromAsg` job is intended to be called periodically (e.g. by using [Je
 
 The disadvantage of using AMI for caching, however, is that it takes some time to fully fetch (hydrate) EBS snapshots, resulting in higher I/O latency during the hydration. In some situations, the hydration process takes too long to be used as a cache. One solution to this the problem is to use the Fast Snapshot Restore feature, which allows the volume to be hydrated immediately without much I/O latency ([Addressing I/O latency when restoring Amazon EBS volumes from EBS Snapshots](https://aws.amazon.com/blogs/storage/addressing-i-o-latency-when-restoring-amazon-ebs-volumes-from-ebs-snapshots/)).
 
-There is another way to avoid this problem and solve the cache problem at the same time, which is described in the next section.
+Note that if you are using FSR, you should be aware of [volume creation credits](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebs-fast-snapshot-restore.html#volume-creation-credits) and [additional charges](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebs-fast-snapshot-restore.html#fsr-pricing).
+
+There is another way to avoid this problem and solve the caching problem at the same time, which is described in the next section.
 
 ### Maintain a pool of EBS volumes
 The problem with using AMI (and EBS snapshots) is the initial higher I/O latency because all the snapshot data is stored in S3 and lazily loaded into volumes.
@@ -325,7 +328,7 @@ To avoid incurring future charges, clean up the resources you created.
 
 To remove all the AWS resources deployed by this sample, please follow these steps:
 
-1. Set the minimum Jenkins Linux agent fleet size to zero. You can set this in the Jenkins cloud configuration UI (Dashboard -> Manage Jenkins -> Nodes -> Configure Clouds). Please confirm that all Linux nodes have been removed from the Jenkins controller.
+1. Set the minimum Jenkins Linux agent fleet size to zero. You can set this in the Jenkins cloud configuration UI (Dashboard -> Manage Jenkins -> Nodes -> Configure Clouds -> Minimum Cluster Size). Please confirm that all Linux nodes have been removed from the Jenkins controller. You should wait for at least `Max Idle Minutes Before Scaledown` minutes before nodes will be removed.
     * We need to do this because the [Jenkins EC2 Fleet plugin](https://plugins.jenkins.io/ec2-fleet/) sets the scale-in protection policy of the fleets to enabled, which prevents CFn from deleting the instances.
 2. Run the following command to delete the CloudFormation stack.
     ```sh
