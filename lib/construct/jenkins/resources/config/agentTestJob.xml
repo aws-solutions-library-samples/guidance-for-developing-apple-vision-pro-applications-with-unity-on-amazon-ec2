@@ -47,6 +47,16 @@ pipeline {
                         echo 'Hello from Small!'
                     }
                 }
+                stage('Unity Accelerator Test') {
+                    agent {
+                        label 'small'
+                    }
+                    steps {
+                        sh '''
+                            curl -s http://${UNITY_ACCELERATOR_URL}/api/agent-health
+                        '''
+                    }
+                }
             }
         }
     }
