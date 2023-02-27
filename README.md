@@ -264,7 +264,7 @@ To reduce the cost of EC2 Mac instances, it is desirable to use EC2 Linux spot i
 Most parts of the Unity build process can be done on Linux servers, while specifically Xcode build requires a Mac instance.
 By offloading those build tasks to EC2 Linux spot instances, which are relatively inexpensive and have a shorter minimum billing period, you can reduce the number of Mac instances and ultimately save on infrastructure costs while still keeping the overall length of a build job short enough.
 
-![mac-jobs](docs/imgs/mac-jobs.svg)
+![mac-jobs](docs/imgs/mac-jobs.png)
 
 You can also refer to this [reference architecture](https://d1.awsstatic.com/architecture-diagrams/ArchitectureDiagrams/unity-build-pipeline-ios-games-on-aws-cloud-ra.pdf) for more details.
 
