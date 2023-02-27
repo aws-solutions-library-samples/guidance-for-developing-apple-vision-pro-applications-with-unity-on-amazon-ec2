@@ -42,7 +42,7 @@ export class AgentMac extends Construct {
     // That's why we set RemovalPolicy = RETAIN here to avoid CFn errors.
     host.applyRemovalPolicy(RemovalPolicy.RETAIN);
 
-    // mac1 (Intel) と mac2 (M1) のAMI間でBrewのパスが異なる
+    // Brew installation path differs with mac1 (Intel) and mac2 (M1)
     const brewPath = instanceType == 'mac2.metal' ? '/opt/homebrew' : '/usr/local';
     const userData = ec2.UserData.custom(`#!/bin/zsh
 #install openjdk@17
