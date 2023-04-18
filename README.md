@@ -1,14 +1,14 @@
-# Unity Build Pipeline with Jenkins and EC2 Mac
+# Unity Build Pipeline with Jenkins and Amazon EC2 Mac Instances
 [![Build](https://github.com/aws-samples/jenkins-unity-build-on-aws/actions/workflows/build.yml/badge.svg)](https://github.com/aws-samples/jenkins-unity-build-on-aws/actions/workflows/build.yml)
 
-This is a starter kit for Unity build pipeline with Jenkins and EC2 Linux/Mac instances on AWS.
+This is a starter kit for Unity build pipeline with Jenkins and Amazon EC2 Linux/Mac instances on AWS.
 
 Features include:
 
-* Jenkins controller on ECS Fargate
-* Jenkins agents on EC2 Linux Spot and EC2 Mac instances
+* Jenkins controller on Amazon ECS Fargate
+* Jenkins agents on Amazon EC2 Linux Spot and EC2 Mac instances
 * Optional container support for Jenkins agents
-* Unity Accelerator on EC2
+* Unity Accelerator on EC2 Linux
 * Periodic AMI replacement to keep build cache warm
 * A warm pool of Amazon EBS volumes to maintain intermediate caches
 * Highly automated provisioning through AWS Cloud Development Kit (CDK)
@@ -94,21 +94,21 @@ After a successful deployment, you will get a CLI output as below:
 
 Outputs:
 JenkinsUnityBuildStack.JenkinsMacAgent1InstanceId39041E59 = i-xxxxxxxxxxx
-JenkinsUnityBuildStack.JenkinsMasterServiceLoadBalancerDNS8A32739E = Jenki-Jenki-1234567890.us-east-2.elb.amazonaws.com
-JenkinsUnityBuildStack.JenkinsMasterServiceServiceURL6DCB4BEE = http://Jenki-Jenki-1234567890.us-east-2.elb.amazonaws.com
+JenkinsUnityBuildStack.JenkinsControllerServiceLoadBalancerDNS8A32739E = Jenki-Jenki-1234567890.us-east-2.elb.amazonaws.com
+JenkinsUnityBuildStack.JenkinsControllerServiceServiceURL6DCB4BEE = http://Jenki-Jenki-1234567890.us-east-2.elb.amazonaws.com
 JenkinsUnityBuildStack.UnityAcceleratorEndpointC89B3A26 = accelerator.build:10080
 JenkinsUnityBuildStack.UnityAcceleratorInstanceIdC7EEEEA7 = i-yyyyyyyyyyy
 ```
 
-By opening the URL in `JenkinsMasterServiceServiceURL` output, you can now access to Jenkins Web GUI.
+By opening the URL in `JenkinsControllerServiceServiceURL` output, you can now access to Jenkins Web GUI.
 Please login with the username and password you entered in `jenkins.yaml.ejs`. 
 
 ![jenkins_gui](docs/imgs/jenkins_gui.png)
 
 **NOTE:** You may observe that the Jenkins controller initialization process takes longer time (>3 minutes), because Jenkins needs to copy all the required files to an [Amazon EFS volume](https://aws.amazon.com/efs/) on the very first boot. If you see a 503 error, please reload the page after a few minutes and you will get a login page soon. You will NOT see such a long initialization after the second boot because all the files have already been copied to the EFS volume.
 
-### 4. Provision EC2 Mac instance
-Note that EC2 Mac instances are not yet provisioned.
+### 4. Provision Amazon EC2 Mac instance
+Note that EC2 Mac instances are not yet provisioned at the previous step.
 To provision one, **you have to uncomment the `macAmiId` property** in [bin/jenkins-unity-build.ts](./bin/jenkins-unity-build.ts) and provide an AMI ID for the instance.
 
 
@@ -143,7 +143,7 @@ If you see a provisioning error, you can change the AZ using the code in [`jenki
       subnet: vpc.privateSubnets[1],
 ```
 
-### 5. (Optional) Setup the EC2 Mac instance
+### 5. (Optional) Setup the Amazon EC2 Mac instance
 To use the Mac instance for a Unity build, you may want to configure it manually (e.g. by installing Xcode or other dependencies).
 You can configure it using Remote Desktop and reuse the configuration for another Mac instance.
 Please refer to the [Setup EC2 Mac instance](docs/setup-mac-instance.md) document for more details.
@@ -223,8 +223,8 @@ You can try this configuration by explicitly setting a subnet in [`jenkins-unity
     });
 ```
 
-### Add another Mac instance
-By default, we provision only one instance for EC2 Mac. You can add more Mac instances by the following steps.
+### Add another Amazon EC2 Mac instance
+By default, we provision only one Mac instance. You can add more Mac instances by the following steps.
 
 1. Check Quotas
     * You have to have enough quotas to provision your Mac instances. See [`Service Quotas` page](https://console.aws.amazon.com/servicequotas/home/services/ec2/quotas). Please also refer to [this section](#4-provision-ec2-mac-instance) for more details.
@@ -258,7 +258,7 @@ By default, we provision only one instance for EC2 Mac. You can add more Mac ins
 ## How it works
 This project requires several architectural considerations, which we will cover in this section.
 
-### Offload build tasks from Mac instances to Linux spots
+### Offload build tasks from Amazon EC2 Mac instances to Linux spot instances
 To reduce the cost of EC2 Mac instances, it is desirable to use EC2 Linux spot instances as well as EC2 Mac instances to build Unity applications.
 
 Most parts of the Unity build process can be done on Linux servers, while specifically Xcode build requires a Mac instance.
