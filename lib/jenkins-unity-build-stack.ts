@@ -3,7 +3,7 @@ import * as ec2 from 'aws-cdk-lib/aws-ec2';
 import * as ecr from 'aws-cdk-lib/aws-ecr';
 import * as servicediscovery from 'aws-cdk-lib/aws-servicediscovery';
 import { Secret } from 'aws-cdk-lib/aws-ecs';
-import { Master } from './construct/jenkins/master';
+import { Controller } from './construct/jenkins/controller';
 import { Bucket, BucketEncryption, BlockPublicAccess } from 'aws-cdk-lib/aws-s3';
 import { Construct } from 'constructs';
 import { AgentEC2 } from './construct/jenkins/agent-ec2';
@@ -84,7 +84,7 @@ export class JenkinsUnityBuildStack extends cdk.Stack {
       removalPolicy: cdk.RemovalPolicy.DESTROY,
     });
 
-    // EC2 key pair that Jenkins master uses to connect to Jenkins agents
+    // EC2 key pair that Jenkins controller uses to connect to Jenkins agents
     const keyPair = new AgentKeyPair(this, 'KeyPair', { keyPairName: `${Stack.of(this).stackName}-agent-ssh-key` });
 
     const namespace = new servicediscovery.PrivateDnsNamespace(this, 'Namespace', {
@@ -180,7 +180,7 @@ export class JenkinsUnityBuildStack extends cdk.Stack {
       );
     }
 
-    const masterEcs = new Master(this, 'JenkinsMaster', {
+    const controllerEcs = new Controller(this, 'JenkinsController', {
       vpc,
       allowedCidrs: props.allowedCidrs,
       logBucket,
@@ -210,8 +210,8 @@ export class JenkinsUnityBuildStack extends cdk.Stack {
         },
       ],
     });
-    agentEc2.allowSSHFrom(masterEcs.service);
-    agentEc2Small.allowSSHFrom(masterEcs.service);
-    macAgents.forEach((agent) => agent.allowSSHFrom(masterEcs.service));
+    agentEc2.allowSSHFrom(controllerEcs.service);
+    agentEc2Small.allowSSHFrom(controllerEcs.service);
+    macAgents.forEach((agent) => agent.allowSSHFrom(controllerEcs.service));
   }
 }

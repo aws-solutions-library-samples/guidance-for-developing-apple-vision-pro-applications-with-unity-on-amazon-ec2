@@ -26,7 +26,7 @@ export interface LinuxAgentProps {
   readonly launchTemplateId?: string;
 }
 
-export interface MasterProps {
+export interface ControllerProps {
   readonly vpc: IVpc;
   readonly logBucket: IBucket;
   readonly artifactBucket: IBucket;
@@ -41,13 +41,13 @@ export interface MasterProps {
 }
 
 /**
- * EC2 Auto Scaling Group for Jenkins master.
+ * EC2 Auto Scaling Group for Jenkins controller.
  * The number of instances is fixed to one since Jenkins does not support horizontal scaling.
  */
-export class Master extends Construct {
+export class Controller extends Construct {
   public readonly service: ecs.FargateService;
 
-  constructor(scope: Construct, id: string, props: MasterProps) {
+  constructor(scope: Construct, id: string, props: ControllerProps) {
     super(scope, id);
 
     const { configOutputFilename = 'jenkins.yaml', macAgents = [], linuxAgents = [] } = props;
@@ -113,14 +113,14 @@ export class Master extends Construct {
 
     const container = taskDefinition.addContainer('main', {
       image: ecs.ContainerImage.fromAsset(join(__dirname, 'resources'), {
-        file: 'master.Dockerfile',
+        file: 'controller.Dockerfile',
         platform: Platform.LINUX_AMD64,
         buildArgs: {
           CONFIG_FILE_NAME: configOutputFilename,
         },
       }),
       logging: ecs.LogDriver.awsLogs({
-        streamPrefix: 'jenkins-master',
+        streamPrefix: 'jenkins-controller',
         logRetention: RetentionDays.SIX_MONTHS,
       }),
       portMappings: [
@@ -143,9 +143,9 @@ export class Master extends Construct {
       },
     });
 
-    const master = new ApplicationLoadBalancedFargateService(this, 'Service', {
+    const controller = new ApplicationLoadBalancedFargateService(this, 'Service', {
       cluster,
-      // We only need just one instance for Jenkins master
+      // We only need just one instance for Jenkins controller
       desiredCount: 1,
       targetProtocol: ApplicationProtocol.HTTP,
       openListener: false,
@@ -162,12 +162,12 @@ export class Master extends Construct {
       enableExecuteCommand: true,
     });
 
-    container.addEnvironment('JENKINS_URL', `${protocol.toLowerCase()}://${master.loadBalancer.loadBalancerDnsName}`);
+    container.addEnvironment('JENKINS_URL', `${protocol.toLowerCase()}://${controller.loadBalancer.loadBalancerDnsName}`);
 
     // https://github.com/aws/aws-cdk/issues/4015
-    master.targetGroup.setAttribute('deregistration_delay.timeout_seconds', '10');
+    controller.targetGroup.setAttribute('deregistration_delay.timeout_seconds', '10');
 
-    master.targetGroup.configureHealthCheck({
+    controller.targetGroup.configureHealthCheck({
       interval: Duration.seconds(15),
       healthyThresholdCount: 2,
       unhealthyThresholdCount: 4,
@@ -226,12 +226,12 @@ export class Master extends Construct {
 
     const port = protocol == ApplicationProtocol.HTTPS ? 443 : 80;
     allowedCidrs.forEach((cidr) => {
-      master.loadBalancer.connections.allowFrom(ec2.Peer.ipv4(cidr), ec2.Port.tcp(port));
+      controller.loadBalancer.connections.allowFrom(ec2.Peer.ipv4(cidr), ec2.Port.tcp(port));
     });
 
-    master.loadBalancer.logAccessLogs(props.logBucket, 'jenkinsAlbAccessLog');
+    controller.loadBalancer.logAccessLogs(props.logBucket, 'jenkinsAlbAccessLog');
 
-    fileSystem.connections.allowDefaultPortFrom(master.service.connections);
+    fileSystem.connections.allowDefaultPortFrom(controller.service.connections);
 
     // https://docs.aws.amazon.com/efs/latest/ug/accessing-fs-nfs-permissions.html
     // https://aws.amazon.com/blogs/containers/developers-guide-to-using-amazon-efs-with-amazon-ecs-and-aws-fargate-part-2/
@@ -276,6 +276,6 @@ export class Master extends Construct {
       readOnly: false,
     });
 
-    this.service = master.service;
+    this.service = controller.service;
   }
 }

@@ -3,20 +3,15 @@
 exports[`Snapshot test 1`] = `
 {
   "Outputs": {
-    "JenkinsMacAgent1InstanceId39041E59": {
-      "Value": {
-        "Ref": "JenkinsMacAgent1Instance609468B3",
-      },
-    },
-    "JenkinsMasterServiceLoadBalancerDNS8A32739E": {
+    "JenkinsControllerServiceLoadBalancerDNSBF5E040D": {
       "Value": {
         "Fn::GetAtt": [
-          "JenkinsMasterServiceLB6A63DD53",
+          "JenkinsControllerServiceLB06787F02",
           "DNSName",
         ],
       },
     },
-    "JenkinsMasterServiceServiceURL6DCB4BEE": {
+    "JenkinsControllerServiceServiceURLC68939D9": {
       "Value": {
         "Fn::Join": [
           "",
@@ -24,12 +19,17 @@ exports[`Snapshot test 1`] = `
             "http://",
             {
               "Fn::GetAtt": [
-                "JenkinsMasterServiceLB6A63DD53",
+                "JenkinsControllerServiceLB06787F02",
                 "DNSName",
               ],
             },
           ],
         ],
+      },
+    },
+    "JenkinsMacAgent1InstanceId39041E59": {
+      "Value": {
+        "Ref": "JenkinsMacAgent1Instance609468B3",
       },
     },
     "UnityAcceleratorEndpointC89B3A26": {
@@ -431,6 +431,970 @@ exports[`Snapshot test 1`] = `
         "RoleName": "TestStack-CFN-Resource-Custom-EC2-Key-Pair",
       },
       "Type": "AWS::IAM::Role",
+    },
+    "JenkinsControllerClusterE5BC789D": {
+      "Properties": {
+        "ClusterSettings": [
+          {
+            "Name": "containerInsights",
+            "Value": "enabled",
+          },
+        ],
+      },
+      "Type": "AWS::ECS::Cluster",
+    },
+    "JenkinsControllerServiceDF0B0414": {
+      "DependsOn": [
+        "JenkinsControllerServiceLBPublicListenerECSGroup2B1CBE4E",
+        "JenkinsControllerServiceLBPublicListener92C1276E",
+      ],
+      "Properties": {
+        "Cluster": {
+          "Ref": "JenkinsControllerClusterE5BC789D",
+        },
+        "DeploymentConfiguration": {
+          "DeploymentCircuitBreaker": {
+            "Enable": true,
+            "Rollback": true,
+          },
+          "MaximumPercent": 200,
+          "MinimumHealthyPercent": 100,
+        },
+        "DeploymentController": {
+          "Type": "ECS",
+        },
+        "DesiredCount": 1,
+        "EnableECSManagedTags": false,
+        "EnableExecuteCommand": true,
+        "HealthCheckGracePeriodSeconds": 60,
+        "LaunchType": "FARGATE",
+        "LoadBalancers": [
+          {
+            "ContainerName": "main",
+            "ContainerPort": 8080,
+            "TargetGroupArn": {
+              "Ref": "JenkinsControllerServiceLBPublicListenerECSGroup2B1CBE4E",
+            },
+          },
+        ],
+        "NetworkConfiguration": {
+          "AwsvpcConfiguration": {
+            "AssignPublicIp": "DISABLED",
+            "SecurityGroups": [
+              {
+                "Fn::GetAtt": [
+                  "JenkinsControllerServiceSecurityGroup8CBE094C",
+                  "GroupId",
+                ],
+              },
+            ],
+            "Subnets": [
+              {
+                "Ref": "VpcPrivateSubnet1Subnet536B997A",
+              },
+              {
+                "Ref": "VpcPrivateSubnet2Subnet3788AAA1",
+              },
+            ],
+          },
+        },
+        "TaskDefinition": {
+          "Ref": "JenkinsControllerTaskDefinitionA87C7BAA",
+        },
+      },
+      "Type": "AWS::ECS::Service",
+    },
+    "JenkinsControllerServiceLB06787F02": {
+      "DependsOn": [
+        "LogBucketAutoDeleteObjectsCustomResource7762F42C",
+        "LogBucketPolicy900DBE48",
+        "LogBucketCC3B17E8",
+        "VpcPublicSubnet1DefaultRoute3DA9E72A",
+        "VpcPublicSubnet1RouteTableAssociation97140677",
+        "VpcPublicSubnet2DefaultRoute97F91067",
+        "VpcPublicSubnet2RouteTableAssociationDD5762D8",
+      ],
+      "Properties": {
+        "LoadBalancerAttributes": [
+          {
+            "Key": "deletion_protection.enabled",
+            "Value": "false",
+          },
+          {
+            "Key": "access_logs.s3.enabled",
+            "Value": "true",
+          },
+          {
+            "Key": "access_logs.s3.bucket",
+            "Value": {
+              "Ref": "LogBucketCC3B17E8",
+            },
+          },
+          {
+            "Key": "access_logs.s3.prefix",
+            "Value": "jenkinsAlbAccessLog",
+          },
+        ],
+        "Scheme": "internet-facing",
+        "SecurityGroups": [
+          {
+            "Fn::GetAtt": [
+              "JenkinsControllerServiceLBSecurityGroup00DC39C4",
+              "GroupId",
+            ],
+          },
+        ],
+        "Subnets": [
+          {
+            "Ref": "VpcPublicSubnet1Subnet5C2D37C4",
+          },
+          {
+            "Ref": "VpcPublicSubnet2Subnet691E08A3",
+          },
+        ],
+        "Type": "application",
+      },
+      "Type": "AWS::ElasticLoadBalancingV2::LoadBalancer",
+    },
+    "JenkinsControllerServiceLBPublicListener92C1276E": {
+      "DependsOn": [
+        "LogBucketAutoDeleteObjectsCustomResource7762F42C",
+        "LogBucketPolicy900DBE48",
+        "LogBucketCC3B17E8",
+      ],
+      "Properties": {
+        "DefaultActions": [
+          {
+            "TargetGroupArn": {
+              "Ref": "JenkinsControllerServiceLBPublicListenerECSGroup2B1CBE4E",
+            },
+            "Type": "forward",
+          },
+        ],
+        "LoadBalancerArn": {
+          "Ref": "JenkinsControllerServiceLB06787F02",
+        },
+        "Port": 80,
+        "Protocol": "HTTP",
+      },
+      "Type": "AWS::ElasticLoadBalancingV2::Listener",
+    },
+    "JenkinsControllerServiceLBPublicListenerECSGroup2B1CBE4E": {
+      "DependsOn": [
+        "LogBucketAutoDeleteObjectsCustomResource7762F42C",
+        "LogBucketPolicy900DBE48",
+        "LogBucketCC3B17E8",
+      ],
+      "Properties": {
+        "HealthCheckIntervalSeconds": 15,
+        "HealthCheckPath": "/login",
+        "HealthyThresholdCount": 2,
+        "Matcher": {
+          "HttpCode": "200",
+        },
+        "Port": 80,
+        "Protocol": "HTTP",
+        "TargetGroupAttributes": [
+          {
+            "Key": "stickiness.enabled",
+            "Value": "false",
+          },
+          {
+            "Key": "deregistration_delay.timeout_seconds",
+            "Value": "10",
+          },
+        ],
+        "TargetType": "ip",
+        "UnhealthyThresholdCount": 4,
+        "VpcId": {
+          "Ref": "Vpc8378EB38",
+        },
+      },
+      "Type": "AWS::ElasticLoadBalancingV2::TargetGroup",
+    },
+    "JenkinsControllerServiceLBSecurityGroup00DC39C4": {
+      "DependsOn": [
+        "LogBucketAutoDeleteObjectsCustomResource7762F42C",
+        "LogBucketPolicy900DBE48",
+        "LogBucketCC3B17E8",
+      ],
+      "Properties": {
+        "GroupDescription": "Automatically created Security Group for ELB TestStackJenkinsControllerServiceLB86F74D18",
+        "SecurityGroupIngress": [
+          {
+            "CidrIp": "127.0.0.1/32",
+            "Description": "from 127.0.0.1/32:80",
+            "FromPort": 80,
+            "IpProtocol": "tcp",
+            "ToPort": 80,
+          },
+          {
+            "CidrIp": {
+              "Fn::GetAtt": [
+                "Vpc8378EB38",
+                "CidrBlock",
+              ],
+            },
+            "Description": {
+              "Fn::Join": [
+                "",
+                [
+                  "from ",
+                  {
+                    "Fn::GetAtt": [
+                      "Vpc8378EB38",
+                      "CidrBlock",
+                    ],
+                  },
+                  ":80",
+                ],
+              ],
+            },
+            "FromPort": 80,
+            "IpProtocol": "tcp",
+            "ToPort": 80,
+          },
+        ],
+        "VpcId": {
+          "Ref": "Vpc8378EB38",
+        },
+      },
+      "Type": "AWS::EC2::SecurityGroup",
+    },
+    "JenkinsControllerServiceLBSecurityGrouptoTestStackJenkinsControllerServiceSecurityGroupFCB7D6F8808050DEB582": {
+      "DependsOn": [
+        "LogBucketAutoDeleteObjectsCustomResource7762F42C",
+        "LogBucketPolicy900DBE48",
+        "LogBucketCC3B17E8",
+      ],
+      "Properties": {
+        "Description": "Load balancer to target",
+        "DestinationSecurityGroupId": {
+          "Fn::GetAtt": [
+            "JenkinsControllerServiceSecurityGroup8CBE094C",
+            "GroupId",
+          ],
+        },
+        "FromPort": 8080,
+        "GroupId": {
+          "Fn::GetAtt": [
+            "JenkinsControllerServiceLBSecurityGroup00DC39C4",
+            "GroupId",
+          ],
+        },
+        "IpProtocol": "tcp",
+        "ToPort": 8080,
+      },
+      "Type": "AWS::EC2::SecurityGroupEgress",
+    },
+    "JenkinsControllerServiceSecurityGroup8CBE094C": {
+      "Properties": {
+        "GroupDescription": "TestStack/JenkinsController/Service/Service/SecurityGroup",
+        "SecurityGroupEgress": [
+          {
+            "CidrIp": "0.0.0.0/0",
+            "Description": "Allow all outbound traffic by default",
+            "IpProtocol": "-1",
+          },
+        ],
+        "VpcId": {
+          "Ref": "Vpc8378EB38",
+        },
+      },
+      "Type": "AWS::EC2::SecurityGroup",
+    },
+    "JenkinsControllerServiceSecurityGroupfromTestStackJenkinsControllerServiceLBSecurityGroup69D548DA8080E236CD2D": {
+      "Properties": {
+        "Description": "Load balancer to target",
+        "FromPort": 8080,
+        "GroupId": {
+          "Fn::GetAtt": [
+            "JenkinsControllerServiceSecurityGroup8CBE094C",
+            "GroupId",
+          ],
+        },
+        "IpProtocol": "tcp",
+        "SourceSecurityGroupId": {
+          "Fn::GetAtt": [
+            "JenkinsControllerServiceLBSecurityGroup00DC39C4",
+            "GroupId",
+          ],
+        },
+        "ToPort": 8080,
+      },
+      "Type": "AWS::EC2::SecurityGroupIngress",
+    },
+    "JenkinsControllerStorage013252B2": {
+      "DeletionPolicy": "Delete",
+      "Properties": {
+        "Encrypted": true,
+        "FileSystemTags": [
+          {
+            "Key": "Name",
+            "Value": "TestStack/JenkinsController/Storage",
+          },
+        ],
+        "PerformanceMode": "generalPurpose",
+      },
+      "Type": "AWS::EFS::FileSystem",
+      "UpdateReplacePolicy": "Delete",
+    },
+    "JenkinsControllerStorageAccessPointA57FF6EA": {
+      "Properties": {
+        "FileSystemId": {
+          "Ref": "JenkinsControllerStorage013252B2",
+        },
+        "PosixUser": {
+          "Gid": "1000",
+          "Uid": "1000",
+        },
+        "RootDirectory": {
+          "CreationInfo": {
+            "OwnerGid": "1000",
+            "OwnerUid": "1000",
+            "Permissions": "755",
+          },
+          "Path": "/jenkins-home",
+        },
+      },
+      "Type": "AWS::EFS::AccessPoint",
+    },
+    "JenkinsControllerStorageEfsMountTarget178994935": {
+      "Properties": {
+        "FileSystemId": {
+          "Ref": "JenkinsControllerStorage013252B2",
+        },
+        "SecurityGroups": [
+          {
+            "Fn::GetAtt": [
+              "JenkinsControllerStorageEfsSecurityGroup95BB6200",
+              "GroupId",
+            ],
+          },
+        ],
+        "SubnetId": {
+          "Ref": "VpcPrivateSubnet1Subnet536B997A",
+        },
+      },
+      "Type": "AWS::EFS::MountTarget",
+    },
+    "JenkinsControllerStorageEfsMountTarget202199416": {
+      "Properties": {
+        "FileSystemId": {
+          "Ref": "JenkinsControllerStorage013252B2",
+        },
+        "SecurityGroups": [
+          {
+            "Fn::GetAtt": [
+              "JenkinsControllerStorageEfsSecurityGroup95BB6200",
+              "GroupId",
+            ],
+          },
+        ],
+        "SubnetId": {
+          "Ref": "VpcPrivateSubnet2Subnet3788AAA1",
+        },
+      },
+      "Type": "AWS::EFS::MountTarget",
+    },
+    "JenkinsControllerStorageEfsSecurityGroup95BB6200": {
+      "Properties": {
+        "GroupDescription": "TestStack/JenkinsController/Storage/EfsSecurityGroup",
+        "SecurityGroupEgress": [
+          {
+            "CidrIp": "0.0.0.0/0",
+            "Description": "Allow all outbound traffic by default",
+            "IpProtocol": "-1",
+          },
+        ],
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "TestStack/JenkinsController/Storage",
+          },
+        ],
+        "VpcId": {
+          "Ref": "Vpc8378EB38",
+        },
+      },
+      "Type": "AWS::EC2::SecurityGroup",
+    },
+    "JenkinsControllerStorageEfsSecurityGroupfromTestStackJenkinsControllerServiceSecurityGroupFCB7D6F820494A76B663": {
+      "Properties": {
+        "Description": "from TestStackJenkinsControllerServiceSecurityGroupFCB7D6F8:2049",
+        "FromPort": 2049,
+        "GroupId": {
+          "Fn::GetAtt": [
+            "JenkinsControllerStorageEfsSecurityGroup95BB6200",
+            "GroupId",
+          ],
+        },
+        "IpProtocol": "tcp",
+        "SourceSecurityGroupId": {
+          "Fn::GetAtt": [
+            "JenkinsControllerServiceSecurityGroup8CBE094C",
+            "GroupId",
+          ],
+        },
+        "ToPort": 2049,
+      },
+      "Type": "AWS::EC2::SecurityGroupIngress",
+    },
+    "JenkinsControllerTaskDefinitionA87C7BAA": {
+      "Properties": {
+        "ContainerDefinitions": [
+          {
+            "Environment": [
+              {
+                "Name": "UNITY_ACCELERATOR_URL",
+                "Value": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      {
+                        "Fn::GetAtt": [
+                          "NamespaceServiceCABDF534",
+                          "Name",
+                        ],
+                      },
+                      ".build:10080",
+                    ],
+                  ],
+                },
+              },
+              {
+                "Name": "AWS_REGION",
+                "Value": "us-east-2",
+              },
+              {
+                "Name": "ARTIFACT_BUCKET_NAME",
+                "Value": {
+                  "Ref": "ArtifactBucket7410C9EF",
+                },
+              },
+              {
+                "Name": "FLEET_ASG_NAME_LINUX_FLEET",
+                "Value": {
+                  "Ref": "JenkinsLinuxAgentFleetASG75788F44",
+                },
+              },
+              {
+                "Name": "FLEET_LAUNCH_TEMPLATE_ID_LINUX_FLEET",
+                "Value": {
+                  "Ref": "JenkinsLinuxAgentLaunchTemplate14EE0ADC",
+                },
+              },
+              {
+                "Name": "FLEET_ASG_NAME_LINUX_FLEET_SMALL",
+                "Value": {
+                  "Ref": "JenkinsLinuxAgentSmallFleetASG9671C0E4",
+                },
+              },
+              {
+                "Name": "FLEET_LAUNCH_TEMPLATE_ID_LINUX_FLEET_SMALL",
+              },
+              {
+                "Name": "ECR_REPOSITORY_URL",
+                "Value": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      {
+                        "Fn::Select": [
+                          4,
+                          {
+                            "Fn::Split": [
+                              ":",
+                              {
+                                "Fn::GetAtt": [
+                                  "Repository22E53BBD",
+                                  "Arn",
+                                ],
+                              },
+                            ],
+                          },
+                        ],
+                      },
+                      ".dkr.ecr.",
+                      {
+                        "Fn::Select": [
+                          3,
+                          {
+                            "Fn::Split": [
+                              ":",
+                              {
+                                "Fn::GetAtt": [
+                                  "Repository22E53BBD",
+                                  "Arn",
+                                ],
+                              },
+                            ],
+                          },
+                        ],
+                      },
+                      ".",
+                      {
+                        "Ref": "AWS::URLSuffix",
+                      },
+                      "/",
+                      {
+                        "Ref": "Repository22E53BBD",
+                      },
+                    ],
+                  ],
+                },
+              },
+              {
+                "Name": "ECR_REGISTRY_URL",
+                "Value": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "https://",
+                      {
+                        "Ref": "AWS::AccountId",
+                      },
+                      ".dkr.ecr.us-east-2.amazonaws.com",
+                    ],
+                  ],
+                },
+              },
+              {
+                "Name": "PLUGINS_FORCE_UPGRADE",
+                "Value": "true",
+              },
+              {
+                "Name": "ECR_ROLE_ARN",
+                "Value": {
+                  "Fn::GetAtt": [
+                    "JenkinsControllerTaskDefinitionTaskRoleDFC317F9",
+                    "Arn",
+                  ],
+                },
+              },
+              {
+                "Name": "MAC_HOST_MAC0",
+                "Value": {
+                  "Fn::GetAtt": [
+                    "JenkinsMacAgent1Instance609468B3",
+                    "PrivateIp",
+                  ],
+                },
+              },
+              {
+                "Name": "JENKINS_URL",
+                "Value": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "http://",
+                      {
+                        "Fn::GetAtt": [
+                          "JenkinsControllerServiceLB06787F02",
+                          "DNSName",
+                        ],
+                      },
+                    ],
+                  ],
+                },
+              },
+            ],
+            "Essential": true,
+            "Image": {
+              "Fn::Sub": "\${AWS::AccountId}.dkr.ecr.us-east-2.\${AWS::URLSuffix}/cdk-hnb659fds-container-assets-\${AWS::AccountId}-us-east-2:6cbbde99a8a0d91223da3c35653bbf484a8a2b5bfe628a59a574906067e3dfeb",
+            },
+            "LinuxParameters": {
+              "Capabilities": {},
+              "InitProcessEnabled": true,
+            },
+            "LogConfiguration": {
+              "LogDriver": "awslogs",
+              "Options": {
+                "awslogs-group": {
+                  "Ref": "JenkinsControllerTaskDefinitionmainLogGroup59AA6B46",
+                },
+                "awslogs-region": "us-east-2",
+                "awslogs-stream-prefix": "jenkins-controller",
+              },
+            },
+            "MountPoints": [
+              {
+                "ContainerPath": "/var/jenkins_home",
+                "ReadOnly": false,
+                "SourceVolume": "shared",
+              },
+            ],
+            "Name": "main",
+            "PortMappings": [
+              {
+                "ContainerPort": 8080,
+                "Protocol": "tcp",
+              },
+            ],
+            "Secrets": [
+              {
+                "Name": "PRIVATE_KEY",
+                "ValueFrom": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition",
+                      },
+                      ":secretsmanager:us-east-2:",
+                      {
+                        "Ref": "AWS::AccountId",
+                      },
+                      ":secret:ec2-ssh-key/TestStack-agent-ssh-key/private",
+                    ],
+                  ],
+                },
+              },
+            ],
+          },
+        ],
+        "Cpu": "1024",
+        "ExecutionRoleArn": {
+          "Fn::GetAtt": [
+            "JenkinsControllerTaskDefinitionExecutionRoleFA99B987",
+            "Arn",
+          ],
+        },
+        "Family": "TestStackJenkinsControllerTaskDefinition75150BD3",
+        "Memory": "2048",
+        "NetworkMode": "awsvpc",
+        "RequiresCompatibilities": [
+          "FARGATE",
+        ],
+        "TaskRoleArn": {
+          "Fn::GetAtt": [
+            "JenkinsControllerTaskDefinitionTaskRoleDFC317F9",
+            "Arn",
+          ],
+        },
+        "Volumes": [
+          {
+            "EFSVolumeConfiguration": {
+              "AuthorizationConfig": {
+                "AccessPointId": {
+                  "Ref": "JenkinsControllerStorageAccessPointA57FF6EA",
+                },
+                "IAM": "ENABLED",
+              },
+              "FilesystemId": {
+                "Ref": "JenkinsControllerStorage013252B2",
+              },
+              "TransitEncryption": "ENABLED",
+            },
+            "Name": "shared",
+          },
+        ],
+      },
+      "Type": "AWS::ECS::TaskDefinition",
+    },
+    "JenkinsControllerTaskDefinitionExecutionRoleDefaultPolicy609E4B04": {
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "ecr:BatchCheckLayerAvailability",
+                "ecr:GetDownloadUrlForLayer",
+                "ecr:BatchGetImage",
+              ],
+              "Effect": "Allow",
+              "Resource": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "arn:",
+                    {
+                      "Ref": "AWS::Partition",
+                    },
+                    ":ecr:us-east-2:",
+                    {
+                      "Ref": "AWS::AccountId",
+                    },
+                    ":repository/",
+                    {
+                      "Fn::Sub": "cdk-hnb659fds-container-assets-\${AWS::AccountId}-us-east-2",
+                    },
+                  ],
+                ],
+              },
+            },
+            {
+              "Action": "ecr:GetAuthorizationToken",
+              "Effect": "Allow",
+              "Resource": "*",
+            },
+            {
+              "Action": [
+                "logs:CreateLogStream",
+                "logs:PutLogEvents",
+              ],
+              "Effect": "Allow",
+              "Resource": {
+                "Fn::GetAtt": [
+                  "JenkinsControllerTaskDefinitionmainLogGroup59AA6B46",
+                  "Arn",
+                ],
+              },
+            },
+            {
+              "Action": [
+                "secretsmanager:GetSecretValue",
+                "secretsmanager:DescribeSecret",
+              ],
+              "Effect": "Allow",
+              "Resource": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "arn:",
+                    {
+                      "Ref": "AWS::Partition",
+                    },
+                    ":secretsmanager:us-east-2:",
+                    {
+                      "Ref": "AWS::AccountId",
+                    },
+                    ":secret:ec2-ssh-key/TestStack-agent-ssh-key/private-??????",
+                  ],
+                ],
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "PolicyName": "JenkinsControllerTaskDefinitionExecutionRoleDefaultPolicy609E4B04",
+        "Roles": [
+          {
+            "Ref": "JenkinsControllerTaskDefinitionExecutionRoleFA99B987",
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Policy",
+    },
+    "JenkinsControllerTaskDefinitionExecutionRoleFA99B987": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "ecs-tasks.amazonaws.com",
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+      },
+      "Type": "AWS::IAM::Role",
+    },
+    "JenkinsControllerTaskDefinitionTaskRoleDFC317F9": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "ecs-tasks.amazonaws.com",
+              },
+            },
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "AWS": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition",
+                      },
+                      ":iam::",
+                      {
+                        "Ref": "AWS::AccountId",
+                      },
+                      ":root",
+                    ],
+                  ],
+                },
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+      },
+      "Type": "AWS::IAM::Role",
+    },
+    "JenkinsControllerTaskDefinitionTaskRoleDefaultPolicy96CF6745": {
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "ssmmessages:CreateControlChannel",
+                "ssmmessages:CreateDataChannel",
+                "ssmmessages:OpenControlChannel",
+                "ssmmessages:OpenDataChannel",
+              ],
+              "Effect": "Allow",
+              "Resource": "*",
+            },
+            {
+              "Action": "logs:DescribeLogGroups",
+              "Effect": "Allow",
+              "Resource": "*",
+            },
+            {
+              "Action": [
+                "logs:CreateLogStream",
+                "logs:DescribeLogStreams",
+                "logs:PutLogEvents",
+              ],
+              "Effect": "Allow",
+              "Resource": "*",
+            },
+            {
+              "Action": [
+                "ec2:DescribeSpotFleetInstances",
+                "ec2:ModifySpotFleetRequest",
+                "ec2:CreateTags",
+                "ec2:DescribeRegions",
+                "ec2:DescribeInstances",
+                "ec2:TerminateInstances",
+                "ec2:DescribeInstanceStatus",
+                "ec2:DescribeSpotFleetRequests",
+                "autoscaling:DescribeAutoScalingGroups",
+                "autoscaling:UpdateAutoScalingGroup",
+                "iam:ListInstanceProfiles",
+                "iam:ListRoles",
+              ],
+              "Effect": "Allow",
+              "Resource": "*",
+            },
+            {
+              "Action": "iam:PassRole",
+              "Condition": {
+                "StringEquals": {
+                  "iam:PassedToService": [
+                    "ec2.amazonaws.com",
+                  ],
+                },
+              },
+              "Effect": "Allow",
+              "Resource": {
+                "Fn::GetAtt": [
+                  "JenkinsControllerTaskDefinitionTaskRoleDFC317F9",
+                  "Arn",
+                ],
+              },
+            },
+            {
+              "Action": [
+                "ecr:BatchCheckLayerAvailability",
+                "ecr:GetDownloadUrlForLayer",
+                "ecr:BatchGetImage",
+              ],
+              "Effect": "Allow",
+              "Resource": {
+                "Fn::GetAtt": [
+                  "Repository22E53BBD",
+                  "Arn",
+                ],
+              },
+            },
+            {
+              "Action": "ecr:GetAuthorizationToken",
+              "Effect": "Allow",
+              "Resource": "*",
+            },
+            {
+              "Action": [
+                "s3:GetObject*",
+                "s3:GetBucket*",
+                "s3:List*",
+                "s3:DeleteObject*",
+                "s3:PutObject",
+                "s3:PutObjectLegalHold",
+                "s3:PutObjectRetention",
+                "s3:PutObjectTagging",
+                "s3:PutObjectVersionTagging",
+                "s3:Abort*",
+              ],
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "ArtifactBucket7410C9EF",
+                    "Arn",
+                  ],
+                },
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      {
+                        "Fn::GetAtt": [
+                          "ArtifactBucket7410C9EF",
+                          "Arn",
+                        ],
+                      },
+                      "/*",
+                    ],
+                  ],
+                },
+              ],
+            },
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Resource": {
+                "Fn::GetAtt": [
+                  "JenkinsControllerTaskDefinitionTaskRoleDFC317F9",
+                  "Arn",
+                ],
+              },
+            },
+            {
+              "Action": [
+                "elasticfilesystem:ClientMount",
+                "elasticfilesystem:ClientWrite",
+                "elasticfilesystem:ClientRootAccess",
+              ],
+              "Effect": "Allow",
+              "Resource": {
+                "Fn::GetAtt": [
+                  "JenkinsControllerStorage013252B2",
+                  "Arn",
+                ],
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "PolicyName": "JenkinsControllerTaskDefinitionTaskRoleDefaultPolicy96CF6745",
+        "Roles": [
+          {
+            "Ref": "JenkinsControllerTaskDefinitionTaskRoleDFC317F9",
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Policy",
+    },
+    "JenkinsControllerTaskDefinitionmainLogGroup59AA6B46": {
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "RetentionInDays": 180,
+      },
+      "Type": "AWS::Logs::LogGroup",
+      "UpdateReplacePolicy": "Retain",
     },
     "JenkinsLinuxAgentFleetASG75788F44": {
       "Properties": {
@@ -1075,9 +2039,9 @@ yum install -y tmux htop
       },
       "Type": "AWS::EC2::SecurityGroup",
     },
-    "JenkinsLinuxAgentSecurityGroupfromTestStackJenkinsMasterServiceSecurityGroup509810082216B75EBD": {
+    "JenkinsLinuxAgentSecurityGroupfromTestStackJenkinsControllerServiceSecurityGroupFCB7D6F8228F42F393": {
       "Properties": {
-        "Description": "from TestStackJenkinsMasterServiceSecurityGroup50981008:22",
+        "Description": "from TestStackJenkinsControllerServiceSecurityGroupFCB7D6F8:22",
         "FromPort": 22,
         "GroupId": {
           "Fn::GetAtt": [
@@ -1088,7 +2052,7 @@ yum install -y tmux htop
         "IpProtocol": "tcp",
         "SourceSecurityGroupId": {
           "Fn::GetAtt": [
-            "JenkinsMasterServiceSecurityGroupC408306B",
+            "JenkinsControllerServiceSecurityGroup8CBE094C",
             "GroupId",
           ],
         },
@@ -1378,9 +2342,9 @@ yum install -y tmux htop
       },
       "Type": "AWS::EC2::SecurityGroup",
     },
-    "JenkinsLinuxAgentSmallSecurityGroupfromTestStackJenkinsMasterServiceSecurityGroup50981008229160FE0E": {
+    "JenkinsLinuxAgentSmallSecurityGroupfromTestStackJenkinsControllerServiceSecurityGroupFCB7D6F822535DAB4E": {
       "Properties": {
-        "Description": "from TestStackJenkinsMasterServiceSecurityGroup50981008:22",
+        "Description": "from TestStackJenkinsControllerServiceSecurityGroupFCB7D6F8:22",
         "FromPort": 22,
         "GroupId": {
           "Fn::GetAtt": [
@@ -1391,7 +2355,7 @@ yum install -y tmux htop
         "IpProtocol": "tcp",
         "SourceSecurityGroupId": {
           "Fn::GetAtt": [
-            "JenkinsMasterServiceSecurityGroupC408306B",
+            "JenkinsControllerServiceSecurityGroup8CBE094C",
             "GroupId",
           ],
         },
@@ -1726,9 +2690,9 @@ diskutil apfs resizeContainer $APFSCONT 0
       },
       "Type": "AWS::EC2::SecurityGroup",
     },
-    "JenkinsMacAgent1InstanceInstanceSecurityGroupfromTestStackJenkinsMasterServiceSecurityGroup5098100822949DBDC0": {
+    "JenkinsMacAgent1InstanceInstanceSecurityGroupfromTestStackJenkinsControllerServiceSecurityGroupFCB7D6F822A4CEA2EA": {
       "Properties": {
-        "Description": "from TestStackJenkinsMasterServiceSecurityGroup50981008:22",
+        "Description": "from TestStackJenkinsControllerServiceSecurityGroupFCB7D6F8:22",
         "FromPort": 22,
         "GroupId": {
           "Fn::GetAtt": [
@@ -1739,977 +2703,13 @@ diskutil apfs resizeContainer $APFSCONT 0
         "IpProtocol": "tcp",
         "SourceSecurityGroupId": {
           "Fn::GetAtt": [
-            "JenkinsMasterServiceSecurityGroupC408306B",
+            "JenkinsControllerServiceSecurityGroup8CBE094C",
             "GroupId",
           ],
         },
         "ToPort": 22,
       },
       "Type": "AWS::EC2::SecurityGroupIngress",
-    },
-    "JenkinsMasterClusterAC897532": {
-      "Properties": {
-        "ClusterSettings": [
-          {
-            "Name": "containerInsights",
-            "Value": "enabled",
-          },
-        ],
-      },
-      "Type": "AWS::ECS::Cluster",
-    },
-    "JenkinsMasterServiceF7391AC1": {
-      "DependsOn": [
-        "JenkinsMasterServiceLBPublicListenerECSGroupFE3FDF30",
-        "JenkinsMasterServiceLBPublicListenerD674B4E4",
-      ],
-      "Properties": {
-        "Cluster": {
-          "Ref": "JenkinsMasterClusterAC897532",
-        },
-        "DeploymentConfiguration": {
-          "DeploymentCircuitBreaker": {
-            "Enable": true,
-            "Rollback": true,
-          },
-          "MaximumPercent": 200,
-          "MinimumHealthyPercent": 100,
-        },
-        "DeploymentController": {
-          "Type": "ECS",
-        },
-        "DesiredCount": 1,
-        "EnableECSManagedTags": false,
-        "EnableExecuteCommand": true,
-        "HealthCheckGracePeriodSeconds": 60,
-        "LaunchType": "FARGATE",
-        "LoadBalancers": [
-          {
-            "ContainerName": "main",
-            "ContainerPort": 8080,
-            "TargetGroupArn": {
-              "Ref": "JenkinsMasterServiceLBPublicListenerECSGroupFE3FDF30",
-            },
-          },
-        ],
-        "NetworkConfiguration": {
-          "AwsvpcConfiguration": {
-            "AssignPublicIp": "DISABLED",
-            "SecurityGroups": [
-              {
-                "Fn::GetAtt": [
-                  "JenkinsMasterServiceSecurityGroupC408306B",
-                  "GroupId",
-                ],
-              },
-            ],
-            "Subnets": [
-              {
-                "Ref": "VpcPrivateSubnet1Subnet536B997A",
-              },
-              {
-                "Ref": "VpcPrivateSubnet2Subnet3788AAA1",
-              },
-            ],
-          },
-        },
-        "TaskDefinition": {
-          "Ref": "JenkinsMasterTaskDefinition12093379",
-        },
-      },
-      "Type": "AWS::ECS::Service",
-    },
-    "JenkinsMasterServiceLB6A63DD53": {
-      "DependsOn": [
-        "LogBucketAutoDeleteObjectsCustomResource7762F42C",
-        "LogBucketPolicy900DBE48",
-        "LogBucketCC3B17E8",
-        "VpcPublicSubnet1DefaultRoute3DA9E72A",
-        "VpcPublicSubnet1RouteTableAssociation97140677",
-        "VpcPublicSubnet2DefaultRoute97F91067",
-        "VpcPublicSubnet2RouteTableAssociationDD5762D8",
-      ],
-      "Properties": {
-        "LoadBalancerAttributes": [
-          {
-            "Key": "deletion_protection.enabled",
-            "Value": "false",
-          },
-          {
-            "Key": "access_logs.s3.enabled",
-            "Value": "true",
-          },
-          {
-            "Key": "access_logs.s3.bucket",
-            "Value": {
-              "Ref": "LogBucketCC3B17E8",
-            },
-          },
-          {
-            "Key": "access_logs.s3.prefix",
-            "Value": "jenkinsAlbAccessLog",
-          },
-        ],
-        "Scheme": "internet-facing",
-        "SecurityGroups": [
-          {
-            "Fn::GetAtt": [
-              "JenkinsMasterServiceLBSecurityGroup2F0839CC",
-              "GroupId",
-            ],
-          },
-        ],
-        "Subnets": [
-          {
-            "Ref": "VpcPublicSubnet1Subnet5C2D37C4",
-          },
-          {
-            "Ref": "VpcPublicSubnet2Subnet691E08A3",
-          },
-        ],
-        "Type": "application",
-      },
-      "Type": "AWS::ElasticLoadBalancingV2::LoadBalancer",
-    },
-    "JenkinsMasterServiceLBPublicListenerD674B4E4": {
-      "DependsOn": [
-        "LogBucketAutoDeleteObjectsCustomResource7762F42C",
-        "LogBucketPolicy900DBE48",
-        "LogBucketCC3B17E8",
-      ],
-      "Properties": {
-        "DefaultActions": [
-          {
-            "TargetGroupArn": {
-              "Ref": "JenkinsMasterServiceLBPublicListenerECSGroupFE3FDF30",
-            },
-            "Type": "forward",
-          },
-        ],
-        "LoadBalancerArn": {
-          "Ref": "JenkinsMasterServiceLB6A63DD53",
-        },
-        "Port": 80,
-        "Protocol": "HTTP",
-      },
-      "Type": "AWS::ElasticLoadBalancingV2::Listener",
-    },
-    "JenkinsMasterServiceLBPublicListenerECSGroupFE3FDF30": {
-      "DependsOn": [
-        "LogBucketAutoDeleteObjectsCustomResource7762F42C",
-        "LogBucketPolicy900DBE48",
-        "LogBucketCC3B17E8",
-      ],
-      "Properties": {
-        "HealthCheckIntervalSeconds": 15,
-        "HealthCheckPath": "/login",
-        "HealthyThresholdCount": 2,
-        "Matcher": {
-          "HttpCode": "200",
-        },
-        "Port": 80,
-        "Protocol": "HTTP",
-        "TargetGroupAttributes": [
-          {
-            "Key": "stickiness.enabled",
-            "Value": "false",
-          },
-          {
-            "Key": "deregistration_delay.timeout_seconds",
-            "Value": "10",
-          },
-        ],
-        "TargetType": "ip",
-        "UnhealthyThresholdCount": 4,
-        "VpcId": {
-          "Ref": "Vpc8378EB38",
-        },
-      },
-      "Type": "AWS::ElasticLoadBalancingV2::TargetGroup",
-    },
-    "JenkinsMasterServiceLBSecurityGroup2F0839CC": {
-      "DependsOn": [
-        "LogBucketAutoDeleteObjectsCustomResource7762F42C",
-        "LogBucketPolicy900DBE48",
-        "LogBucketCC3B17E8",
-      ],
-      "Properties": {
-        "GroupDescription": "Automatically created Security Group for ELB TestStackJenkinsMasterServiceLB96798AB6",
-        "SecurityGroupIngress": [
-          {
-            "CidrIp": "127.0.0.1/32",
-            "Description": "from 127.0.0.1/32:80",
-            "FromPort": 80,
-            "IpProtocol": "tcp",
-            "ToPort": 80,
-          },
-          {
-            "CidrIp": {
-              "Fn::GetAtt": [
-                "Vpc8378EB38",
-                "CidrBlock",
-              ],
-            },
-            "Description": {
-              "Fn::Join": [
-                "",
-                [
-                  "from ",
-                  {
-                    "Fn::GetAtt": [
-                      "Vpc8378EB38",
-                      "CidrBlock",
-                    ],
-                  },
-                  ":80",
-                ],
-              ],
-            },
-            "FromPort": 80,
-            "IpProtocol": "tcp",
-            "ToPort": 80,
-          },
-        ],
-        "VpcId": {
-          "Ref": "Vpc8378EB38",
-        },
-      },
-      "Type": "AWS::EC2::SecurityGroup",
-    },
-    "JenkinsMasterServiceLBSecurityGrouptoTestStackJenkinsMasterServiceSecurityGroup509810088080E3541A5A": {
-      "DependsOn": [
-        "LogBucketAutoDeleteObjectsCustomResource7762F42C",
-        "LogBucketPolicy900DBE48",
-        "LogBucketCC3B17E8",
-      ],
-      "Properties": {
-        "Description": "Load balancer to target",
-        "DestinationSecurityGroupId": {
-          "Fn::GetAtt": [
-            "JenkinsMasterServiceSecurityGroupC408306B",
-            "GroupId",
-          ],
-        },
-        "FromPort": 8080,
-        "GroupId": {
-          "Fn::GetAtt": [
-            "JenkinsMasterServiceLBSecurityGroup2F0839CC",
-            "GroupId",
-          ],
-        },
-        "IpProtocol": "tcp",
-        "ToPort": 8080,
-      },
-      "Type": "AWS::EC2::SecurityGroupEgress",
-    },
-    "JenkinsMasterServiceSecurityGroupC408306B": {
-      "Properties": {
-        "GroupDescription": "TestStack/JenkinsMaster/Service/Service/SecurityGroup",
-        "SecurityGroupEgress": [
-          {
-            "CidrIp": "0.0.0.0/0",
-            "Description": "Allow all outbound traffic by default",
-            "IpProtocol": "-1",
-          },
-        ],
-        "VpcId": {
-          "Ref": "Vpc8378EB38",
-        },
-      },
-      "Type": "AWS::EC2::SecurityGroup",
-    },
-    "JenkinsMasterServiceSecurityGroupfromTestStackJenkinsMasterServiceLBSecurityGroup5E6D7A6B808074170F31": {
-      "Properties": {
-        "Description": "Load balancer to target",
-        "FromPort": 8080,
-        "GroupId": {
-          "Fn::GetAtt": [
-            "JenkinsMasterServiceSecurityGroupC408306B",
-            "GroupId",
-          ],
-        },
-        "IpProtocol": "tcp",
-        "SourceSecurityGroupId": {
-          "Fn::GetAtt": [
-            "JenkinsMasterServiceLBSecurityGroup2F0839CC",
-            "GroupId",
-          ],
-        },
-        "ToPort": 8080,
-      },
-      "Type": "AWS::EC2::SecurityGroupIngress",
-    },
-    "JenkinsMasterStorageAccessPoint1BB88191": {
-      "Properties": {
-        "FileSystemId": {
-          "Ref": "JenkinsMasterStorageF0282409",
-        },
-        "PosixUser": {
-          "Gid": "1000",
-          "Uid": "1000",
-        },
-        "RootDirectory": {
-          "CreationInfo": {
-            "OwnerGid": "1000",
-            "OwnerUid": "1000",
-            "Permissions": "755",
-          },
-          "Path": "/jenkins-home",
-        },
-      },
-      "Type": "AWS::EFS::AccessPoint",
-    },
-    "JenkinsMasterStorageEfsMountTarget173EF4842": {
-      "Properties": {
-        "FileSystemId": {
-          "Ref": "JenkinsMasterStorageF0282409",
-        },
-        "SecurityGroups": [
-          {
-            "Fn::GetAtt": [
-              "JenkinsMasterStorageEfsSecurityGroupC93EE732",
-              "GroupId",
-            ],
-          },
-        ],
-        "SubnetId": {
-          "Ref": "VpcPrivateSubnet1Subnet536B997A",
-        },
-      },
-      "Type": "AWS::EFS::MountTarget",
-    },
-    "JenkinsMasterStorageEfsMountTarget251C29654": {
-      "Properties": {
-        "FileSystemId": {
-          "Ref": "JenkinsMasterStorageF0282409",
-        },
-        "SecurityGroups": [
-          {
-            "Fn::GetAtt": [
-              "JenkinsMasterStorageEfsSecurityGroupC93EE732",
-              "GroupId",
-            ],
-          },
-        ],
-        "SubnetId": {
-          "Ref": "VpcPrivateSubnet2Subnet3788AAA1",
-        },
-      },
-      "Type": "AWS::EFS::MountTarget",
-    },
-    "JenkinsMasterStorageEfsSecurityGroupC93EE732": {
-      "Properties": {
-        "GroupDescription": "TestStack/JenkinsMaster/Storage/EfsSecurityGroup",
-        "SecurityGroupEgress": [
-          {
-            "CidrIp": "0.0.0.0/0",
-            "Description": "Allow all outbound traffic by default",
-            "IpProtocol": "-1",
-          },
-        ],
-        "Tags": [
-          {
-            "Key": "Name",
-            "Value": "TestStack/JenkinsMaster/Storage",
-          },
-        ],
-        "VpcId": {
-          "Ref": "Vpc8378EB38",
-        },
-      },
-      "Type": "AWS::EC2::SecurityGroup",
-    },
-    "JenkinsMasterStorageEfsSecurityGroupfromTestStackJenkinsMasterServiceSecurityGroup5098100820497567261A": {
-      "Properties": {
-        "Description": "from TestStackJenkinsMasterServiceSecurityGroup50981008:2049",
-        "FromPort": 2049,
-        "GroupId": {
-          "Fn::GetAtt": [
-            "JenkinsMasterStorageEfsSecurityGroupC93EE732",
-            "GroupId",
-          ],
-        },
-        "IpProtocol": "tcp",
-        "SourceSecurityGroupId": {
-          "Fn::GetAtt": [
-            "JenkinsMasterServiceSecurityGroupC408306B",
-            "GroupId",
-          ],
-        },
-        "ToPort": 2049,
-      },
-      "Type": "AWS::EC2::SecurityGroupIngress",
-    },
-    "JenkinsMasterStorageF0282409": {
-      "DeletionPolicy": "Delete",
-      "Properties": {
-        "Encrypted": true,
-        "FileSystemTags": [
-          {
-            "Key": "Name",
-            "Value": "TestStack/JenkinsMaster/Storage",
-          },
-        ],
-        "PerformanceMode": "generalPurpose",
-      },
-      "Type": "AWS::EFS::FileSystem",
-      "UpdateReplacePolicy": "Delete",
-    },
-    "JenkinsMasterTaskDefinition12093379": {
-      "Properties": {
-        "ContainerDefinitions": [
-          {
-            "Environment": [
-              {
-                "Name": "UNITY_ACCELERATOR_URL",
-                "Value": {
-                  "Fn::Join": [
-                    "",
-                    [
-                      {
-                        "Fn::GetAtt": [
-                          "NamespaceServiceCABDF534",
-                          "Name",
-                        ],
-                      },
-                      ".build:10080",
-                    ],
-                  ],
-                },
-              },
-              {
-                "Name": "AWS_REGION",
-                "Value": "us-east-2",
-              },
-              {
-                "Name": "ARTIFACT_BUCKET_NAME",
-                "Value": {
-                  "Ref": "ArtifactBucket7410C9EF",
-                },
-              },
-              {
-                "Name": "FLEET_ASG_NAME_LINUX_FLEET",
-                "Value": {
-                  "Ref": "JenkinsLinuxAgentFleetASG75788F44",
-                },
-              },
-              {
-                "Name": "FLEET_LAUNCH_TEMPLATE_ID_LINUX_FLEET",
-                "Value": {
-                  "Ref": "JenkinsLinuxAgentLaunchTemplate14EE0ADC",
-                },
-              },
-              {
-                "Name": "FLEET_ASG_NAME_LINUX_FLEET_SMALL",
-                "Value": {
-                  "Ref": "JenkinsLinuxAgentSmallFleetASG9671C0E4",
-                },
-              },
-              {
-                "Name": "FLEET_LAUNCH_TEMPLATE_ID_LINUX_FLEET_SMALL",
-              },
-              {
-                "Name": "ECR_REPOSITORY_URL",
-                "Value": {
-                  "Fn::Join": [
-                    "",
-                    [
-                      {
-                        "Fn::Select": [
-                          4,
-                          {
-                            "Fn::Split": [
-                              ":",
-                              {
-                                "Fn::GetAtt": [
-                                  "Repository22E53BBD",
-                                  "Arn",
-                                ],
-                              },
-                            ],
-                          },
-                        ],
-                      },
-                      ".dkr.ecr.",
-                      {
-                        "Fn::Select": [
-                          3,
-                          {
-                            "Fn::Split": [
-                              ":",
-                              {
-                                "Fn::GetAtt": [
-                                  "Repository22E53BBD",
-                                  "Arn",
-                                ],
-                              },
-                            ],
-                          },
-                        ],
-                      },
-                      ".",
-                      {
-                        "Ref": "AWS::URLSuffix",
-                      },
-                      "/",
-                      {
-                        "Ref": "Repository22E53BBD",
-                      },
-                    ],
-                  ],
-                },
-              },
-              {
-                "Name": "ECR_REGISTRY_URL",
-                "Value": {
-                  "Fn::Join": [
-                    "",
-                    [
-                      "https://",
-                      {
-                        "Ref": "AWS::AccountId",
-                      },
-                      ".dkr.ecr.us-east-2.amazonaws.com",
-                    ],
-                  ],
-                },
-              },
-              {
-                "Name": "PLUGINS_FORCE_UPGRADE",
-                "Value": "true",
-              },
-              {
-                "Name": "ECR_ROLE_ARN",
-                "Value": {
-                  "Fn::GetAtt": [
-                    "JenkinsMasterTaskDefinitionTaskRole0D5723F3",
-                    "Arn",
-                  ],
-                },
-              },
-              {
-                "Name": "MAC_HOST_MAC0",
-                "Value": {
-                  "Fn::GetAtt": [
-                    "JenkinsMacAgent1Instance609468B3",
-                    "PrivateIp",
-                  ],
-                },
-              },
-              {
-                "Name": "JENKINS_URL",
-                "Value": {
-                  "Fn::Join": [
-                    "",
-                    [
-                      "http://",
-                      {
-                        "Fn::GetAtt": [
-                          "JenkinsMasterServiceLB6A63DD53",
-                          "DNSName",
-                        ],
-                      },
-                    ],
-                  ],
-                },
-              },
-            ],
-            "Essential": true,
-            "Image": {
-              "Fn::Sub": "\${AWS::AccountId}.dkr.ecr.us-east-2.\${AWS::URLSuffix}/cdk-hnb659fds-container-assets-\${AWS::AccountId}-us-east-2:9d593664351480d6e11d027ea6eae646f22456b73d8e75a12e98d7e44af95bb3",
-            },
-            "LinuxParameters": {
-              "Capabilities": {},
-              "InitProcessEnabled": true,
-            },
-            "LogConfiguration": {
-              "LogDriver": "awslogs",
-              "Options": {
-                "awslogs-group": {
-                  "Ref": "JenkinsMasterTaskDefinitionmainLogGroup457966E3",
-                },
-                "awslogs-region": "us-east-2",
-                "awslogs-stream-prefix": "jenkins-master",
-              },
-            },
-            "MountPoints": [
-              {
-                "ContainerPath": "/var/jenkins_home",
-                "ReadOnly": false,
-                "SourceVolume": "shared",
-              },
-            ],
-            "Name": "main",
-            "PortMappings": [
-              {
-                "ContainerPort": 8080,
-                "Protocol": "tcp",
-              },
-            ],
-            "Secrets": [
-              {
-                "Name": "PRIVATE_KEY",
-                "ValueFrom": {
-                  "Fn::Join": [
-                    "",
-                    [
-                      "arn:",
-                      {
-                        "Ref": "AWS::Partition",
-                      },
-                      ":secretsmanager:us-east-2:",
-                      {
-                        "Ref": "AWS::AccountId",
-                      },
-                      ":secret:ec2-ssh-key/TestStack-agent-ssh-key/private",
-                    ],
-                  ],
-                },
-              },
-            ],
-          },
-        ],
-        "Cpu": "1024",
-        "ExecutionRoleArn": {
-          "Fn::GetAtt": [
-            "JenkinsMasterTaskDefinitionExecutionRoleE2A2DDE2",
-            "Arn",
-          ],
-        },
-        "Family": "TestStackJenkinsMasterTaskDefinition6FE73240",
-        "Memory": "2048",
-        "NetworkMode": "awsvpc",
-        "RequiresCompatibilities": [
-          "FARGATE",
-        ],
-        "TaskRoleArn": {
-          "Fn::GetAtt": [
-            "JenkinsMasterTaskDefinitionTaskRole0D5723F3",
-            "Arn",
-          ],
-        },
-        "Volumes": [
-          {
-            "EFSVolumeConfiguration": {
-              "AuthorizationConfig": {
-                "AccessPointId": {
-                  "Ref": "JenkinsMasterStorageAccessPoint1BB88191",
-                },
-                "IAM": "ENABLED",
-              },
-              "FilesystemId": {
-                "Ref": "JenkinsMasterStorageF0282409",
-              },
-              "TransitEncryption": "ENABLED",
-            },
-            "Name": "shared",
-          },
-        ],
-      },
-      "Type": "AWS::ECS::TaskDefinition",
-    },
-    "JenkinsMasterTaskDefinitionExecutionRoleDefaultPolicyBBE4D287": {
-      "Properties": {
-        "PolicyDocument": {
-          "Statement": [
-            {
-              "Action": [
-                "ecr:BatchCheckLayerAvailability",
-                "ecr:GetDownloadUrlForLayer",
-                "ecr:BatchGetImage",
-              ],
-              "Effect": "Allow",
-              "Resource": {
-                "Fn::Join": [
-                  "",
-                  [
-                    "arn:",
-                    {
-                      "Ref": "AWS::Partition",
-                    },
-                    ":ecr:us-east-2:",
-                    {
-                      "Ref": "AWS::AccountId",
-                    },
-                    ":repository/",
-                    {
-                      "Fn::Sub": "cdk-hnb659fds-container-assets-\${AWS::AccountId}-us-east-2",
-                    },
-                  ],
-                ],
-              },
-            },
-            {
-              "Action": "ecr:GetAuthorizationToken",
-              "Effect": "Allow",
-              "Resource": "*",
-            },
-            {
-              "Action": [
-                "logs:CreateLogStream",
-                "logs:PutLogEvents",
-              ],
-              "Effect": "Allow",
-              "Resource": {
-                "Fn::GetAtt": [
-                  "JenkinsMasterTaskDefinitionmainLogGroup457966E3",
-                  "Arn",
-                ],
-              },
-            },
-            {
-              "Action": [
-                "secretsmanager:GetSecretValue",
-                "secretsmanager:DescribeSecret",
-              ],
-              "Effect": "Allow",
-              "Resource": {
-                "Fn::Join": [
-                  "",
-                  [
-                    "arn:",
-                    {
-                      "Ref": "AWS::Partition",
-                    },
-                    ":secretsmanager:us-east-2:",
-                    {
-                      "Ref": "AWS::AccountId",
-                    },
-                    ":secret:ec2-ssh-key/TestStack-agent-ssh-key/private-??????",
-                  ],
-                ],
-              },
-            },
-          ],
-          "Version": "2012-10-17",
-        },
-        "PolicyName": "JenkinsMasterTaskDefinitionExecutionRoleDefaultPolicyBBE4D287",
-        "Roles": [
-          {
-            "Ref": "JenkinsMasterTaskDefinitionExecutionRoleE2A2DDE2",
-          },
-        ],
-      },
-      "Type": "AWS::IAM::Policy",
-    },
-    "JenkinsMasterTaskDefinitionExecutionRoleE2A2DDE2": {
-      "Properties": {
-        "AssumeRolePolicyDocument": {
-          "Statement": [
-            {
-              "Action": "sts:AssumeRole",
-              "Effect": "Allow",
-              "Principal": {
-                "Service": "ecs-tasks.amazonaws.com",
-              },
-            },
-          ],
-          "Version": "2012-10-17",
-        },
-      },
-      "Type": "AWS::IAM::Role",
-    },
-    "JenkinsMasterTaskDefinitionTaskRole0D5723F3": {
-      "Properties": {
-        "AssumeRolePolicyDocument": {
-          "Statement": [
-            {
-              "Action": "sts:AssumeRole",
-              "Effect": "Allow",
-              "Principal": {
-                "Service": "ecs-tasks.amazonaws.com",
-              },
-            },
-            {
-              "Action": "sts:AssumeRole",
-              "Effect": "Allow",
-              "Principal": {
-                "AWS": {
-                  "Fn::Join": [
-                    "",
-                    [
-                      "arn:",
-                      {
-                        "Ref": "AWS::Partition",
-                      },
-                      ":iam::",
-                      {
-                        "Ref": "AWS::AccountId",
-                      },
-                      ":root",
-                    ],
-                  ],
-                },
-              },
-            },
-          ],
-          "Version": "2012-10-17",
-        },
-      },
-      "Type": "AWS::IAM::Role",
-    },
-    "JenkinsMasterTaskDefinitionTaskRoleDefaultPolicy17548315": {
-      "Properties": {
-        "PolicyDocument": {
-          "Statement": [
-            {
-              "Action": [
-                "ssmmessages:CreateControlChannel",
-                "ssmmessages:CreateDataChannel",
-                "ssmmessages:OpenControlChannel",
-                "ssmmessages:OpenDataChannel",
-              ],
-              "Effect": "Allow",
-              "Resource": "*",
-            },
-            {
-              "Action": "logs:DescribeLogGroups",
-              "Effect": "Allow",
-              "Resource": "*",
-            },
-            {
-              "Action": [
-                "logs:CreateLogStream",
-                "logs:DescribeLogStreams",
-                "logs:PutLogEvents",
-              ],
-              "Effect": "Allow",
-              "Resource": "*",
-            },
-            {
-              "Action": [
-                "ec2:DescribeSpotFleetInstances",
-                "ec2:ModifySpotFleetRequest",
-                "ec2:CreateTags",
-                "ec2:DescribeRegions",
-                "ec2:DescribeInstances",
-                "ec2:TerminateInstances",
-                "ec2:DescribeInstanceStatus",
-                "ec2:DescribeSpotFleetRequests",
-                "autoscaling:DescribeAutoScalingGroups",
-                "autoscaling:UpdateAutoScalingGroup",
-                "iam:ListInstanceProfiles",
-                "iam:ListRoles",
-              ],
-              "Effect": "Allow",
-              "Resource": "*",
-            },
-            {
-              "Action": "iam:PassRole",
-              "Condition": {
-                "StringEquals": {
-                  "iam:PassedToService": [
-                    "ec2.amazonaws.com",
-                  ],
-                },
-              },
-              "Effect": "Allow",
-              "Resource": {
-                "Fn::GetAtt": [
-                  "JenkinsMasterTaskDefinitionTaskRole0D5723F3",
-                  "Arn",
-                ],
-              },
-            },
-            {
-              "Action": [
-                "ecr:BatchCheckLayerAvailability",
-                "ecr:GetDownloadUrlForLayer",
-                "ecr:BatchGetImage",
-              ],
-              "Effect": "Allow",
-              "Resource": {
-                "Fn::GetAtt": [
-                  "Repository22E53BBD",
-                  "Arn",
-                ],
-              },
-            },
-            {
-              "Action": "ecr:GetAuthorizationToken",
-              "Effect": "Allow",
-              "Resource": "*",
-            },
-            {
-              "Action": [
-                "s3:GetObject*",
-                "s3:GetBucket*",
-                "s3:List*",
-                "s3:DeleteObject*",
-                "s3:PutObject",
-                "s3:PutObjectLegalHold",
-                "s3:PutObjectRetention",
-                "s3:PutObjectTagging",
-                "s3:PutObjectVersionTagging",
-                "s3:Abort*",
-              ],
-              "Effect": "Allow",
-              "Resource": [
-                {
-                  "Fn::GetAtt": [
-                    "ArtifactBucket7410C9EF",
-                    "Arn",
-                  ],
-                },
-                {
-                  "Fn::Join": [
-                    "",
-                    [
-                      {
-                        "Fn::GetAtt": [
-                          "ArtifactBucket7410C9EF",
-                          "Arn",
-                        ],
-                      },
-                      "/*",
-                    ],
-                  ],
-                },
-              ],
-            },
-            {
-              "Action": "sts:AssumeRole",
-              "Effect": "Allow",
-              "Resource": {
-                "Fn::GetAtt": [
-                  "JenkinsMasterTaskDefinitionTaskRole0D5723F3",
-                  "Arn",
-                ],
-              },
-            },
-            {
-              "Action": [
-                "elasticfilesystem:ClientMount",
-                "elasticfilesystem:ClientWrite",
-                "elasticfilesystem:ClientRootAccess",
-              ],
-              "Effect": "Allow",
-              "Resource": {
-                "Fn::GetAtt": [
-                  "JenkinsMasterStorageF0282409",
-                  "Arn",
-                ],
-              },
-            },
-          ],
-          "Version": "2012-10-17",
-        },
-        "PolicyName": "JenkinsMasterTaskDefinitionTaskRoleDefaultPolicy17548315",
-        "Roles": [
-          {
-            "Ref": "JenkinsMasterTaskDefinitionTaskRole0D5723F3",
-          },
-        ],
-      },
-      "Type": "AWS::IAM::Policy",
-    },
-    "JenkinsMasterTaskDefinitionmainLogGroup457966E3": {
-      "DeletionPolicy": "Retain",
-      "Properties": {
-        "RetentionInDays": 180,
-      },
-      "Type": "AWS::Logs::LogGroup",
-      "UpdateReplacePolicy": "Retain",
     },
     "KeyPairEC2KeyPairTestStackagentsshkeyB7B10C45": {
       "DeletionPolicy": "Delete",
