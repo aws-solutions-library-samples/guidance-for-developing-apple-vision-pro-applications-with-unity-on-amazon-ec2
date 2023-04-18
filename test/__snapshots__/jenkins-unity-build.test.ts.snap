@@ -213,7 +213,7 @@ exports[`Snapshot test 1`] = `
           "S3Bucket": {
             "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-us-east-2",
           },
-          "S3Key": "2332a8953f2d92ebffdc01cf20d5a2fb5bf2ef29764cda4186f01c55edee8c73.zip",
+          "S3Key": "40aa87cdf43c4095cec18bc443965f22ab2f8c1ace47e482a0ba4e35d83b0cc9.zip",
         },
         "Description": {
           "Fn::Join": [
@@ -741,6 +741,12 @@ exports[`Snapshot test 1`] = `
     },
     "JenkinsControllerStorageAccessPointA57FF6EA": {
       "Properties": {
+        "AccessPointTags": [
+          {
+            "Key": "Name",
+            "Value": "TestStack/JenkinsController/Storage/AccessPoint",
+          },
+        ],
         "FileSystemId": {
           "Ref": "JenkinsControllerStorage013252B2",
         },
