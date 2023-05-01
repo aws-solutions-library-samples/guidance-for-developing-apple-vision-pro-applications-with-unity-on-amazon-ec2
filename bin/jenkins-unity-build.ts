@@ -2,6 +2,7 @@
 import 'source-map-support/register';
 import * as cdk from 'aws-cdk-lib';
 import { JenkinsUnityBuildStack } from '../lib/jenkins-unity-build-stack';
+import { AwsPrototypingChecks } from '@aws-prototyping-sdk/pdk-nag';
 
 const app = new cdk.App();
 new JenkinsUnityBuildStack(app, 'JenkinsUnityBuildStack', {
