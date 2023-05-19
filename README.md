@@ -1,6 +1,8 @@
 # Unity Build Pipeline with Jenkins and Amazon EC2 Mac Instances
 [![Build](https://github.com/aws-samples/jenkins-unity-build-on-aws/actions/workflows/build.yml/badge.svg)](https://github.com/aws-samples/jenkins-unity-build-on-aws/actions/workflows/build.yml)
 
+日本語の記事はこちら: [Unityモバイルアプリのビルドパイプラインを実装する](https://aws.amazon.com/jp/blogs/news/unity-mobile-app-build-pipeline/)
+
 This is a starter kit for Unity build pipeline with Jenkins and Amazon EC2 Linux/Mac instances on AWS.
 
 Features include:
