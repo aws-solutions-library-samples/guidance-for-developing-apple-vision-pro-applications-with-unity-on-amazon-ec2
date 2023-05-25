@@ -35,11 +35,11 @@ interface JenkinsUnityBuildStackProps extends cdk.StackProps {
    *
    * @default VPC is created automatically
    */
-  readonly vpc?: IVpc;
+  readonly vpcId?: string;
 
   /**
    * ARN of an ACM certificate for Jenkins controller ALB.
-   * 
+   *
    * @default Traffic is not encrypted (via HTTP)
    */
   readonly certificateArn?: string;
@@ -49,12 +49,12 @@ export class JenkinsUnityBuildStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props: JenkinsUnityBuildStackProps) {
     super(scope, id, props);
 
-    let vpc = props.vpc;
-    if (vpc === undefined) {
-      vpc = new ec2.Vpc(this, 'Vpc', {
-        natGateways: 1,
-      });
-    }
+    const vpc =
+      props.vpcId == null
+        ? new ec2.Vpc(this, 'Vpc', {
+            natGateways: 1,
+          })
+        : ec2.Vpc.fromLookup(this, 'Vpc', { vpcId: props.vpcId });
 
     // S3 bucket to store logs (e.g. ALB access log or S3 bucket access log)
     const logBucket = new Bucket(this, 'LogBucket', {
