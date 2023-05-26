@@ -186,7 +186,7 @@ export class JenkinsUnityBuildStack extends cdk.Stack {
       logBucket,
       artifactBucket,
       certificateArn: props.certificateArn,
-      environmentSecrets: { PRIVATE_KEY: Secret.fromSecretsManager(keyPair.privateKey) },
+      environmentSecrets: { PRIVATE_KEY: Secret.fromSsmParameter(keyPair.privateKey) },
       environmentVariables: {
         UNITY_ACCELERATOR_URL: accelerator.endpoint,
       },

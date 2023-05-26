@@ -262,176 +262,6 @@ exports[`Snapshot test 1`] = `
       },
       "Type": "AWS::IAM::Role",
     },
-    "EC2KeyNameManagerLambdaBE629145": {
-      "DependsOn": [
-        "EC2KeyPairManagerRoleB243C519",
-      ],
-      "Properties": {
-        "Code": {
-          "S3Bucket": {
-            "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-us-east-2",
-          },
-          "S3Key": "4b53adc667dcab419bec9e03553dce125d10f1d9c6ac1d2c082001b9332f150f.zip",
-        },
-        "Description": "Custom CFN resource: Manage EC2 Key Pairs",
-        "FunctionName": "TestStack-CFN-Resource-Custom-EC2-Key-Pair",
-        "Handler": "index.handler",
-        "Role": {
-          "Fn::GetAtt": [
-            "EC2KeyPairManagerRoleB243C519",
-            "Arn",
-          ],
-        },
-        "Runtime": "nodejs14.x",
-        "Timeout": 180,
-      },
-      "Type": "AWS::Lambda::Function",
-    },
-    "EC2KeyPairManagerPolicyEBBC1576": {
-      "Properties": {
-        "Description": "Used by Lambda CFN-Resource-Custom-EC2-Key-Pair, which is a custom CFN resource, managing EC2 Key Pairs",
-        "ManagedPolicyName": "TestStack-CFN-Resource-Custom-EC2-Key-Pair",
-        "Path": "/",
-        "PolicyDocument": {
-          "Statement": [
-            {
-              "Action": "ec2:DescribeKeyPairs",
-              "Effect": "Allow",
-              "Resource": "*",
-            },
-            {
-              "Action": [
-                "ec2:CreateKeyPair",
-                "ec2:CreateTags",
-                "ec2:ImportKeyPair",
-              ],
-              "Condition": {
-                "StringLike": {
-                  "aws:RequestTag/CreatedByCfnCustomResource": "CFN::Resource::Custom::EC2-Key-Pair",
-                },
-              },
-              "Effect": "Allow",
-              "Resource": {
-                "Fn::Join": [
-                  "",
-                  [
-                    "arn:",
-                    {
-                      "Ref": "AWS::Partition",
-                    },
-                    ":ec2:*:*:key-pair/*",
-                  ],
-                ],
-              },
-            },
-            {
-              "Action": [
-                "ec2:CreateTags",
-                "ec2:DeleteKeyPair",
-                "ec2:DeleteTags",
-              ],
-              "Condition": {
-                "StringLike": {
-                  "ec2:ResourceTag/CreatedByCfnCustomResource": "CFN::Resource::Custom::EC2-Key-Pair",
-                },
-              },
-              "Effect": "Allow",
-              "Resource": {
-                "Fn::Join": [
-                  "",
-                  [
-                    "arn:",
-                    {
-                      "Ref": "AWS::Partition",
-                    },
-                    ":ec2:*:*:key-pair/*",
-                  ],
-                ],
-              },
-            },
-            {
-              "Action": "secretsmanager:ListSecrets",
-              "Effect": "Allow",
-              "Resource": "*",
-            },
-            {
-              "Action": [
-                "secretsmanager:CreateSecret",
-                "secretsmanager:TagResource",
-              ],
-              "Condition": {
-                "StringLike": {
-                  "aws:RequestTag/CreatedByCfnCustomResource": "CFN::Resource::Custom::EC2-Key-Pair",
-                },
-              },
-              "Effect": "Allow",
-              "Resource": "*",
-            },
-            {
-              "Action": [
-                "secretsmanager:DeleteResourcePolicy",
-                "secretsmanager:DeleteSecret",
-                "secretsmanager:DescribeSecret",
-                "secretsmanager:GetResourcePolicy",
-                "secretsmanager:GetSecretValue",
-                "secretsmanager:ListSecretVersionIds",
-                "secretsmanager:PutResourcePolicy",
-                "secretsmanager:PutSecretValue",
-                "secretsmanager:RestoreSecret",
-                "secretsmanager:UntagResource",
-                "secretsmanager:UpdateSecret",
-                "secretsmanager:UpdateSecretVersionStage",
-              ],
-              "Condition": {
-                "StringLike": {
-                  "secretsmanager:ResourceTag/CreatedByCfnCustomResource": "CFN::Resource::Custom::EC2-Key-Pair",
-                },
-              },
-              "Effect": "Allow",
-              "Resource": "*",
-            },
-          ],
-          "Version": "2012-10-17",
-        },
-      },
-      "Type": "AWS::IAM::ManagedPolicy",
-    },
-    "EC2KeyPairManagerRoleB243C519": {
-      "Properties": {
-        "AssumeRolePolicyDocument": {
-          "Statement": [
-            {
-              "Action": "sts:AssumeRole",
-              "Effect": "Allow",
-              "Principal": {
-                "Service": "lambda.amazonaws.com",
-              },
-            },
-          ],
-          "Version": "2012-10-17",
-        },
-        "Description": "Used by Lambda CFN-Resource-Custom-EC2-Key-Pair, which is a custom CFN resource, managing EC2 Key Pairs",
-        "ManagedPolicyArns": [
-          {
-            "Ref": "EC2KeyPairManagerPolicyEBBC1576",
-          },
-          {
-            "Fn::Join": [
-              "",
-              [
-                "arn:",
-                {
-                  "Ref": "AWS::Partition",
-                },
-                ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
-              ],
-            ],
-          },
-        ],
-        "RoleName": "TestStack-CFN-Resource-Custom-EC2-Key-Pair",
-      },
-      "Type": "AWS::IAM::Role",
-    },
     "JenkinsControllerClusterE5BC789D": {
       "Properties": {
         "ClusterSettings": [
@@ -1048,11 +878,17 @@ exports[`Snapshot test 1`] = `
                       {
                         "Ref": "AWS::Partition",
                       },
-                      ":secretsmanager:us-east-2:",
+                      ":ssm:us-east-2:",
                       {
                         "Ref": "AWS::AccountId",
                       },
-                      ":secret:ec2-ssh-key/TestStack-agent-ssh-key/private",
+                      ":parameter/ec2/keypair/",
+                      {
+                        "Fn::GetAtt": [
+                          "KeyPair0151ACB6",
+                          "KeyPairId",
+                        ],
+                      },
                     ],
                   ],
                 },
@@ -1150,8 +986,10 @@ exports[`Snapshot test 1`] = `
             },
             {
               "Action": [
-                "secretsmanager:GetSecretValue",
-                "secretsmanager:DescribeSecret",
+                "ssm:DescribeParameters",
+                "ssm:GetParameters",
+                "ssm:GetParameter",
+                "ssm:GetParameterHistory",
               ],
               "Effect": "Allow",
               "Resource": {
@@ -1162,11 +1000,17 @@ exports[`Snapshot test 1`] = `
                     {
                       "Ref": "AWS::Partition",
                     },
-                    ":secretsmanager:us-east-2:",
+                    ":ssm:us-east-2:",
                     {
                       "Ref": "AWS::AccountId",
                     },
-                    ":secret:ec2-ssh-key/TestStack-agent-ssh-key/private-??????",
+                    ":parameter/ec2/keypair/",
+                    {
+                      "Fn::GetAtt": [
+                        "KeyPair0151ACB6",
+                        "KeyPairId",
+                      ],
+                    },
                   ],
                 ],
               },
@@ -1481,12 +1325,7 @@ exports[`Snapshot test 1`] = `
           "ImageId": {
             "Ref": "SsmParameterValueawsserviceamiamazonlinuxlatestamzn2amihvmx8664gp2C96584B6F00A464EAD1953AFF4B05118Parameter",
           },
-          "KeyName": {
-            "Fn::GetAtt": [
-              "KeyPairEC2KeyPairTestStackagentsshkeyB7B10C45",
-              "KeyPairName",
-            ],
-          },
+          "KeyName": "TestStack-agent-ssh-key",
           "SecurityGroupIds": [
             {
               "Fn::GetAtt": [
@@ -2136,12 +1975,7 @@ yum install -y tmux htop
           "ImageId": {
             "Ref": "SsmParameterValueawsserviceamiamazonlinuxlatestamzn2amihvmx8664gp2C96584B6F00A464EAD1953AFF4B05118Parameter",
           },
-          "KeyName": {
-            "Fn::GetAtt": [
-              "KeyPairEC2KeyPairTestStackagentsshkeyB7B10C45",
-              "KeyPairName",
-            ],
-          },
+          "KeyName": "TestStack-agent-ssh-key",
           "SecurityGroupIds": [
             {
               "Fn::GetAtt": [
@@ -2528,12 +2362,7 @@ yum install -y tmux htop
         },
         "ImageId": "ami-013846afc111c94b0",
         "InstanceType": "mac1.metal",
-        "KeyName": {
-          "Fn::GetAtt": [
-            "KeyPairEC2KeyPairTestStackagentsshkeyB7B10C45",
-            "KeyPairName",
-          ],
-        },
+        "KeyName": "TestStack-agent-ssh-key",
         "SecurityGroupIds": [
           {
             "Fn::GetAtt": [
@@ -2717,32 +2546,11 @@ diskutil apfs resizeContainer $APFSCONT 0
       },
       "Type": "AWS::EC2::SecurityGroupIngress",
     },
-    "KeyPairEC2KeyPairTestStackagentsshkeyB7B10C45": {
-      "DeletionPolicy": "Delete",
+    "KeyPair0151ACB6": {
       "Properties": {
-        "Description": "",
-        "ExposePublicKey": false,
-        "KmsPrivate": "alias/aws/secretsmanager",
-        "KmsPublic": "alias/aws/secretsmanager",
-        "Name": "TestStack-agent-ssh-key",
-        "PublicKey": "",
-        "PublicKeyFormat": "OPENSSH",
-        "RemoveKeySecretsAfterDays": 0,
-        "SecretPrefix": "ec2-ssh-key/",
-        "ServiceToken": {
-          "Fn::GetAtt": [
-            "EC2KeyNameManagerLambdaBE629145",
-            "Arn",
-          ],
-        },
-        "StackName": "TestStack",
-        "StorePublicKey": true,
-        "Tags": {
-          "CreatedByCfnCustomResource": "CFN::Resource::Custom::EC2-Key-Pair",
-        },
+        "KeyName": "TestStack-agent-ssh-key",
       },
-      "Type": "Custom::EC2-Key-Pair",
-      "UpdateReplacePolicy": "Delete",
+      "Type": "AWS::EC2::KeyPair",
     },
     "LogBucketAutoDeleteObjectsCustomResource7762F42C": {
       "DeletionPolicy": "Delete",
