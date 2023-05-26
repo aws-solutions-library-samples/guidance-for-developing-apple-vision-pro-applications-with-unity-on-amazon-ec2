@@ -1,11 +1,4 @@
-import {
-  AmazonLinuxGeneration,
-  InstanceClass,
-  InstanceSize,
-  IVpc,
-  LaunchTemplate,
-  SubnetType,
-} from 'aws-cdk-lib/aws-ec2';
+import { IVpc } from 'aws-cdk-lib/aws-ec2';
 import { Construct } from 'constructs';
 import * as ec2 from 'aws-cdk-lib/aws-ec2';
 import { AutoScalingGroup, SpotAllocationStrategy } from 'aws-cdk-lib/aws-autoscaling';
@@ -26,7 +19,7 @@ export interface AgentProps {
   /**
    * The size of a data volume that is attached as a secondary volume to an instance.
    * A data volume will be not deleted when an instance is terminated and reattached by new instances.
-   * 
+   *
    * @default No data volume is created.
    */
   readonly dataVolumeSize?: Size;
@@ -70,9 +63,7 @@ export class AgentEC2 extends Construct {
     const launchTemplate = new ec2.LaunchTemplate(this, 'LaunchTemplate', {
       machineImage: props.amiId
         ? ec2.MachineImage.genericLinux({ [Stack.of(this).region]: props.amiId })
-        : ec2.MachineImage.latestAmazonLinux({
-            generation: AmazonLinuxGeneration.AMAZON_LINUX_2,
-          }),
+        : ec2.MachineImage.latestAmazonLinux2(),
       blockDevices: [
         {
           deviceName: '/dev/xvda',
@@ -94,7 +85,10 @@ export class AgentEC2 extends Construct {
     });
 
     // You can adjust throughput (MB/s) of the gp3 EBS volume
-    (launchTemplate.node.defaultChild as CfnResource).addPropertyOverride('LaunchTemplateData.BlockDeviceMappings.0.Ebs.Throughput', 150);
+    (launchTemplate.node.defaultChild as CfnResource).addPropertyOverride(
+      'LaunchTemplateData.BlockDeviceMappings.0.Ebs.Throughput',
+      150,
+    );
 
     props.artifactBucket?.grantReadWrite(launchTemplate);
     (props.policyStatements ?? []).forEach((policy) => launchTemplate.role!.addToPrincipalPolicy(policy));

@@ -64,6 +64,10 @@ exports[`Snapshot test 1`] = `
       "Default": "/aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2",
       "Type": "AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>",
     },
+    "SsmParameterValueawsserviceamiamazonlinuxlatestamzn2amikernel510hvmx8664gp2C96584B6F00A464EAD1953AFF4B05118Parameter": {
+      "Default": "/aws/service/ami-amazon-linux-latest/amzn2-ami-kernel-5.10-hvm-x86_64-gp2",
+      "Type": "AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>",
+    },
   },
   "Resources": {
     "ArtifactBucket7410C9EF": {
@@ -1323,7 +1327,7 @@ exports[`Snapshot test 1`] = `
             },
           },
           "ImageId": {
-            "Ref": "SsmParameterValueawsserviceamiamazonlinuxlatestamzn2amihvmx8664gp2C96584B6F00A464EAD1953AFF4B05118Parameter",
+            "Ref": "SsmParameterValueawsserviceamiamazonlinuxlatestamzn2amikernel510hvmx8664gp2C96584B6F00A464EAD1953AFF4B05118Parameter",
           },
           "KeyName": "TestStack-agent-ssh-key",
           "SecurityGroupIds": [
@@ -1973,7 +1977,7 @@ yum install -y tmux htop
             },
           },
           "ImageId": {
-            "Ref": "SsmParameterValueawsserviceamiamazonlinuxlatestamzn2amihvmx8664gp2C96584B6F00A464EAD1953AFF4B05118Parameter",
+            "Ref": "SsmParameterValueawsserviceamiamazonlinuxlatestamzn2amikernel510hvmx8664gp2C96584B6F00A464EAD1953AFF4B05118Parameter",
           },
           "KeyName": "TestStack-agent-ssh-key",
           "SecurityGroupIds": [
