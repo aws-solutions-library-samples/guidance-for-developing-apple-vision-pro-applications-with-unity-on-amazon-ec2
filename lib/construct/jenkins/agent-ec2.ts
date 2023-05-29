@@ -63,7 +63,7 @@ export class AgentEC2 extends Construct {
     const launchTemplate = new ec2.LaunchTemplate(this, 'LaunchTemplate', {
       machineImage: props.amiId
         ? ec2.MachineImage.genericLinux({ [Stack.of(this).region]: props.amiId })
-        : ec2.MachineImage.latestAmazonLinux2(),
+        : ec2.MachineImage.latestAmazonLinux2023(),
       blockDevices: [
         {
           deviceName: '/dev/xvda',

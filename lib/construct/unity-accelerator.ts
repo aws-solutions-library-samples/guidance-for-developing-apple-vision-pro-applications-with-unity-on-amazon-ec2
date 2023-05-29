@@ -44,8 +44,7 @@ export class UnityAccelerator extends Construct {
     const instance = new ec2.Instance(this, 'Default', {
       vpc,
       instanceType,
-      machineImage: new ec2.AmazonLinuxImage({
-        generation: ec2.AmazonLinuxGeneration.AMAZON_LINUX_2,
+      machineImage: ec2.MachineImage.latestAmazonLinux2023({
         userData,
       }),
       blockDevices: [

@@ -1,10 +1,3 @@
-# update AWS CLI to v2
-rm -rf /usr/local/aws
-rm /usr/local/bin/aws
-curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-unzip -q -o awscliv2.zip
-./aws/install
-
 yum update -y
 yum install -y git jq
 
@@ -14,9 +7,10 @@ mkdir $JENKINS_DIR
 chmod 777 $JENKINS_DIR
 
 # mount a data volume 
-AZ=$(curl -s http://169.254.169.254/latest/dynamic/instance-identity/document | jq -r .availabilityZone)
-INSTANCE_ID=$(wget -q -O - http://169.254.169.254/latest/meta-data/instance-id)
-REGION=$(wget -q -O - http://169.254.169.254/latest/meta-data/placement/region)
+TOKEN=`curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 600"`
+AZ=`curl -H "X-aws-ec2-metadata-token: $TOKEN" -s http://169.254.169.254/latest/dynamic/instance-identity/document | jq -r .availabilityZone`
+INSTANCE_ID=`curl -H "X-aws-ec2-metadata-token: $TOKEN" -s http://169.254.169.254/latest/meta-data/instance-id`
+REGION=`curl -H "X-aws-ec2-metadata-token: $TOKEN" -s http://169.254.169.254/latest/meta-data/placement/region`
 VOLUME_ID=$(aws ec2 describe-volumes --filters Name=tag:Kind,Values=<KIND_TAG> Name=availability-zone,Values=$AZ Name=status,Values=available --query 'Volumes[0].VolumeId' --output text --region $REGION)
 
 if [ "$VOLUME_ID" ];then
@@ -40,7 +34,7 @@ if [ "$VOLUME_ID" ];then
     mount $DEVICE_NAME $JENKINS_DIR
     chmod 777 $JENKINS_DIR
 
-    UUID=$(blkid | grep $VNAME | sed 's/.*UUID="\(.*\)"\s.*/\1/')
+    UUID=$(blkid | grep $VNAME | sed 's/.*UUID="\(\S*\)"\s.*/\1/')
     printf "\nUUID=${UUID}  ${JENKINS_DIR}  xfs  defaults,nofail  0  2\n" >> /etc/fstab
 fi
 
@@ -52,8 +46,9 @@ usermod -aG docker ec2-user
 chmod 777 /var/run/docker.sock
 
 # install git lfs
-# install java after data volume is set up to avoid jenkis agent configured too quickly
-curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.rpm.sh | bash
+# install java after data volume is set up to avoid jenkins agent configured before /data is mounted
+# Set os/dist explicitly https://github.com/git-lfs/git-lfs/issues/5356
+curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.rpm.sh | os=fedora dist=36 bash
 yum install -y java-17-amazon-corretto-headless git-lfs
 
 # install tools for debug
