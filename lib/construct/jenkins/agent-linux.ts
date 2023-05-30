@@ -84,7 +84,9 @@ export class AgentLinux extends Construct {
       }),
     });
 
-    // You can adjust throughput (MB/s) of the gp3 EBS volume
+    // You can adjust throughput (MB/s) of the gp3 EBS volume, which is currently not exposed to the L2 construct.
+    // https://github.com/aws/aws-cdk/issues/16213
+    // https://github.com/aws-cloudformation/cloudformation-coverage-roadmap/issues/824
     (launchTemplate.node.defaultChild as CfnResource).addPropertyOverride(
       'LaunchTemplateData.BlockDeviceMappings.0.Ebs.Throughput',
       150,
@@ -133,7 +135,7 @@ export class AgentLinux extends Construct {
         volume.grantAttachVolume(launchTemplate);
         volume.grantDetachVolume(launchTemplate);
       });
-      launchTemplate.role?.addToPrincipalPolicy(
+      launchTemplate.role!.addToPrincipalPolicy(
         new iam.PolicyStatement({
           actions: ['ec2:DescribeVolumes'],
           resources: ['*'],
