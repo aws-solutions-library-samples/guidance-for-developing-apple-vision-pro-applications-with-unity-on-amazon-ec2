@@ -6,7 +6,7 @@ import { Secret } from 'aws-cdk-lib/aws-ecs';
 import { Controller } from './construct/jenkins/controller';
 import { Bucket, BucketEncryption, BlockPublicAccess } from 'aws-cdk-lib/aws-s3';
 import { Construct } from 'constructs';
-import { AgentEC2 } from './construct/jenkins/agent-ec2';
+import { AgentLinux } from './construct/jenkins/agent-linux';
 import { AgentMac } from './construct/jenkins/agent-mac';
 import { AgentKeyPair } from './construct/jenkins/key-pair';
 import { UnityAccelerator } from './construct/unity-accelerator';
@@ -101,7 +101,7 @@ export class JenkinsUnityBuildStack extends cdk.Stack {
       // subnet: vpc.privateSubnets[0],
     });
 
-    const agentEc2 = new AgentEC2(this, 'JenkinsLinuxAgent', {
+    const linuxAgent = new AgentLinux(this, 'JenkinsLinuxAgent', {
       vpc,
       sshKeyName: keyPair.keyPairName,
       artifactBucket,
@@ -127,7 +127,7 @@ export class JenkinsUnityBuildStack extends cdk.Stack {
     });
 
     // agents for small tasks
-    const agentEc2Small = new AgentEC2(this, 'JenkinsLinuxAgentSmall', {
+    const linuxAgentSmall = new AgentLinux(this, 'JenkinsLinuxAgentSmall', {
       vpc,
       sshKeyName: keyPair.keyPairName,
       rootVolumeSize: Size.gibibytes(20),
@@ -195,23 +195,23 @@ export class JenkinsUnityBuildStack extends cdk.Stack {
       linuxAgents: [
         {
           minSize: 1,
-          maxSize: agentEc2.fleetMaxSize,
-          fleetAsgName: agentEc2.fleetName,
+          maxSize: linuxAgent.fleetMaxSize,
+          fleetAsgName: linuxAgent.fleetName,
           label: 'linux',
           name: 'linux-fleet',
-          launchTemplateId: agentEc2.launchTemplate.launchTemplateId,
+          launchTemplateId: linuxAgent.launchTemplate.launchTemplateId,
         },
         {
           minSize: 1,
-          maxSize: agentEc2.fleetMaxSize,
-          fleetAsgName: agentEc2Small.fleetName,
+          maxSize: linuxAgent.fleetMaxSize,
+          fleetAsgName: linuxAgentSmall.fleetName,
           label: 'small',
           name: 'linux-fleet-small',
         },
       ],
     });
-    agentEc2.allowSSHFrom(controllerEcs.service);
-    agentEc2Small.allowSSHFrom(controllerEcs.service);
+    linuxAgent.allowSSHFrom(controllerEcs.service);
+    linuxAgentSmall.allowSSHFrom(controllerEcs.service);
     macAgents.forEach((agent) => agent.allowSSHFrom(controllerEcs.service));
   }
 }

@@ -8,7 +8,7 @@ import { IBucket } from 'aws-cdk-lib/aws-s3';
 import { PolicyStatement } from 'aws-cdk-lib/aws-iam';
 import { readFileSync } from 'fs';
 
-export interface AgentProps {
+export interface AgentLinuxProps {
   readonly vpc: IVpc;
   readonly sshKeyName: string;
   readonly artifactBucket?: IBucket;
@@ -44,12 +44,12 @@ export interface AgentProps {
  * Fleet of Linux instances for Jenkins agents.
  * The number of instances is supposed to be controlled by Jenkins EC2 Fleet plugin.
  */
-export class AgentEC2 extends Construct {
+export class AgentLinux extends Construct {
   public readonly fleetName: string;
   public readonly launchTemplate: ec2.LaunchTemplate;
   public readonly fleetMaxSize: number;
 
-  constructor(scope: Construct, id: string, props: AgentProps) {
+  constructor(scope: Construct, id: string, props: AgentLinuxProps) {
     super(scope, id);
 
     const { vpc, subnets = vpc.privateSubnets, instanceTypes, dataVolumeSize } = props;
