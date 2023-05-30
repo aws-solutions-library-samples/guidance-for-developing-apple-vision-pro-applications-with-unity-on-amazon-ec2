@@ -35,7 +35,6 @@ export interface ControllerProps {
   readonly allowedCidrs?: string[];
   readonly certificateArn?: string;
   readonly containerRepository?: IRepository;
-  readonly configOutputFilename?: string;
   readonly macAgents?: { ipAddress: string; name: string }[];
   readonly linuxAgents?: LinuxAgentProps[];
 }
@@ -50,7 +49,7 @@ export class Controller extends Construct {
   constructor(scope: Construct, id: string, props: ControllerProps) {
     super(scope, id);
 
-    const { configOutputFilename = 'jenkins.yaml', macAgents = [], linuxAgents = [] } = props;
+    const { macAgents = [], linuxAgents = [] } = props;
 
     const { vpc, allowedCidrs = [] } = props;
     allowedCidrs.push(vpc.vpcCidrBlock);
@@ -98,6 +97,8 @@ export class Controller extends Construct {
       ECR_REGISTRY_URL: `https://${Stack.of(this).account}.dkr.ecr.${Stack.of(this).region}.amazonaws.com`,
     };
 
+    // avoid from overwriting jenkins.yaml of other stacks
+    const configOutputFilename = `jenkins.${Stack.of(this).stackName}.yaml`;
     ejs.renderFile(
       join(__dirname, 'resources', 'config', 'jenkins.yaml.ejs'),
       {
