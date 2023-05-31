@@ -203,7 +203,7 @@ export class JenkinsUnityBuildStack extends cdk.Stack {
         },
         {
           minSize: 1,
-          maxSize: linuxAgent.fleetMaxSize,
+          maxSize: linuxAgentSmall.fleetMaxSize,
           fleetAsgName: linuxAgentSmall.fleetName,
           label: 'small',
           name: 'linux-fleet-small',
