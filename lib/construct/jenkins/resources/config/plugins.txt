@@ -1,10 +1,10 @@
-configuration-as-code:1569.vb_72405b_80249
-workflow-aggregator:590.v6a_d052e5a_a_b_5
+configuration-as-code:latest
+workflow-aggregator:latest
+git:latest
+docker-plugin:latest
+docker-workflow:latest
+timestamper:latest
 ec2-fleet:2.5.2
-git:4.14.2
-docker-plugin:1.2.10
-docker-workflow:563.vd5d2e5c4007f
 artifact-manager-s3:670.v0558a_cb_c82c2
 jobcacher:323.vcb_cb_98b_4e96a
 amazon-ecr:1.107.ve50d37906739
-timestamper:1.21
