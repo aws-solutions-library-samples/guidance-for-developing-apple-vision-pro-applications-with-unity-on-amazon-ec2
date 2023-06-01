@@ -17,13 +17,21 @@ import { Cluster } from 'aws-cdk-lib/aws-ecs';
 import * as ejs from 'ejs';
 import { writeFileSync } from 'fs';
 
-export interface LinuxAgentProps {
+export interface MacAgentProps {
+  readonly ipAddress: string;
+  readonly name: string;
+}
+
+export interface EC2FleetAgentProps {
   readonly fleetAsgName: string;
   readonly label: string;
   readonly name: string;
-  readonly minSize: number;
-  readonly maxSize: number;
+  readonly fleetMinSize: number;
+  readonly fleetMaxSize: number;
   readonly launchTemplateId?: string;
+  readonly credentialsId: string;
+  readonly fsRoot: string;
+  readonly javaPath?: string;
 }
 
 export interface ControllerProps {
@@ -35,8 +43,8 @@ export interface ControllerProps {
   readonly allowedCidrs?: string[];
   readonly certificateArn?: string;
   readonly containerRepository?: IRepository;
-  readonly macAgents?: { ipAddress: string; name: string }[];
-  readonly linuxAgents?: LinuxAgentProps[];
+  readonly macAgents?: MacAgentProps[];
+  readonly ec2FleetAgents?: EC2FleetAgentProps[];
 }
 
 /**
@@ -49,7 +57,7 @@ export class Controller extends Construct {
   constructor(scope: Construct, id: string, props: ControllerProps) {
     super(scope, id);
 
-    const { macAgents = [], linuxAgents = [] } = props;
+    const { macAgents = [], ec2FleetAgents: ec2FleetAgents = [] } = props;
 
     const { vpc, allowedCidrs = [] } = props;
     allowedCidrs.push(vpc.vpcCidrBlock);
@@ -77,18 +85,20 @@ export class Controller extends Construct {
       memoryLimitMiB: 2048,
     });
 
-    const fleetEnv = (agent: { name: string }) => `FLEET_ASG_NAME_${agent.name.toUpperCase().replace(/-/g, '_')}`;
-    const ltEnv = (agent: { name: string }) =>
+    const fleetAsgNameEnv = (agent: { name: string }) => `FLEET_ASG_NAME_${agent.name.toUpperCase().replace(/-/g, '_')}`;
+    const fleetLaunchTemplateIdEnv = (agent: { name: string }) =>
       `FLEET_LAUNCH_TEMPLATE_ID_${agent.name.toUpperCase().replace(/-/g, '_')}`;
-    const macEnv = (agent: { name: string }) => `MAC_HOST_${agent.name.toUpperCase().replace(/-/g, '_')}`;
+
+    const macHostEnv = (agent: { name: string }) => `MAC_HOST_${agent.name.toUpperCase().replace(/-/g, '_')}`;
+
     const exportingEnvironment = {
       ...props.environmentVariables,
       AWS_REGION: Stack.of(this).region,
       ARTIFACT_BUCKET_NAME: props.artifactBucket.bucketName,
       ...Object.fromEntries(
-        linuxAgents.flatMap((agent) => [
-          [fleetEnv(agent), agent.fleetAsgName],
-          [ltEnv(agent), agent.launchTemplateId],
+        ec2FleetAgents.flatMap((agent) => [
+          [fleetAsgNameEnv(agent), agent.fleetAsgName],
+          [fleetLaunchTemplateIdEnv(agent), agent.launchTemplateId],
         ]),
       ),
       // We need these values when we use a Docker Image from ECR repository for a Jenkins Docker Agent
@@ -103,8 +113,8 @@ export class Controller extends Construct {
       join(__dirname, 'resources', 'config', 'jenkins.yaml.ejs'),
       {
         env: [...Object.keys(exportingEnvironment)],
-        macAgents: macAgents.map((agent) => ({ ...agent, env: macEnv(agent) })),
-        linuxAgents: linuxAgents.map((agent) => ({ ...agent, env: fleetEnv(agent) })),
+        macAgents: macAgents.map((agent) => ({ ...agent, env: macHostEnv(agent) })),
+        ec2FleetAgents: ec2FleetAgents.map((agent) => ({ ...agent, env: fleetAsgNameEnv(agent) })),
       },
       {},
       function (err, str) {
@@ -137,7 +147,7 @@ export class Controller extends Construct {
         ...exportingEnvironment,
         PLUGINS_FORCE_UPGRADE: 'true',
         ECR_ROLE_ARN: taskDefinition.taskRole.roleArn,
-        ...Object.fromEntries(macAgents.flatMap((agent) => [[macEnv(agent), agent.ipAddress]])),
+        ...Object.fromEntries(macAgents.flatMap((agent) => [[macHostEnv(agent), agent.ipAddress]])),
       },
       secrets: {
         ...props.environmentSecrets,

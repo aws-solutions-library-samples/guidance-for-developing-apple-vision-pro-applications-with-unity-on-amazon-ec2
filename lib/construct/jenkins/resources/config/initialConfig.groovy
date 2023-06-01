@@ -14,13 +14,22 @@ import jenkins.model.JenkinsLocationConfiguration
 def key = System.env.PRIVATE_KEY
 
 // https://plugins.jenkins.io/ec2-fleet/#plugin-content-groovy
-BasicSSHUserPrivateKey instanceCredentials = new BasicSSHUserPrivateKey(
+BasicSSHUserPrivateKey ec2UserCredentials = new BasicSSHUserPrivateKey(
   CredentialsScope.GLOBAL,
-  'instance-ssh-key',
+  'instance-ssh-key-ec2-user',
   'ec2-user',
   new DirectEntryPrivateKeySource(key),
   '',
-  'private key to ssh ec2 for jenkins'
+  'private key to ssh ec2-user for jenkins'
+)
+
+BasicSSHUserPrivateKey administratorCredentials = new BasicSSHUserPrivateKey(
+  CredentialsScope.GLOBAL,
+  'instance-ssh-key-administrator',
+  'Administrator',
+  new DirectEntryPrivateKeySource(key),
+  '',
+  'private key to ssh Administrator for jenkins'
 )
 
 // https://github.com/jenkinsci/aws-credentials-plugin/blob/master/src/main/java/com/cloudbees/jenkins/plugins/awscredentials/AWSCredentialsImpl.java
@@ -42,7 +51,8 @@ def domain = Domain.global()
 // get credentials store
 def store = jenkins.getExtensionList('com.cloudbees.plugins.credentials.SystemCredentialsProvider')[0].getStore()
 // add credential to store
-store.addCredentials(domain, instanceCredentials)
+store.addCredentials(domain, ec2UserCredentials)
+store.addCredentials(domain, administratorCredentials)
 store.addCredentials(domain, awsCredential)
 // save current Jenkins state to disk
 jenkins.save()

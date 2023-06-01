@@ -6,7 +6,8 @@ import { Secret } from 'aws-cdk-lib/aws-ecs';
 import { Controller } from './construct/jenkins/controller';
 import { Bucket, BucketEncryption, BlockPublicAccess } from 'aws-cdk-lib/aws-s3';
 import { Construct } from 'constructs';
-import { AgentLinux } from './construct/jenkins/agent-linux';
+import { AgentEC2FleetLinux } from './construct/jenkins/agent-ec2-fleet-linux';
+import { AgentEC2FleetWindows } from './construct/jenkins/agent-ec2-fleet-windows';
 import { AgentMac } from './construct/jenkins/agent-mac';
 import { AgentKeyPair } from './construct/jenkins/key-pair';
 import { UnityAccelerator } from './construct/unity-accelerator';
@@ -101,7 +102,7 @@ export class JenkinsUnityBuildStack extends cdk.Stack {
       // subnet: vpc.privateSubnets[0],
     });
 
-    const linuxAgent = new AgentLinux(this, 'JenkinsLinuxAgent', {
+    const linuxAgent = new AgentEC2FleetLinux(this, 'JenkinsLinuxAgent', {
       vpc,
       sshKeyName: keyPair.keyPairName,
       artifactBucket,
@@ -121,16 +122,22 @@ export class JenkinsUnityBuildStack extends cdk.Stack {
           resources: ['*'],
         }),
       ],
+      name: 'linux-fleet',
+      label: 'linux',
+      fleetMinSize: 1,
       fleetMaxSize: 4,
       // You can explicitly set a subnet agents will run in
       // subnets: [vpc.privateSubnets[0]],
     });
 
     // agents for small tasks
-    const linuxAgentSmall = new AgentLinux(this, 'JenkinsLinuxAgentSmall', {
+    const linuxAgentSmall = new AgentEC2FleetLinux(this, 'JenkinsLinuxAgentSmall', {
       vpc,
       sshKeyName: keyPair.keyPairName,
       rootVolumeSize: Size.gibibytes(20),
+      name: 'linux-fleet-small',
+      label: 'small',
+      fleetMinSize: 1,
       fleetMaxSize: 2,
       instanceTypes: [ec2.InstanceType.of(InstanceClass.T3, InstanceSize.SMALL)],
       policyStatements: [
@@ -158,6 +165,35 @@ export class JenkinsUnityBuildStack extends cdk.Stack {
           },
         }),
       ],
+    });
+
+    const windowsAgent = new AgentEC2FleetWindows(this, 'JenkinsWindowsAgent', {
+      vpc,
+      sshKeyName: keyPair.keyPairName,
+      artifactBucket,
+      rootVolumeSize: Size.gibibytes(50),
+      dataVolumeSize: Size.gibibytes(100),
+      // You may want to add several instance types to avoid from insufficient Spot capacity.
+      instanceTypes: [
+        ec2.InstanceType.of(InstanceClass.M6A, InstanceSize.XLARGE),
+        ec2.InstanceType.of(InstanceClass.M5A, InstanceSize.XLARGE),
+        ec2.InstanceType.of(InstanceClass.M5N, InstanceSize.XLARGE),
+        ec2.InstanceType.of(InstanceClass.M5, InstanceSize.XLARGE),
+        ec2.InstanceType.of(InstanceClass.M4, InstanceSize.XLARGE),
+      ],
+      policyStatements: [
+        // policy required to run detachFromAsg job.
+        new PolicyStatement({
+          actions: ['ec2:DescribeImages', 'autoscaling:DetachInstances'],
+          resources: ['*'],
+        }),
+      ],
+      name: 'windows-fleet',
+      label: 'windows',
+      fleetMinSize: 1,
+      fleetMaxSize: 4,
+      // You can explicitly set a subnet agents will run in
+      // subnets: [vpc.privateSubnets[0]],
     });
 
     const macAgents = [];
@@ -192,26 +228,15 @@ export class JenkinsUnityBuildStack extends cdk.Stack {
       },
       containerRepository,
       macAgents: macAgents.map((agent, i) => ({ ipAddress: agent.instanceIpAddress, name: `mac${i}` })),
-      linuxAgents: [
-        {
-          minSize: 1,
-          maxSize: linuxAgent.fleetMaxSize,
-          fleetAsgName: linuxAgent.fleetName,
-          label: 'linux',
-          name: 'linux-fleet',
-          launchTemplateId: linuxAgent.launchTemplate.launchTemplateId,
-        },
-        {
-          minSize: 1,
-          maxSize: linuxAgentSmall.fleetMaxSize,
-          fleetAsgName: linuxAgentSmall.fleetName,
-          label: 'small',
-          name: 'linux-fleet-small',
-        },
+      ec2FleetAgents: [
+        linuxAgent,
+        linuxAgentSmall,
+        windowsAgent,
       ],
     });
     linuxAgent.allowSSHFrom(controllerEcs.service);
     linuxAgentSmall.allowSSHFrom(controllerEcs.service);
+    windowsAgent.allowSSHFrom(controllerEcs.service);
     macAgents.forEach((agent) => agent.allowSSHFrom(controllerEcs.service));
   }
 }
