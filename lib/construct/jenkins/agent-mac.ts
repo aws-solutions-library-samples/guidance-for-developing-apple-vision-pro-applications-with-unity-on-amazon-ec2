@@ -15,22 +15,47 @@ import { CfnOutput, RemovalPolicy, Size } from 'aws-cdk-lib';
 export interface AgentMacProps {
   readonly vpc: IVpc;
   readonly sshKeyName: string;
+  readonly credentialsIdEnv: string;
+
   readonly artifactBucket?: IBucket;
   readonly amiId: string;
   readonly storageSize: Size;
   readonly instanceType: 'mac1.metal' | 'mac2.metal';
   readonly subnet?: ec2.ISubnet;
+
+  readonly name: string;
+  readonly label: string;
+
+  readonly sshConnectTimeoutSeconds?: number;
+  readonly sshConnectMaxNumRetries?: number;
+  readonly sshConnectRetryWaitTime?: number;
 }
 
 /**
  * A mac instance with a dedicated host.
  */
 export class AgentMac extends Construct {
-  public instanceIpAddress: string;
+  public readonly ipAddress: string;
   private instance: Instance;
+
+  public readonly name: string;
+  public readonly label: string;
+  public readonly credentialsIdEnv: string;
+
+  public readonly sshConnectTimeoutSeconds: number;
+  public readonly sshConnectMaxNumRetries: number;
+  public readonly sshConnectRetryWaitTime: number;
 
   constructor(scope: Construct, id: string, props: AgentMacProps) {
     super(scope, id);
+
+    this.name = props.name;
+    this.label = props.label;
+    this.credentialsIdEnv = props.credentialsIdEnv;
+
+    this.sshConnectTimeoutSeconds = props.sshConnectTimeoutSeconds ?? 60;
+    this.sshConnectMaxNumRetries = props.sshConnectMaxNumRetries ?? 10;
+    this.sshConnectRetryWaitTime = props.sshConnectRetryWaitTime ?? 15;
 
     const { vpc, instanceType, subnet = vpc.privateSubnets[0] } = props;
 
@@ -93,7 +118,7 @@ diskutil apfs resizeContainer $APFSCONT 0
     props.artifactBucket?.grantReadWrite(instance);
 
     this.instance = instance;
-    this.instanceIpAddress = instance.instancePrivateIp;
+    this.ipAddress = instance.instancePrivateIp;
 
     new CfnOutput(this, 'InstanceId', { value: instance.instanceId });
   }

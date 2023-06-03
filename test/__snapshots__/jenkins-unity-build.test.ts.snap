@@ -64,6 +64,10 @@ exports[`Snapshot test 1`] = `
       "Default": "/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-6.1-x86_64",
       "Type": "AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>",
     },
+    "SsmParameterValueawsserviceamiwindowslatestEC2LaunchV2WindowsServer2019EnglishFullContainersLatestC96584B6F00A464EAD1953AFF4B05118Parameter": {
+      "Default": "/aws/service/ami-windows-latest/EC2LaunchV2-Windows_Server-2019-English-Full-ContainersLatest",
+      "Type": "AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>",
+    },
   },
   "Resources": {
     "ArtifactBucket7410C9EF": {
@@ -699,6 +703,14 @@ exports[`Snapshot test 1`] = `
                 },
               },
               {
+                "Name": "CREDENTIALS_ID_EC2_USER",
+                "Value": "instance-ssh-key-ec2-user",
+              },
+              {
+                "Name": "CREDENTIALS_ID_ADMINISTRATOR",
+                "Value": "instance-ssh-key-administrator",
+              },
+              {
                 "Name": "AWS_REGION",
                 "Value": "us-east-2",
               },
@@ -852,7 +864,7 @@ exports[`Snapshot test 1`] = `
             ],
             "Essential": true,
             "Image": {
-              "Fn::Sub": "\${AWS::AccountId}.dkr.ecr.us-east-2.\${AWS::URLSuffix}/cdk-hnb659fds-container-assets-\${AWS::AccountId}-us-east-2:07622a47e0284302b015f25251a737a2df2122c3c123cb72ee6e9f82e2b73d85",
+              "Fn::Sub": "\${AWS::AccountId}.dkr.ecr.us-east-2.\${AWS::URLSuffix}/cdk-hnb659fds-container-assets-\${AWS::AccountId}-us-east-2:1727c76e6ad77da98e0ce5baa0d23b0f188b36033f91ac95e4cfb9dd85b95efe",
             },
             "LinuxParameters": {
               "Capabilities": {},
@@ -2630,7 +2642,9 @@ diskutil apfs resizeContainer $APFSCONT 0
               ],
             },
           },
-          "ImageId": "ami-0a249b7e15c3c080e",
+          "ImageId": {
+            "Ref": "SsmParameterValueawsserviceamiwindowslatestEC2LaunchV2WindowsServer2019EnglishFullContainersLatestC96584B6F00A464EAD1953AFF4B05118Parameter",
+          },
           "KeyName": "TestStack-agent-ssh-key",
           "SecurityGroupIds": [
             {

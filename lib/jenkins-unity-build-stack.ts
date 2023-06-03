@@ -102,9 +102,13 @@ export class JenkinsUnityBuildStack extends cdk.Stack {
       // subnet: vpc.privateSubnets[0],
     });
 
+    const ec2UserCredentialsIdEnv = 'CREDENTIALS_ID_EC2_USER';
+    const ec2UserCredentialsId = 'instance-ssh-key-ec2-user';
+
     const linuxAgent = new AgentEC2FleetLinux(this, 'JenkinsLinuxAgent', {
       vpc,
       sshKeyName: keyPair.keyPairName,
+      credentialsIdEnv: ec2UserCredentialsIdEnv,
       artifactBucket,
       rootVolumeSize: Size.gibibytes(30),
       dataVolumeSize: Size.gibibytes(100),
@@ -134,6 +138,7 @@ export class JenkinsUnityBuildStack extends cdk.Stack {
     const linuxAgentSmall = new AgentEC2FleetLinux(this, 'JenkinsLinuxAgentSmall', {
       vpc,
       sshKeyName: keyPair.keyPairName,
+      credentialsIdEnv: ec2UserCredentialsIdEnv,
       rootVolumeSize: Size.gibibytes(20),
       name: 'linux-fleet-small',
       label: 'small',
@@ -167,9 +172,14 @@ export class JenkinsUnityBuildStack extends cdk.Stack {
       ],
     });
 
+    const administratorCredentialsIdEnv = 'CREDENTIALS_ID_ADMINISTRATOR';
+    const administratorCredentialsId = 'instance-ssh-key-administrator';
+
     const windowsAgent = new AgentEC2FleetWindows(this, 'JenkinsWindowsAgent', {
       vpc,
       sshKeyName: keyPair.keyPairName,
+      credentialsIdEnv: administratorCredentialsIdEnv,
+      sshConnectMaxNumRetries: 20,
       artifactBucket,
       rootVolumeSize: Size.gibibytes(50),
       dataVolumeSize: Size.gibibytes(100),
@@ -211,7 +221,10 @@ export class JenkinsUnityBuildStack extends cdk.Stack {
           storageSize: Size.gibibytes(200),
           instanceType: 'mac1.metal',
           sshKeyName: keyPair.keyPairName,
+          credentialsIdEnv: ec2UserCredentialsIdEnv,
           amiId: props.macAmiId,
+          name: 'mac0',
+          label: 'mac',
         }),
       );
     }
@@ -225,9 +238,11 @@ export class JenkinsUnityBuildStack extends cdk.Stack {
       environmentSecrets: { PRIVATE_KEY: Secret.fromSsmParameter(keyPair.privateKey) },
       environmentVariables: {
         UNITY_ACCELERATOR_URL: accelerator.endpoint,
+        [ec2UserCredentialsIdEnv]: ec2UserCredentialsId,
+        [administratorCredentialsIdEnv]: administratorCredentialsId,
       },
       containerRepository,
-      macAgents: macAgents.map((agent, i) => ({ ipAddress: agent.instanceIpAddress, name: `mac${i}` })),
+      macAgents: macAgents,
       ec2FleetAgents: [
         linuxAgent,
         linuxAgentSmall,

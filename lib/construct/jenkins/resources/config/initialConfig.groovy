@@ -12,20 +12,23 @@ import jenkins.model.JenkinsLocationConfiguration
 // System.setProperty('org.apache.commons.jelly.tags.fmt.timeZone', 'Asia/Tokyo')
 
 def key = System.env.PRIVATE_KEY
+def ec2UserCredentialsId = System.env.CREDENTIALS_ID_EC2_USER
 
 // https://plugins.jenkins.io/ec2-fleet/#plugin-content-groovy
 BasicSSHUserPrivateKey ec2UserCredentials = new BasicSSHUserPrivateKey(
   CredentialsScope.GLOBAL,
-  'instance-ssh-key-ec2-user',
+  ec2UserCredentialsId,
   'ec2-user',
   new DirectEntryPrivateKeySource(key),
   '',
   'private key to ssh ec2-user for jenkins'
 )
 
+def administratorCredentialsId = System.env.CREDENTIALS_ID_ADMINISTRATOR
+
 BasicSSHUserPrivateKey administratorCredentials = new BasicSSHUserPrivateKey(
   CredentialsScope.GLOBAL,
-  'instance-ssh-key-administrator',
+  administratorCredentialsId,
   'Administrator',
   new DirectEntryPrivateKeySource(key),
   '',

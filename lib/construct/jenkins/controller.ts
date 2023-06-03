@@ -19,19 +19,30 @@ import { writeFileSync } from 'fs';
 
 export interface MacAgentProps {
   readonly ipAddress: string;
+
+  readonly label: string;
   readonly name: string;
+  readonly credentialsIdEnv: string;
+
+  readonly sshConnectTimeoutSeconds: number;
+  readonly sshConnectMaxNumRetries: number;
+  readonly sshConnectRetryWaitTime: number;
 }
 
 export interface EC2FleetAgentProps {
   readonly fleetAsgName: string;
-  readonly label: string;
-  readonly name: string;
   readonly fleetMinSize: number;
   readonly fleetMaxSize: number;
+
+  readonly label: string;
+  readonly name: string;
   readonly launchTemplateId?: string;
-  readonly credentialsId: string;
+  readonly credentialsIdEnv: string;
   readonly fsRoot: string;
-  readonly javaPath?: string;
+
+  readonly sshConnectTimeoutSeconds: number;
+  readonly sshConnectMaxNumRetries: number;
+  readonly sshConnectRetryWaitTime: number;
 }
 
 export interface ControllerProps {
@@ -57,7 +68,7 @@ export class Controller extends Construct {
   constructor(scope: Construct, id: string, props: ControllerProps) {
     super(scope, id);
 
-    const { macAgents = [], ec2FleetAgents: ec2FleetAgents = [] } = props;
+    const { macAgents = [], ec2FleetAgents = [] } = props;
 
     const { vpc, allowedCidrs = [] } = props;
     allowedCidrs.push(vpc.vpcCidrBlock);
@@ -85,11 +96,14 @@ export class Controller extends Construct {
       memoryLimitMiB: 2048,
     });
 
-    const fleetAsgNameEnv = (agent: { name: string }) => `FLEET_ASG_NAME_${agent.name.toUpperCase().replace(/-/g, '_')}`;
+    const fleetAsgNameEnv = (agent: { name: string }) =>
+      `FLEET_ASG_NAME_${agent.name.toUpperCase().replace(/-/g, '_')}`;
+
     const fleetLaunchTemplateIdEnv = (agent: { name: string }) =>
       `FLEET_LAUNCH_TEMPLATE_ID_${agent.name.toUpperCase().replace(/-/g, '_')}`;
 
-    const macHostEnv = (agent: { name: string }) => `MAC_HOST_${agent.name.toUpperCase().replace(/-/g, '_')}`;
+    const macHostEnv = (agent: { name: string }) =>
+      `MAC_HOST_${agent.name.toUpperCase().replace(/-/g, '_')}`;
 
     const exportingEnvironment = {
       ...props.environmentVariables,
@@ -113,8 +127,14 @@ export class Controller extends Construct {
       join(__dirname, 'resources', 'config', 'jenkins.yaml.ejs'),
       {
         env: [...Object.keys(exportingEnvironment)],
-        macAgents: macAgents.map((agent) => ({ ...agent, env: macHostEnv(agent) })),
-        ec2FleetAgents: ec2FleetAgents.map((agent) => ({ ...agent, env: fleetAsgNameEnv(agent) })),
+        macAgents: macAgents.map(agent => ({
+          ...agent,
+          macHostEnv: macHostEnv(agent),
+        })),
+        ec2FleetAgents: ec2FleetAgents.map(agent => ({
+          ...agent,
+          fleetAsgNameEnv: fleetAsgNameEnv(agent),
+        })),
       },
       {},
       function (err, str) {
