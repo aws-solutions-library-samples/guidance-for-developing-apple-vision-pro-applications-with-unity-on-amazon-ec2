@@ -206,6 +206,12 @@ export class JenkinsUnityBuildStack extends cdk.Stack {
       // subnets: [vpc.privateSubnets[0]],
     });
 
+    const ec2FleetAgents = [
+      linuxAgent,
+      linuxAgentSmall,
+      windowsAgent,
+    ];
+
     const macAgents = [];
 
     if (props.macAmiId != null) {
@@ -243,15 +249,9 @@ export class JenkinsUnityBuildStack extends cdk.Stack {
       },
       containerRepository,
       macAgents: macAgents,
-      ec2FleetAgents: [
-        linuxAgent,
-        linuxAgentSmall,
-        windowsAgent,
-      ],
+      ec2FleetAgents: ec2FleetAgents,
     });
-    linuxAgent.allowSSHFrom(controllerEcs.service);
-    linuxAgentSmall.allowSSHFrom(controllerEcs.service);
-    windowsAgent.allowSSHFrom(controllerEcs.service);
+    ec2FleetAgents.forEach(agent => agent.allowSSHFrom(controllerEcs.service));
     macAgents.forEach((agent) => agent.allowSSHFrom(controllerEcs.service));
   }
 }
