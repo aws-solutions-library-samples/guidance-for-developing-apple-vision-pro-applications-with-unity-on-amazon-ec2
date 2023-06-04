@@ -1,5 +1,5 @@
 FROM --platform=linux/x86_64 jenkins/jenkins:lts-jdk11
-ARG CONFIG_FILE_NAME='jenkins.yaml'
+ARG CONFIG_FILE_NAME='jenkins.TestStack.yaml'
 
 # https://github.com/jenkinsci/docker
 

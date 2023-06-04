@@ -864,7 +864,7 @@ exports[`Snapshot test 1`] = `
             ],
             "Essential": true,
             "Image": {
-              "Fn::Sub": "\${AWS::AccountId}.dkr.ecr.us-east-2.\${AWS::URLSuffix}/cdk-hnb659fds-container-assets-\${AWS::AccountId}-us-east-2:72dfa9f544e4edadf02d6559c9076a1efca1a05de308f0dfc9786cc7816e696f",
+              "Fn::Sub": "\${AWS::AccountId}.dkr.ecr.us-east-2.\${AWS::URLSuffix}/cdk-hnb659fds-container-assets-\${AWS::AccountId}-us-east-2:b0678c93e11050c3faee5edfdbc5ad17bbee6f35e1d7dbadd43865d4906946d7",
             },
             "LinuxParameters": {
               "Capabilities": {},
