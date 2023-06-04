@@ -2240,6 +2240,10 @@ yum install -y tmux htop
             "Key": "Kind",
             "Value": "TestStack-JenkinsLinuxAgent",
           },
+          {
+            "Key": "Name",
+            "Value": "TestStack-JenkinsLinuxAgent-0-0",
+          },
         ],
         "Throughput": 200,
         "VolumeType": "gp3",
@@ -2266,6 +2270,10 @@ yum install -y tmux htop
           {
             "Key": "Kind",
             "Value": "TestStack-JenkinsLinuxAgent",
+          },
+          {
+            "Key": "Name",
+            "Value": "TestStack-JenkinsLinuxAgent-0-1",
           },
         ],
         "Throughput": 200,
@@ -2294,6 +2302,10 @@ yum install -y tmux htop
             "Key": "Kind",
             "Value": "TestStack-JenkinsLinuxAgent",
           },
+          {
+            "Key": "Name",
+            "Value": "TestStack-JenkinsLinuxAgent-1-0",
+          },
         ],
         "Throughput": 200,
         "VolumeType": "gp3",
@@ -2320,6 +2332,10 @@ yum install -y tmux htop
           {
             "Key": "Kind",
             "Value": "TestStack-JenkinsLinuxAgent",
+          },
+          {
+            "Key": "Name",
+            "Value": "TestStack-JenkinsLinuxAgent-1-1",
           },
         ],
         "Throughput": 200,
@@ -3242,6 +3258,10 @@ tasks:
             "Key": "Kind",
             "Value": "TestStack-JenkinsWindowsAgent",
           },
+          {
+            "Key": "Name",
+            "Value": "TestStack-JenkinsWindowsAgent-0-0",
+          },
         ],
         "Throughput": 200,
         "VolumeType": "gp3",
@@ -3268,6 +3288,10 @@ tasks:
           {
             "Key": "Kind",
             "Value": "TestStack-JenkinsWindowsAgent",
+          },
+          {
+            "Key": "Name",
+            "Value": "TestStack-JenkinsWindowsAgent-0-1",
           },
         ],
         "Throughput": 200,
@@ -3296,6 +3320,10 @@ tasks:
             "Key": "Kind",
             "Value": "TestStack-JenkinsWindowsAgent",
           },
+          {
+            "Key": "Name",
+            "Value": "TestStack-JenkinsWindowsAgent-1-0",
+          },
         ],
         "Throughput": 200,
         "VolumeType": "gp3",
@@ -3322,6 +3350,10 @@ tasks:
           {
             "Key": "Kind",
             "Value": "TestStack-JenkinsWindowsAgent",
+          },
+          {
+            "Key": "Name",
+            "Value": "TestStack-JenkinsWindowsAgent-1-1",
           },
         ],
         "Throughput": 200,

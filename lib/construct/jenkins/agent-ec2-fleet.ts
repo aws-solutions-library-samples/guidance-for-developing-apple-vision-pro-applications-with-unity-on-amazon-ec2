@@ -165,22 +165,31 @@ export class AgentEC2Fleet extends Construct {
     });
 
     if (dataVolumeSize !== undefined) {
+      const kind = `${cdk.Stack.of(this).stackName}-${id}`;
+      const volumesPerAz = Math.floor(props.fleetMaxSize / subnets.length);
+
       // create a pool of EBS volumes
-      const volumes = subnets
-        .flatMap(subnet => subnet.availabilityZone)
-        .flatMap((az, azIndex) => Array.from({
-          length: Math.floor(props.fleetMaxSize / subnets.length)
-        }, (_, i) => new ec2.Volume(this, `Volume-v1-${azIndex}-${i}`, {
-          availabilityZone: az,
+      subnets.flatMap((subnet, azIndex) => Array.from({
+        length: volumesPerAz,
+      }, (_, volumeIndex) => ({
+        az: subnet.availabilityZone,
+        azIndex,
+        volumeIndex,
+      }))).forEach(info => {
+        const volume = new ec2.Volume(this, `Volume-v1-${info.azIndex}-${info.volumeIndex}`, {
+          availabilityZone: info.az,
           size: cdk.Size.gibibytes(dataVolumeSize.toGibibytes()),
           volumeType: ec2.EbsDeviceVolumeType.GP3,
           throughput: 200,
           iops: 3000,
           encrypted: true,
           removalPolicy: cdk.RemovalPolicy.DESTROY,
-        })));
-      volumes.forEach((volume) => {
-        cdk.Tags.of(volume).add('Kind', `${cdk.Stack.of(this).stackName}-${this.node.id}`);
+        });
+
+        const tags = cdk.Tags.of(volume);
+        tags.add('Name', `${kind}-${info.azIndex}-${info.volumeIndex}`);
+        tags.add('Kind', kind);
+
         volume.grantAttachVolume(launchTemplate);
         volume.grantDetachVolume(launchTemplate);
       });
