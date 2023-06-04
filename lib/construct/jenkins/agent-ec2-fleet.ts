@@ -22,6 +22,10 @@ export interface AgentEC2FleetProps {
   readonly sshConnectMaxNumRetries?: number;
   readonly sshConnectRetryWaitTime?: number;
 
+  readonly fsRoot?: string;
+  readonly prefixStartSlaveCmd?: string;
+  readonly suffixStartSlaveCmd?: string;
+
   readonly rootVolumeSize: cdk.Size;
 
   /**
@@ -53,8 +57,15 @@ export interface AgentEC2FleetFactory {
   machineImageFrom(amiMap: Record<string, string>): ec2.IMachineImage;
 
   readonly userData: ec2.UserData;
-  readonly fsRoot: string;
   readonly rootVolumeDeviceName: string;
+
+  readonly defaultFsRoot: string;
+  readonly defaultPrefixStartSlaveCmd?: string;
+  readonly defaultSuffixStartSlaveCmd?: string;
+
+  readonly defaultSshConnectTimeoutSeconds?: number;
+  readonly defaultSshConnectMaxNumRetries?: number;
+  readonly defaultSshConnectRetryWaitTime?: number;
 }
 
 /**
@@ -75,9 +86,12 @@ export class AgentEC2Fleet extends Construct {
   public readonly fsRoot: string;
   public readonly rootVolumeDeviceName: string;
 
-  public readonly sshConnectTimeoutSeconds: number;
-  public readonly sshConnectMaxNumRetries: number;
-  public readonly sshConnectRetryWaitTime: number;
+  public readonly sshConnectTimeoutSeconds?: number;
+  public readonly sshConnectMaxNumRetries?: number;
+  public readonly sshConnectRetryWaitTime?: number;
+
+  public readonly prefixStartSlaveCmd?: string;
+  public readonly suffixStartSlaveCmd?: string;
 
   constructor(scope: Construct, id: string, factory: AgentEC2FleetFactory, props: AgentEC2FleetProps) {
     super(scope, id);
@@ -88,12 +102,15 @@ export class AgentEC2Fleet extends Construct {
     this.name = props.name;
     this.label = props.label;
     this.credentialsIdEnv = props.credentialsIdEnv;
-    this.fsRoot = factory.fsRoot;
+    this.fsRoot = props.fsRoot ?? factory.defaultFsRoot;
     this.rootVolumeDeviceName = factory.rootVolumeDeviceName;
 
-    this.sshConnectTimeoutSeconds = props.sshConnectTimeoutSeconds ?? 60;
-    this.sshConnectMaxNumRetries = props.sshConnectMaxNumRetries ?? 10;
-    this.sshConnectRetryWaitTime = props.sshConnectRetryWaitTime ?? 15;
+    this.sshConnectTimeoutSeconds = props.sshConnectTimeoutSeconds ?? factory.defaultSshConnectTimeoutSeconds;
+    this.sshConnectMaxNumRetries = props.sshConnectMaxNumRetries ?? factory.defaultSshConnectMaxNumRetries;
+    this.sshConnectRetryWaitTime = props.sshConnectRetryWaitTime ?? factory.defaultSshConnectRetryWaitTime;
+
+    this.prefixStartSlaveCmd = props.prefixStartSlaveCmd ?? factory.defaultPrefixStartSlaveCmd;
+    this.suffixStartSlaveCmd = props.suffixStartSlaveCmd ?? factory.defaultSuffixStartSlaveCmd;
 
     const { vpc, subnets = vpc.privateSubnets, instanceTypes, dataVolumeSize } = props;
 

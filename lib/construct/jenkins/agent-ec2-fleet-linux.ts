@@ -28,7 +28,12 @@ export class AgentEC2FleetLinux extends AgentEC2Fleet {
       },
 
       rootVolumeDeviceName: '/dev/xvda',
-      fsRoot: '/data/jenkins-agent',
+
+      defaultFsRoot: '/data/jenkins-agent',
+
+      defaultSshConnectTimeoutSeconds: 60,
+      defaultSshConnectMaxNumRetries: 10,
+      defaultSshConnectRetryWaitTime: 15,
     }, props);
   }
 }

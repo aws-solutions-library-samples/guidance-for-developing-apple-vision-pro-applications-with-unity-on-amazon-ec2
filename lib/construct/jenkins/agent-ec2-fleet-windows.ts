@@ -27,7 +27,13 @@ export class AgentEC2FleetWindows extends AgentEC2Fleet {
       },
 
       rootVolumeDeviceName: '/dev/sda1',
-      fsRoot: 'C:\\Jenkins',
+
+      defaultFsRoot: 'D:\\Jenkins',
+      defaultPrefixStartSlaveCmd: 'cd /d D:\\ && ',
+
+      defaultSshConnectTimeoutSeconds: 60,
+      defaultSshConnectMaxNumRetries: 20,
+      defaultSshConnectRetryWaitTime: 15,
     }, props);
   }
 }

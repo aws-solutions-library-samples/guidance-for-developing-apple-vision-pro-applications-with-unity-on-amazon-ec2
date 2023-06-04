@@ -40,9 +40,12 @@ export interface EC2FleetAgentProps {
   readonly credentialsIdEnv: string;
   readonly fsRoot: string;
 
-  readonly sshConnectTimeoutSeconds: number;
-  readonly sshConnectMaxNumRetries: number;
-  readonly sshConnectRetryWaitTime: number;
+  readonly sshConnectTimeoutSeconds?: number;
+  readonly sshConnectMaxNumRetries?: number;
+  readonly sshConnectRetryWaitTime?: number;
+
+  readonly prefixStartSlaveCmd?: string;
+  readonly suffixStartSlaveCmd?: string;
 }
 
 export interface ControllerProps {

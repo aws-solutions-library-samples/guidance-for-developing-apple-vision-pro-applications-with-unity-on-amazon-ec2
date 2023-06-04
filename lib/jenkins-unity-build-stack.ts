@@ -179,7 +179,6 @@ export class JenkinsUnityBuildStack extends cdk.Stack {
       vpc,
       sshKeyName: keyPair.keyPairName,
       credentialsIdEnv: administratorCredentialsIdEnv,
-      sshConnectMaxNumRetries: 20,
       artifactBucket,
       rootVolumeSize: Size.gibibytes(50),
       dataVolumeSize: Size.gibibytes(100),
