@@ -19,14 +19,8 @@ import { writeFileSync } from 'fs';
 
 export interface MacAgentProps {
   readonly ipAddress: string;
-
-  readonly label: string;
   readonly name: string;
-  readonly credentialsIdEnv: string;
-
-  readonly sshConnectTimeoutSeconds: number;
-  readonly sshConnectMaxNumRetries: number;
-  readonly sshConnectRetryWaitTime: number;
+  readonly sshCredentialsIdEnv: string;
 }
 
 export interface EC2FleetAgentProps {
@@ -37,12 +31,12 @@ export interface EC2FleetAgentProps {
   readonly label: string;
   readonly name: string;
   readonly launchTemplateId?: string;
-  readonly credentialsIdEnv: string;
+  readonly sshCredentialsIdEnv: string;
   readonly fsRoot: string;
 
-  readonly sshConnectTimeoutSeconds?: number;
-  readonly sshConnectMaxNumRetries?: number;
-  readonly sshConnectRetryWaitTime?: number;
+  readonly sshConnectTimeoutSeconds: number;
+  readonly sshConnectMaxNumRetries: number;
+  readonly sshConnectRetryWaitTime: number;
 
   readonly prefixStartSlaveCmd?: string;
   readonly suffixStartSlaveCmd?: string;

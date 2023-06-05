@@ -703,12 +703,12 @@ exports[`Snapshot test 1`] = `
                 },
               },
               {
-                "Name": "CREDENTIALS_ID_EC2_USER",
-                "Value": "instance-ssh-key-ec2-user",
+                "Name": "SSH_CREDENTIALS_ID_UNIX",
+                "Value": "instance-ssh-key-unix",
               },
               {
-                "Name": "CREDENTIALS_ID_ADMINISTRATOR",
-                "Value": "instance-ssh-key-administrator",
+                "Name": "SSH_CREDENTIALS_ID_WINDOWS",
+                "Value": "instance-ssh-key-windows",
               },
               {
                 "Name": "AWS_REGION",
@@ -864,7 +864,7 @@ exports[`Snapshot test 1`] = `
             ],
             "Essential": true,
             "Image": {
-              "Fn::Sub": "\${AWS::AccountId}.dkr.ecr.us-east-2.\${AWS::URLSuffix}/cdk-hnb659fds-container-assets-\${AWS::AccountId}-us-east-2:b0678c93e11050c3faee5edfdbc5ad17bbee6f35e1d7dbadd43865d4906946d7",
+              "Fn::Sub": "\${AWS::AccountId}.dkr.ecr.us-east-2.\${AWS::URLSuffix}/cdk-hnb659fds-container-assets-\${AWS::AccountId}-us-east-2:4d6801ee14a9612b58d4f7670670bf9e17334c6046e96bbb52460b74ace8ac29",
             },
             "LinuxParameters": {
               "Capabilities": {},
@@ -2699,8 +2699,6 @@ tasks:
     type: powershell
     runAs: admin
     content: |-
-      $JENKINS_DRIVE = "D"
-
       $instanceMetadata = Get-EC2InstanceMetadata -Category @("AvailabilityZone", "InstanceId", "Region")
       $AZ = $instanceMetadata[0]
       $INSTANCE_ID = $instanceMetadata[1]
@@ -2708,6 +2706,8 @@ tasks:
 
       $VOLUME_ID = Get-EC2Volume -Filter @(@{Name="tag:Kind"; Values="TestStack-JenkinsWindowsAgent"}, @{Name="availability-zone"; Values=$AZ}, @{Name="status"; Values="available"}) -Region $REGION -Select "Volumes.VolumeId" | Select-Object -First 1
       if ($VOLUME_ID) {
+        $JENKINS_DRIVE = "D"
+
         Write-Output "found volume \${VOLUME_ID}"
 
         $DEVICE_NAME = "/dev/xvdf"
@@ -2742,11 +2742,16 @@ tasks:
         }
       }
 
+      # Install chocolatey package manager: https://chocolatey.org/install
       Set-ExecutionPolicy Bypass -Scope Process -Force
       [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072
       iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+
+      # install git and git-lfs
       choco install git -y --no-progress
       choco install git-lfs -y --no-progress
+
+      # install java
       choco install corretto17jdk --install-args INSTALLDIR="C:\\Java" -y --no-progress
 - task: enableOpenSsh
 ",
@@ -2847,14 +2852,6 @@ tasks:
                   ],
                 },
               ],
-            },
-            {
-              "Action": [
-                "ec2:DescribeImages",
-                "autoscaling:DetachInstances",
-              ],
-              "Effect": "Allow",
-              "Resource": "*",
             },
             {
               "Action": "ec2:AttachVolume",

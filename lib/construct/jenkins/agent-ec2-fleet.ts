@@ -5,10 +5,12 @@ import * as autoscaling from 'aws-cdk-lib/aws-autoscaling';
 import * as s3 from 'aws-cdk-lib/aws-s3';
 import * as iam from 'aws-cdk-lib/aws-iam';
 
-export interface AgentEC2FleetProps {
+import { readFileSync } from 'fs';
+
+export interface AgentEC2FleetPropsBase {
   readonly vpc: ec2.IVpc;
   readonly sshKeyName: string;
-  readonly credentialsIdEnv: string;
+  readonly sshCredentialsIdEnv: string;
 
   readonly artifactBucket?: s3.IBucket;
   readonly instanceTypes: ec2.InstanceType[];
@@ -18,11 +20,6 @@ export interface AgentEC2FleetProps {
   readonly fleetMinSize: number;
   readonly fleetMaxSize: number;
 
-  readonly sshConnectTimeoutSeconds?: number;
-  readonly sshConnectMaxNumRetries?: number;
-  readonly sshConnectRetryWaitTime?: number;
-
-  readonly fsRoot?: string;
   readonly prefixStartSlaveCmd?: string;
   readonly suffixStartSlaveCmd?: string;
 
@@ -42,30 +39,38 @@ export interface AgentEC2FleetProps {
   readonly subnets?: ec2.ISubnet[];
 
   /**
-   * @default the latest Amazon Linux 2 image.
-   */
-  readonly amiId?: string;
-
-  /**
    * @default No additional policies added.
    */
   readonly policyStatements?: iam.PolicyStatement[];
 }
 
-export interface AgentEC2FleetFactory {
-  readonly defaultMachineImage: ec2.IMachineImage;
-  machineImageFrom(amiMap: Record<string, string>): ec2.IMachineImage;
-
+export interface AgentEC2FleetProps extends AgentEC2FleetPropsBase {
+  readonly machineImage: ec2.IMachineImage;
   readonly userData: ec2.UserData;
   readonly rootVolumeDeviceName: string;
+  readonly fsRoot: string;
 
-  readonly defaultFsRoot: string;
-  readonly defaultPrefixStartSlaveCmd?: string;
-  readonly defaultSuffixStartSlaveCmd?: string;
+  readonly sshConnectTimeoutSeconds: number;
+  readonly sshConnectMaxNumRetries: number;
+  readonly sshConnectRetryWaitTime: number;
+}
 
-  readonly defaultSshConnectTimeoutSeconds?: number;
-  readonly defaultSshConnectMaxNumRetries?: number;
-  readonly defaultSshConnectRetryWaitTime?: number;
+export interface AgentEC2FleetPropsCommon extends AgentEC2FleetPropsBase {
+  /**
+   * @default the latest OS image.
+   */
+  readonly amiId?: string;
+  readonly fsRoot?: string;
+
+  readonly sshConnectTimeoutSeconds?: number;
+  readonly sshConnectMaxNumRetries?: number;
+  readonly sshConnectRetryWaitTime?: number;
+}
+
+export interface AgentEC2FleetLinuxProps extends AgentEC2FleetPropsCommon {
+}
+
+export interface AgentEC2FleetWindowsProps extends AgentEC2FleetPropsCommon {
 }
 
 /**
@@ -82,18 +87,18 @@ export class AgentEC2Fleet extends Construct {
   public readonly name: string;
   public readonly label: string;
   public readonly launchTemplateId?: string;
-  public readonly credentialsIdEnv: string;
+  public readonly sshCredentialsIdEnv: string;
   public readonly fsRoot: string;
   public readonly rootVolumeDeviceName: string;
 
-  public readonly sshConnectTimeoutSeconds?: number;
-  public readonly sshConnectMaxNumRetries?: number;
-  public readonly sshConnectRetryWaitTime?: number;
+  public readonly sshConnectTimeoutSeconds: number;
+  public readonly sshConnectMaxNumRetries: number;
+  public readonly sshConnectRetryWaitTime: number;
 
   public readonly prefixStartSlaveCmd?: string;
   public readonly suffixStartSlaveCmd?: string;
 
-  constructor(scope: Construct, id: string, factory: AgentEC2FleetFactory, props: AgentEC2FleetProps) {
+  constructor(scope: Construct, id: string, props: AgentEC2FleetProps) {
     super(scope, id);
 
     this.fleetMinSize = props.fleetMinSize;
@@ -101,26 +106,24 @@ export class AgentEC2Fleet extends Construct {
 
     this.name = props.name;
     this.label = props.label;
-    this.credentialsIdEnv = props.credentialsIdEnv;
-    this.fsRoot = props.fsRoot ?? factory.defaultFsRoot;
-    this.rootVolumeDeviceName = factory.rootVolumeDeviceName;
+    this.sshCredentialsIdEnv = props.sshCredentialsIdEnv;
+    this.fsRoot = props.fsRoot;
+    this.rootVolumeDeviceName = props.rootVolumeDeviceName;
 
-    this.sshConnectTimeoutSeconds = props.sshConnectTimeoutSeconds ?? factory.defaultSshConnectTimeoutSeconds;
-    this.sshConnectMaxNumRetries = props.sshConnectMaxNumRetries ?? factory.defaultSshConnectMaxNumRetries;
-    this.sshConnectRetryWaitTime = props.sshConnectRetryWaitTime ?? factory.defaultSshConnectRetryWaitTime;
+    this.sshConnectTimeoutSeconds = props.sshConnectTimeoutSeconds;
+    this.sshConnectMaxNumRetries = props.sshConnectMaxNumRetries;
+    this.sshConnectRetryWaitTime = props.sshConnectRetryWaitTime;
 
-    this.prefixStartSlaveCmd = props.prefixStartSlaveCmd ?? factory.defaultPrefixStartSlaveCmd;
-    this.suffixStartSlaveCmd = props.suffixStartSlaveCmd ?? factory.defaultSuffixStartSlaveCmd;
+    this.prefixStartSlaveCmd = props.prefixStartSlaveCmd;
+    this.suffixStartSlaveCmd = props.suffixStartSlaveCmd;
 
     const { vpc, subnets = vpc.privateSubnets, instanceTypes, dataVolumeSize } = props;
 
     const launchTemplate = new ec2.LaunchTemplate(this, 'LaunchTemplate', {
-      machineImage: props.amiId
-        ? factory.machineImageFrom({ [cdk.Stack.of(this).region]: props.amiId })
-        : factory.defaultMachineImage,
+      machineImage: props.machineImage,
       blockDevices: [
         {
-          deviceName: factory.rootVolumeDeviceName,
+          deviceName: props.rootVolumeDeviceName,
           volume: ec2.BlockDeviceVolume.ebs(props.rootVolumeSize.toGibibytes(), {
             volumeType: ec2.EbsDeviceVolumeType.GP3,
             encrypted: true,
@@ -128,7 +131,7 @@ export class AgentEC2Fleet extends Construct {
         },
       ],
       keyName: props.sshKeyName,
-      userData: factory.userData,
+      userData: props.userData,
       role: new iam.Role(this, 'Role', {
         assumedBy: new iam.ServicePrincipal('ec2.amazonaws.com'),
         managedPolicies: [iam.ManagedPolicy.fromAwsManagedPolicyName('AmazonSSMManagedInstanceCore')],
@@ -208,5 +211,49 @@ export class AgentEC2Fleet extends Construct {
 
   public allowSSHFrom(other: ec2.IConnectable) {
     this.launchTemplate.connections.allowFrom(other, ec2.Port.tcp(22));
+  }
+
+  public static linuxFleet(scope: Construct, id: string, props: AgentEC2FleetLinuxProps) {
+    const script = readFileSync('./lib/construct/jenkins/resources/agent-userdata.sh', 'utf8');
+    const commands = script.replace('<KIND_TAG>', `${cdk.Stack.of(scope).stackName}-${id}`).split('\n');
+
+    const userData = ec2.UserData.forLinux();
+    userData.addCommands(...commands);
+    return new AgentEC2Fleet(scope, id, {
+      machineImage: props.amiId
+      ? ec2.MachineImage.genericLinux({ [cdk.Stack.of(scope).region]: props.amiId })
+      : ec2.MachineImage.latestAmazonLinux2023(),
+      userData: userData,
+      rootVolumeDeviceName: '/dev/xvda',
+      fsRoot: '/data/jenkins-agent',
+
+      sshConnectTimeoutSeconds: props.sshConnectTimeoutSeconds ?? 60,
+      sshConnectMaxNumRetries: props.sshConnectMaxNumRetries ?? 10,
+      sshConnectRetryWaitTime: props.sshConnectRetryWaitTime ?? 15,
+      ...(props as AgentEC2FleetPropsBase),
+    });
+  }
+
+  public static windowsFleet(scope: Construct, id: string, props: AgentEC2FleetWindowsProps) {
+    const script = readFileSync('./lib/construct/jenkins/resources/agent-userdata-windows.yml', 'utf8');
+    const userDataContent = script.replace('<KIND_TAG>', `${cdk.Stack.of(scope).stackName}-${id}`);
+    const userData = ec2.UserData.custom(userDataContent);
+
+    return new AgentEC2Fleet(scope, id, {
+      machineImage: props.amiId
+      ? ec2.MachineImage.genericWindows({ [cdk.Stack.of(scope).region]: props.amiId })
+      : ec2.MachineImage.fromSsmParameter('/aws/service/ami-windows-latest/EC2LaunchV2-Windows_Server-2019-English-Full-ContainersLatest', {
+        os: ec2.OperatingSystemType.WINDOWS,
+      }),
+      userData: userData,
+      rootVolumeDeviceName: '/dev/sda1',
+      fsRoot: 'D:\\Jenkins',
+      prefixStartSlaveCmd: 'cd /d D:\\ && ',
+
+      sshConnectTimeoutSeconds: props.sshConnectTimeoutSeconds ?? 60,
+      sshConnectMaxNumRetries: props.sshConnectMaxNumRetries ?? 20,
+      sshConnectRetryWaitTime: props.sshConnectRetryWaitTime ?? 15,
+      ...(props as AgentEC2FleetPropsBase),
+    });
   }
 }

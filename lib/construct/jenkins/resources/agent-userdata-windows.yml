@@ -6,8 +6,6 @@ tasks:
     type: powershell
     runAs: admin
     content: |-
-      $JENKINS_DRIVE = "D"
-
       $instanceMetadata = Get-EC2InstanceMetadata -Category @("AvailabilityZone", "InstanceId", "Region")
       $AZ = $instanceMetadata[0]
       $INSTANCE_ID = $instanceMetadata[1]
@@ -15,6 +13,8 @@ tasks:
 
       $VOLUME_ID = Get-EC2Volume -Filter @(@{Name="tag:Kind"; Values="<KIND_TAG>"}, @{Name="availability-zone"; Values=$AZ}, @{Name="status"; Values="available"}) -Region $REGION -Select "Volumes.VolumeId" | Select-Object -First 1
       if ($VOLUME_ID) {
+        $JENKINS_DRIVE = "D"
+
         Write-Output "found volume ${VOLUME_ID}"
 
         $DEVICE_NAME = "/dev/xvdf"
@@ -49,10 +49,15 @@ tasks:
         }
       }
 
+      # Install chocolatey package manager: https://chocolatey.org/install
       Set-ExecutionPolicy Bypass -Scope Process -Force
       [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072
       iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+
+      # install git and git-lfs
       choco install git -y --no-progress
       choco install git-lfs -y --no-progress
+
+      # install java
       choco install corretto17jdk --install-args INSTALLDIR="C:\Java" -y --no-progress
 - task: enableOpenSsh

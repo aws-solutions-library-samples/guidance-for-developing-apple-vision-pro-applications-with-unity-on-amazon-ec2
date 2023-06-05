@@ -12,27 +12,27 @@ import jenkins.model.JenkinsLocationConfiguration
 // System.setProperty('org.apache.commons.jelly.tags.fmt.timeZone', 'Asia/Tokyo')
 
 def key = System.env.PRIVATE_KEY
-def ec2UserCredentialsId = System.env.CREDENTIALS_ID_EC2_USER
+def unixSshCredentialsId = System.env.SSH_CREDENTIALS_ID_UNIX
 
 // https://plugins.jenkins.io/ec2-fleet/#plugin-content-groovy
-BasicSSHUserPrivateKey ec2UserCredentials = new BasicSSHUserPrivateKey(
+BasicSSHUserPrivateKey unixSshCredentials = new BasicSSHUserPrivateKey(
   CredentialsScope.GLOBAL,
-  ec2UserCredentialsId,
+  unixSshCredentialsId,
   'ec2-user',
   new DirectEntryPrivateKeySource(key),
   '',
-  'private key to ssh ec2-user for jenkins'
+  'SSH private key for UNIX agents'
 )
 
-def administratorCredentialsId = System.env.CREDENTIALS_ID_ADMINISTRATOR
+def windowsSshCredentialsId = System.env.SSH_CREDENTIALS_ID_WINDOWS
 
-BasicSSHUserPrivateKey administratorCredentials = new BasicSSHUserPrivateKey(
+BasicSSHUserPrivateKey windowsSshCredentials = new BasicSSHUserPrivateKey(
   CredentialsScope.GLOBAL,
-  administratorCredentialsId,
+  windowsSshCredentialsId,
   'Administrator',
   new DirectEntryPrivateKeySource(key),
   '',
-  'private key to ssh Administrator for jenkins'
+  'SSH private key for Windows agents'
 )
 
 // https://github.com/jenkinsci/aws-credentials-plugin/blob/master/src/main/java/com/cloudbees/jenkins/plugins/awscredentials/AWSCredentialsImpl.java
@@ -54,8 +54,8 @@ def domain = Domain.global()
 // get credentials store
 def store = jenkins.getExtensionList('com.cloudbees.plugins.credentials.SystemCredentialsProvider')[0].getStore()
 // add credential to store
-store.addCredentials(domain, ec2UserCredentials)
-store.addCredentials(domain, administratorCredentials)
+store.addCredentials(domain, unixSshCredentials)
+store.addCredentials(domain, windowsSshCredentials)
 store.addCredentials(domain, awsCredential)
 // save current Jenkins state to disk
 jenkins.save()

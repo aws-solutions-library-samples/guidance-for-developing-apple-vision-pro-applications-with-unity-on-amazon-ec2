@@ -6,8 +6,7 @@ import { Secret } from 'aws-cdk-lib/aws-ecs';
 import { Controller } from './construct/jenkins/controller';
 import { Bucket, BucketEncryption, BlockPublicAccess } from 'aws-cdk-lib/aws-s3';
 import { Construct } from 'constructs';
-import { AgentEC2FleetLinux } from './construct/jenkins/agent-ec2-fleet-linux';
-import { AgentEC2FleetWindows } from './construct/jenkins/agent-ec2-fleet-windows';
+import { AgentEC2Fleet } from './construct/jenkins/agent-ec2-fleet';
 import { AgentMac } from './construct/jenkins/agent-mac';
 import { AgentKeyPair } from './construct/jenkins/key-pair';
 import { UnityAccelerator } from './construct/unity-accelerator';
@@ -102,13 +101,13 @@ export class JenkinsUnityBuildStack extends cdk.Stack {
       // subnet: vpc.privateSubnets[0],
     });
 
-    const ec2UserCredentialsIdEnv = 'CREDENTIALS_ID_EC2_USER';
-    const ec2UserCredentialsId = 'instance-ssh-key-ec2-user';
+    const unixSshCredentialsIdEnv = 'SSH_CREDENTIALS_ID_UNIX';
+    const unixSshCredentialsId = 'instance-ssh-key-unix';
 
-    const linuxAgent = new AgentEC2FleetLinux(this, 'JenkinsLinuxAgent', {
+    const linuxAgent = AgentEC2Fleet.linuxFleet(this, 'JenkinsLinuxAgent', {
       vpc,
       sshKeyName: keyPair.keyPairName,
-      credentialsIdEnv: ec2UserCredentialsIdEnv,
+      sshCredentialsIdEnv: unixSshCredentialsIdEnv,
       artifactBucket,
       rootVolumeSize: Size.gibibytes(30),
       dataVolumeSize: Size.gibibytes(100),
@@ -135,10 +134,10 @@ export class JenkinsUnityBuildStack extends cdk.Stack {
     });
 
     // agents for small tasks
-    const linuxAgentSmall = new AgentEC2FleetLinux(this, 'JenkinsLinuxAgentSmall', {
+    const linuxAgentSmall = AgentEC2Fleet.linuxFleet(this, 'JenkinsLinuxAgentSmall', {
       vpc,
       sshKeyName: keyPair.keyPairName,
-      credentialsIdEnv: ec2UserCredentialsIdEnv,
+      sshCredentialsIdEnv: unixSshCredentialsIdEnv,
       rootVolumeSize: Size.gibibytes(20),
       name: 'linux-fleet-small',
       label: 'small',
@@ -172,13 +171,13 @@ export class JenkinsUnityBuildStack extends cdk.Stack {
       ],
     });
 
-    const administratorCredentialsIdEnv = 'CREDENTIALS_ID_ADMINISTRATOR';
-    const administratorCredentialsId = 'instance-ssh-key-administrator';
+    const windowsSshCredentialsIdEnv = 'SSH_CREDENTIALS_ID_WINDOWS';
+    const windowsSshCredentialsId = 'instance-ssh-key-windows';
 
-    const windowsAgent = new AgentEC2FleetWindows(this, 'JenkinsWindowsAgent', {
+    const windowsAgent = AgentEC2Fleet.windowsFleet(this, 'JenkinsWindowsAgent', {
       vpc,
       sshKeyName: keyPair.keyPairName,
-      credentialsIdEnv: administratorCredentialsIdEnv,
+      sshCredentialsIdEnv: windowsSshCredentialsIdEnv,
       artifactBucket,
       rootVolumeSize: Size.gibibytes(50),
       dataVolumeSize: Size.gibibytes(100),
@@ -189,13 +188,6 @@ export class JenkinsUnityBuildStack extends cdk.Stack {
         ec2.InstanceType.of(InstanceClass.M5N, InstanceSize.XLARGE),
         ec2.InstanceType.of(InstanceClass.M5, InstanceSize.XLARGE),
         ec2.InstanceType.of(InstanceClass.M4, InstanceSize.XLARGE),
-      ],
-      policyStatements: [
-        // policy required to run detachFromAsg job.
-        new PolicyStatement({
-          actions: ['ec2:DescribeImages', 'autoscaling:DetachInstances'],
-          resources: ['*'],
-        }),
       ],
       name: 'windows-fleet',
       label: 'windows',
@@ -226,10 +218,9 @@ export class JenkinsUnityBuildStack extends cdk.Stack {
           storageSize: Size.gibibytes(200),
           instanceType: 'mac1.metal',
           sshKeyName: keyPair.keyPairName,
-          credentialsIdEnv: ec2UserCredentialsIdEnv,
+          sshCredentialsIdEnv: unixSshCredentialsIdEnv,
           amiId: props.macAmiId,
           name: 'mac0',
-          label: 'mac',
         }),
       );
     }
@@ -243,8 +234,8 @@ export class JenkinsUnityBuildStack extends cdk.Stack {
       environmentSecrets: { PRIVATE_KEY: Secret.fromSsmParameter(keyPair.privateKey) },
       environmentVariables: {
         UNITY_ACCELERATOR_URL: accelerator.endpoint,
-        [ec2UserCredentialsIdEnv]: ec2UserCredentialsId,
-        [administratorCredentialsIdEnv]: administratorCredentialsId,
+        [unixSshCredentialsIdEnv]: unixSshCredentialsId,
+        [windowsSshCredentialsIdEnv]: windowsSshCredentialsId,
       },
       containerRepository,
       macAgents: macAgents,
