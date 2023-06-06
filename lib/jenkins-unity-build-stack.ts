@@ -241,7 +241,7 @@ export class JenkinsUnityBuildStack extends cdk.Stack {
       macAgents: macAgents,
       ec2FleetAgents: ec2FleetAgents,
     });
-    ec2FleetAgents.forEach(agent => agent.allowSSHFrom(controllerEcs.service));
+    ec2FleetAgents.forEach((agent) => agent.allowSSHFrom(controllerEcs.service));
     macAgents.forEach((agent) => agent.allowSSHFrom(controllerEcs.service));
   }
 }

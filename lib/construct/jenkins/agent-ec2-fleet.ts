@@ -167,35 +167,42 @@ export class AgentEC2Fleet extends Construct {
       vpcSubnets: { subnets },
     });
 
-    if (dataVolumeSize !== undefined) {
+    if (dataVolumeSize != null) {
       const kind = `${cdk.Stack.of(this).stackName}-${id}`;
       const volumesPerAz = Math.floor(props.fleetMaxSize / subnets.length);
 
       // create a pool of EBS volumes
-      subnets.flatMap((subnet, azIndex) => Array.from({
-        length: volumesPerAz,
-      }, (_, volumeIndex) => ({
-        az: subnet.availabilityZone,
-        azIndex,
-        volumeIndex,
-      }))).forEach(info => {
-        const volume = new ec2.Volume(this, `Volume-v1-${info.azIndex}-${info.volumeIndex}`, {
-          availabilityZone: info.az,
-          size: cdk.Size.gibibytes(dataVolumeSize.toGibibytes()),
-          volumeType: ec2.EbsDeviceVolumeType.GP3,
-          throughput: 200,
-          iops: 3000,
-          encrypted: true,
-          removalPolicy: cdk.RemovalPolicy.DESTROY,
+      subnets
+        .flatMap((subnet, azIndex) =>
+          Array.from(
+            {
+              length: volumesPerAz,
+            },
+            (_, volumeIndex) => ({
+              az: subnet.availabilityZone,
+              azIndex,
+              volumeIndex,
+            }),
+          ),
+        )
+        .forEach((info) => {
+          const volume = new ec2.Volume(this, `Volume-v1-${info.azIndex}-${info.volumeIndex}`, {
+            availabilityZone: info.az,
+            size: cdk.Size.gibibytes(dataVolumeSize.toGibibytes()),
+            volumeType: ec2.EbsDeviceVolumeType.GP3,
+            throughput: 200,
+            iops: 3000,
+            encrypted: true,
+            removalPolicy: cdk.RemovalPolicy.DESTROY,
+          });
+
+          const tags = cdk.Tags.of(volume);
+          tags.add('Name', `${kind}-${info.azIndex}-${info.volumeIndex}`);
+          tags.add('Kind', kind);
+
+          volume.grantAttachVolume(launchTemplate);
+          volume.grantDetachVolume(launchTemplate);
         });
-
-        const tags = cdk.Tags.of(volume);
-        tags.add('Name', `${kind}-${info.azIndex}-${info.volumeIndex}`);
-        tags.add('Kind', kind);
-
-        volume.grantAttachVolume(launchTemplate);
-        volume.grantDetachVolume(launchTemplate);
-      });
       launchTemplate.role!.addToPrincipalPolicy(
         new iam.PolicyStatement({
           actions: ['ec2:DescribeVolumes'],
@@ -221,8 +228,8 @@ export class AgentEC2Fleet extends Construct {
     userData.addCommands(...commands);
     return new AgentEC2Fleet(scope, id, {
       machineImage: props.amiId
-      ? ec2.MachineImage.genericLinux({ [cdk.Stack.of(scope).region]: props.amiId })
-      : ec2.MachineImage.latestAmazonLinux2023(),
+        ? ec2.MachineImage.genericLinux({ [cdk.Stack.of(scope).region]: props.amiId })
+        : ec2.MachineImage.latestAmazonLinux2023(),
       userData: userData,
       rootVolumeDeviceName: '/dev/xvda',
       fsRoot: '/data/jenkins-agent',
@@ -241,14 +248,29 @@ export class AgentEC2Fleet extends Construct {
 
     return new AgentEC2Fleet(scope, id, {
       machineImage: props.amiId
-      ? ec2.MachineImage.genericWindows({ [cdk.Stack.of(scope).region]: props.amiId })
-      : ec2.MachineImage.fromSsmParameter('/aws/service/ami-windows-latest/EC2LaunchV2-Windows_Server-2019-English-Full-ContainersLatest', {
-        os: ec2.OperatingSystemType.WINDOWS,
-      }),
+        ? ec2.MachineImage.genericWindows({ [cdk.Stack.of(scope).region]: props.amiId })
+        // Lookup AMI ID of Windows Server from SSM public parameter.
+        // https://docs.aws.amazon.com/systems-manager/latest/userguide/parameter-store-public-parameters-ami.html#public-parameters-ami-windows
+        : ec2.MachineImage.fromSsmParameter(
+            // EC2LaunchV2: for use 'enableOpenSsh' feature. https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ec2launch-v2-settings.html#ec2launch-v2-enableopenssh
+            // Windows_Server-2019: for use docker image of Unity editor based on Windows Server 2019 published by GamiCI. https://hub.docker.com/r/unityci/editor
+            // ContainersLatest: for use docker environment.
+            '/aws/service/ami-windows-latest/EC2LaunchV2-Windows_Server-2019-English-Full-ContainersLatest',
+            {
+              os: ec2.OperatingSystemType.WINDOWS,
+            },
+          ),
       userData: userData,
       rootVolumeDeviceName: '/dev/sda1',
-      fsRoot: 'D:\\Jenkins',
-      prefixStartSlaveCmd: 'cd /d D:\\ && ',
+
+      ...(props.dataVolumeSize != null
+        ? {
+            fsRoot: 'D:\\Jenkins',
+            prefixStartSlaveCmd: 'cd /d D:\\ && ',
+          }
+        : {
+            fsRoot: 'C:\\Jenkins',
+          }),
 
       sshConnectTimeoutSeconds: props.sshConnectTimeoutSeconds ?? 60,
       sshConnectMaxNumRetries: props.sshConnectMaxNumRetries ?? 20,

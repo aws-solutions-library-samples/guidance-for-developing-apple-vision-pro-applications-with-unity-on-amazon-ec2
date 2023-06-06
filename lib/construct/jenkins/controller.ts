@@ -99,8 +99,7 @@ export class Controller extends Construct {
     const fleetLaunchTemplateIdEnv = (agent: { name: string }) =>
       `FLEET_LAUNCH_TEMPLATE_ID_${agent.name.toUpperCase().replace(/-/g, '_')}`;
 
-    const macHostEnv = (agent: { name: string }) =>
-      `MAC_HOST_${agent.name.toUpperCase().replace(/-/g, '_')}`;
+    const macHostEnv = (agent: { name: string }) => `MAC_HOST_${agent.name.toUpperCase().replace(/-/g, '_')}`;
 
     const exportingEnvironment = {
       ...props.environmentVariables,
@@ -124,11 +123,11 @@ export class Controller extends Construct {
       join(__dirname, 'resources', 'config', 'jenkins.yaml.ejs'),
       {
         env: [...Object.keys(exportingEnvironment)],
-        macAgents: macAgents.map(agent => ({
+        macAgents: macAgents.map((agent) => ({
           ...agent,
           macHostEnv: macHostEnv(agent),
         })),
-        ec2FleetAgents: ec2FleetAgents.map(agent => ({
+        ec2FleetAgents: ec2FleetAgents.map((agent) => ({
           ...agent,
           fleetAsgNameEnv: fleetAsgNameEnv(agent),
         })),
@@ -190,7 +189,10 @@ export class Controller extends Construct {
       enableExecuteCommand: true,
     });
 
-    container.addEnvironment('JENKINS_URL', `${protocol.toLowerCase()}://${controller.loadBalancer.loadBalancerDnsName}`);
+    container.addEnvironment(
+      'JENKINS_URL',
+      `${protocol.toLowerCase()}://${controller.loadBalancer.loadBalancerDnsName}`,
+    );
 
     // https://github.com/aws/aws-cdk/issues/4015
     controller.targetGroup.setAttribute('deregistration_delay.timeout_seconds', '10');
