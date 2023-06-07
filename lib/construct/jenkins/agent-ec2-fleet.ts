@@ -67,11 +67,9 @@ export interface AgentEC2FleetPropsCommon extends AgentEC2FleetPropsBase {
   readonly sshConnectRetryWaitTime?: number;
 }
 
-export interface AgentEC2FleetLinuxProps extends AgentEC2FleetPropsCommon {
-}
+export interface AgentEC2FleetLinuxProps extends AgentEC2FleetPropsCommon {}
 
-export interface AgentEC2FleetWindowsProps extends AgentEC2FleetPropsCommon {
-}
+export interface AgentEC2FleetWindowsProps extends AgentEC2FleetPropsCommon {}
 
 /**
  * Fleet of EC2 instances for Jenkins agents.
@@ -150,7 +148,7 @@ export class AgentEC2Fleet extends Construct {
     );
 
     props.artifactBucket?.grantReadWrite(launchTemplate);
-    props.policyStatements?.forEach(policy => launchTemplate.role!.addToPrincipalPolicy(policy));
+    props.policyStatements?.forEach((policy) => launchTemplate.role!.addToPrincipalPolicy(policy));
 
     const fleet = new autoscaling.AutoScalingGroup(this, 'Fleet', {
       vpc,
@@ -162,7 +160,7 @@ export class AgentEC2Fleet extends Construct {
           spotAllocationStrategy: autoscaling.SpotAllocationStrategy.PRICE_CAPACITY_OPTIMIZED,
         },
         launchTemplate,
-        launchTemplateOverrides: instanceTypes.map(type => ({ instanceType: type })),
+        launchTemplateOverrides: instanceTypes.map((type) => ({ instanceType: type })),
       },
       vpcSubnets: { subnets },
     });
@@ -174,16 +172,11 @@ export class AgentEC2Fleet extends Construct {
       // create a pool of EBS volumes
       subnets
         .flatMap((subnet, azIndex) =>
-          Array.from(
-            {
-              length: volumesPerAz,
-            },
-            (_, volumeIndex) => ({
-              az: subnet.availabilityZone,
-              azIndex,
-              volumeIndex,
-            }),
-          ),
+          Array.from({ length: volumesPerAz }, (_, volumeIndex) => ({
+            az: subnet.availabilityZone,
+            azIndex,
+            volumeIndex,
+          })),
         )
         .forEach((info) => {
           const volume = new ec2.Volume(this, `Volume-v1-${info.azIndex}-${info.volumeIndex}`, {
@@ -249,9 +242,9 @@ export class AgentEC2Fleet extends Construct {
     return new AgentEC2Fleet(scope, id, {
       machineImage: props.amiId
         ? ec2.MachineImage.genericWindows({ [cdk.Stack.of(scope).region]: props.amiId })
-        // Lookup AMI ID of Windows Server from SSM public parameter.
-        // https://docs.aws.amazon.com/systems-manager/latest/userguide/parameter-store-public-parameters-ami.html#public-parameters-ami-windows
-        : ec2.MachineImage.fromSsmParameter(
+        : // Lookup AMI ID of Windows Server from SSM public parameter.
+          // https://docs.aws.amazon.com/systems-manager/latest/userguide/parameter-store-public-parameters-ami.html#public-parameters-ami-windows
+          ec2.MachineImage.fromSsmParameter(
             // EC2LaunchV2: for use 'enableOpenSsh' feature. https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ec2launch-v2-settings.html#ec2launch-v2-enableopenssh
             // Windows_Server-2019: for use docker image of Unity editor based on Windows Server 2019 published by GamiCI. https://hub.docker.com/r/unityci/editor
             // ContainersLatest: for use docker environment.

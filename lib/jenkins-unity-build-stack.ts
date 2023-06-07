@@ -197,11 +197,7 @@ export class JenkinsUnityBuildStack extends cdk.Stack {
       // subnets: [vpc.privateSubnets[0]],
     });
 
-    const ec2FleetAgents = [
-      linuxAgent,
-      linuxAgentSmall,
-      windowsAgent,
-    ];
+    const ec2FleetAgents = [linuxAgent, linuxAgentSmall, windowsAgent];
 
     const macAgents = [];
 
