@@ -8,7 +8,7 @@ This is a starter kit for Unity build pipeline with Jenkins and Amazon EC2 Linux
 Features include:
 
 * Jenkins controller on Amazon ECS Fargate
-* Jenkins agents on Amazon EC2 Linux Spot and EC2 Mac instances
+* Jenkins agents on Amazon EC2 Linux / Windows Spot fleet and EC2 Mac instances
 * Optional container support for Jenkins agents
 * Unity Accelerator on EC2 Linux
 * Periodic AMI replacement to keep build cache warm
