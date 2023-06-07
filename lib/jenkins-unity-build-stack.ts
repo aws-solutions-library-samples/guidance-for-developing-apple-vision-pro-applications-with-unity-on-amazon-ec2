@@ -6,7 +6,7 @@ import { Secret } from 'aws-cdk-lib/aws-ecs';
 import { Controller } from './construct/jenkins/controller';
 import { Bucket, BucketEncryption, BlockPublicAccess } from 'aws-cdk-lib/aws-s3';
 import { Construct } from 'constructs';
-import { AgentLinux } from './construct/jenkins/agent-linux';
+import { AgentEC2Fleet } from './construct/jenkins/agent-ec2-fleet';
 import { AgentMac } from './construct/jenkins/agent-mac';
 import { AgentKeyPair } from './construct/jenkins/key-pair';
 import { UnityAccelerator } from './construct/unity-accelerator';
@@ -101,9 +101,13 @@ export class JenkinsUnityBuildStack extends cdk.Stack {
       // subnet: vpc.privateSubnets[0],
     });
 
-    const linuxAgent = new AgentLinux(this, 'JenkinsLinuxAgent', {
+    const unixSshCredentialsIdEnv = 'SSH_CREDENTIALS_ID_UNIX';
+    const unixSshCredentialsId = 'instance-ssh-key-unix';
+
+    const linuxAgent = AgentEC2Fleet.linuxFleet(this, 'JenkinsLinuxAgent', {
       vpc,
       sshKeyName: keyPair.keyPairName,
+      sshCredentialsIdEnv: unixSshCredentialsIdEnv,
       artifactBucket,
       rootVolumeSize: Size.gibibytes(30),
       dataVolumeSize: Size.gibibytes(100),
@@ -121,16 +125,23 @@ export class JenkinsUnityBuildStack extends cdk.Stack {
           resources: ['*'],
         }),
       ],
+      name: 'linux-fleet',
+      label: 'linux',
+      fleetMinSize: 1,
       fleetMaxSize: 4,
       // You can explicitly set a subnet agents will run in
       // subnets: [vpc.privateSubnets[0]],
     });
 
     // agents for small tasks
-    const linuxAgentSmall = new AgentLinux(this, 'JenkinsLinuxAgentSmall', {
+    const linuxAgentSmall = AgentEC2Fleet.linuxFleet(this, 'JenkinsLinuxAgentSmall', {
       vpc,
       sshKeyName: keyPair.keyPairName,
+      sshCredentialsIdEnv: unixSshCredentialsIdEnv,
       rootVolumeSize: Size.gibibytes(20),
+      name: 'linux-fleet-small',
+      label: 'small',
+      fleetMinSize: 1,
       fleetMaxSize: 2,
       instanceTypes: [ec2.InstanceType.of(InstanceClass.T3, InstanceSize.SMALL)],
       policyStatements: [
@@ -160,6 +171,38 @@ export class JenkinsUnityBuildStack extends cdk.Stack {
       ],
     });
 
+    const windowsSshCredentialsIdEnv = 'SSH_CREDENTIALS_ID_WINDOWS';
+    const windowsSshCredentialsId = 'instance-ssh-key-windows';
+
+    const windowsAgent = AgentEC2Fleet.windowsFleet(this, 'JenkinsWindowsAgent', {
+      vpc,
+      sshKeyName: keyPair.keyPairName,
+      sshCredentialsIdEnv: windowsSshCredentialsIdEnv,
+      artifactBucket,
+      rootVolumeSize: Size.gibibytes(50),
+      dataVolumeSize: Size.gibibytes(100),
+      // You may want to add several instance types to avoid from insufficient Spot capacity.
+      instanceTypes: [
+        ec2.InstanceType.of(InstanceClass.M6A, InstanceSize.XLARGE),
+        ec2.InstanceType.of(InstanceClass.M5A, InstanceSize.XLARGE),
+        ec2.InstanceType.of(InstanceClass.M5N, InstanceSize.XLARGE),
+        ec2.InstanceType.of(InstanceClass.M5, InstanceSize.XLARGE),
+        ec2.InstanceType.of(InstanceClass.M4, InstanceSize.XLARGE),
+      ],
+      name: 'windows-fleet',
+      label: 'windows',
+      fleetMinSize: 1,
+      fleetMaxSize: 4,
+      // You can explicitly set a subnet agents will run in
+      // subnets: [vpc.privateSubnets[0]],
+    });
+
+    const ec2FleetAgents = [
+      linuxAgent,
+      linuxAgentSmall,
+      windowsAgent,
+    ];
+
     const macAgents = [];
 
     if (props.macAmiId != null) {
@@ -175,7 +218,9 @@ export class JenkinsUnityBuildStack extends cdk.Stack {
           storageSize: Size.gibibytes(200),
           instanceType: 'mac1.metal',
           sshKeyName: keyPair.keyPairName,
+          sshCredentialsIdEnv: unixSshCredentialsIdEnv,
           amiId: props.macAmiId,
+          name: 'mac0',
         }),
       );
     }
@@ -189,29 +234,14 @@ export class JenkinsUnityBuildStack extends cdk.Stack {
       environmentSecrets: { PRIVATE_KEY: Secret.fromSsmParameter(keyPair.privateKey) },
       environmentVariables: {
         UNITY_ACCELERATOR_URL: accelerator.endpoint,
+        [unixSshCredentialsIdEnv]: unixSshCredentialsId,
+        [windowsSshCredentialsIdEnv]: windowsSshCredentialsId,
       },
       containerRepository,
-      macAgents: macAgents.map((agent, i) => ({ ipAddress: agent.instanceIpAddress, name: `mac${i}` })),
-      linuxAgents: [
-        {
-          minSize: 1,
-          maxSize: linuxAgent.fleetMaxSize,
-          fleetAsgName: linuxAgent.fleetName,
-          label: 'linux',
-          name: 'linux-fleet',
-          launchTemplateId: linuxAgent.launchTemplate.launchTemplateId,
-        },
-        {
-          minSize: 1,
-          maxSize: linuxAgent.fleetMaxSize,
-          fleetAsgName: linuxAgentSmall.fleetName,
-          label: 'small',
-          name: 'linux-fleet-small',
-        },
-      ],
+      macAgents: macAgents,
+      ec2FleetAgents: ec2FleetAgents,
     });
-    linuxAgent.allowSSHFrom(controllerEcs.service);
-    linuxAgentSmall.allowSSHFrom(controllerEcs.service);
+    ec2FleetAgents.forEach((agent) => agent.allowSSHFrom(controllerEcs.service));
     macAgents.forEach((agent) => agent.allowSSHFrom(controllerEcs.service));
   }
 }

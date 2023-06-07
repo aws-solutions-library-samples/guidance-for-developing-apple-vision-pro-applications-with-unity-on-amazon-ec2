@@ -1,0 +1,63 @@
+version: 1.1
+tasks:
+- task: executeScript
+  inputs:
+  - frequency: once
+    type: powershell
+    runAs: admin
+    content: |-
+      $instanceMetadata = Get-EC2InstanceMetadata -Category @("AvailabilityZone", "InstanceId", "Region")
+      $AZ = $instanceMetadata[0]
+      $INSTANCE_ID = $instanceMetadata[1]
+      $REGION = $instanceMetadata[2].SystemName
+
+      $VOLUME_ID = Get-EC2Volume -Filter @(@{Name="tag:Kind"; Values="<KIND_TAG>"}, @{Name="availability-zone"; Values=$AZ}, @{Name="status"; Values="available"}) -Region $REGION -Select "Volumes.VolumeId" | Select-Object -First 1
+      if ($VOLUME_ID) {
+        $JENKINS_DRIVE = "D"
+
+        Write-Output "found volume ${VOLUME_ID}"
+
+        $DEVICE_NAME = "/dev/xvdf"
+        # There is possibly a race condition between other instances.
+        # We may want to retry attach-volume according to the return code (currently omitted).
+        Add-EC2Volume -Device $DEVICE_NAME -InstanceId $INSTANCE_ID -VolumeId $VOLUME_ID -Region $REGION
+
+        # we should do polling for the volume status instead, but it usually finishes in a few seconds...
+        Start-Sleep 10
+
+        # basically following this doc: https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ec2-windows-volumes.html
+        $serialNumber = $VOLUME_ID.Replace("vol-","vol")
+        $disk = Get-Disk | Where-Object {$_.SerialNumber -CLike "$serialNumber*"}
+
+        # basically following this doc: https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ebs-using-volumes.html
+        if ($disk.PartitionStyle -eq "RAW") {
+          Write-Output "initialize raw disk"
+          $disk | Initialize-Disk -PartitionStyle MBR
+        }
+        $partitions = $disk | Get-Partition
+        if (-not $partitions) {
+          Write-Output "create partition"
+          $disk | New-Partition -DriveLetter $JENKINS_DRIVE -UseMaximumSize | Format-Volume -FileSystem NTFS -NewFileSystemLabel "Data"
+        } else {
+          $jenkinsPartition = $partitions | Where-Object {$_.DriveLetter -eq $JENKINS_DRIVE}
+          if ($jenkinsPartition) {
+            Write-Output "drive $JENKINS_DRIVE already mounted"
+          } else {
+            Write-Output "change drive letter of first partition to $JENKINS_DRIVE"
+            $partitions | Select-Object -First 1 | Set-Partition -NewDriveLetter $JENKINS_DRIVE
+          }
+        }
+      }
+
+      # Install chocolatey package manager: https://chocolatey.org/install
+      Set-ExecutionPolicy Bypass -Scope Process -Force
+      [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072
+      iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+
+      # install git and git-lfs
+      choco install git -y --no-progress
+      choco install git-lfs -y --no-progress
+
+      # install java
+      choco install corretto17jdk --install-args INSTALLDIR="C:\Java" -y --no-progress
+- task: enableOpenSsh
