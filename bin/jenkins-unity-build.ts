@@ -25,6 +25,10 @@ new JenkinsUnityBuildStack(app, 'JenkinsUnityBuildStack', {
 
   // You can use an existing VPC by specifying vpcId.
   // vpcId: 'vpc-xxxxxxx',
+
+  // base url for your Unity license sever.
+  // You can setup one using this project: https://github.com/aws-samples/unity-build-server-with-aws-cdk
+  // licenseServerBaseUrl: 'http://10.0.0.100:8080',
 });
 
 // Uncomment to enable vulnerability analysis by cdk-nag

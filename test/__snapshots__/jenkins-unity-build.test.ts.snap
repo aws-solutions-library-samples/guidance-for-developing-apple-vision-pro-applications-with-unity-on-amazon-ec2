@@ -703,6 +703,10 @@ exports[`Snapshot test 1`] = `
                 },
               },
               {
+                "Name": "UNITY_BUILD_SERVER_URL",
+                "Value": "http://10.0.0.100:8080",
+              },
+              {
                 "Name": "SSH_CREDENTIALS_ID_UNIX",
                 "Value": "instance-ssh-key-unix",
               },
@@ -864,7 +868,7 @@ exports[`Snapshot test 1`] = `
             ],
             "Essential": true,
             "Image": {
-              "Fn::Sub": "\${AWS::AccountId}.dkr.ecr.us-east-2.\${AWS::URLSuffix}/cdk-hnb659fds-container-assets-\${AWS::AccountId}-us-east-2:4d6801ee14a9612b58d4f7670670bf9e17334c6046e96bbb52460b74ace8ac29",
+              "Fn::Sub": "\${AWS::AccountId}.dkr.ecr.us-east-2.\${AWS::URLSuffix}/cdk-hnb659fds-container-assets-\${AWS::AccountId}-us-east-2:9c8a05d7c5f2ca15acd572e35773cc7c81a1d1515e7d62bb1b5da0efe79f8a79",
             },
             "LinuxParameters": {
               "Capabilities": {},

@@ -18,6 +18,7 @@ test('Snapshot test', () => {
     },
     allowedCidrs: ['127.0.0.1/32'],
     macAmiId: 'ami-013846afc111c94b0',
+    licenseServerBaseUrl: 'http://10.0.0.100:8080',
   });
   const template = Template.fromStack(stack);
   expect(template).toMatchSnapshot();

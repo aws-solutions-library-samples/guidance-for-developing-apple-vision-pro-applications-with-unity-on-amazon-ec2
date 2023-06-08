@@ -43,6 +43,14 @@ interface JenkinsUnityBuildStackProps extends cdk.StackProps {
    * @default Traffic is not encrypted (via HTTP)
    */
   readonly certificateArn?: string;
+
+  /**
+   * The base URL for your Unity license server.
+   * See this document for more details: https://docs.unity3d.com/licensing/manual/ClientConfig.html
+   * 
+   * @default No license server (undefined)
+   */
+  readonly licenseServerBaseUrl?: string;
 }
 
 export class JenkinsUnityBuildStack extends cdk.Stack {
@@ -230,6 +238,7 @@ export class JenkinsUnityBuildStack extends cdk.Stack {
       environmentSecrets: { PRIVATE_KEY: Secret.fromSsmParameter(keyPair.privateKey) },
       environmentVariables: {
         UNITY_ACCELERATOR_URL: accelerator.endpoint,
+        UNITY_BUILD_SERVER_URL: props.licenseServerBaseUrl ?? '',
         [unixSshCredentialsIdEnv]: unixSshCredentialsId,
         [windowsSshCredentialsIdEnv]: windowsSshCredentialsId,
       },
