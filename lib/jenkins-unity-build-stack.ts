@@ -151,7 +151,7 @@ export class JenkinsUnityBuildStack extends cdk.Stack {
       label: 'small',
       fleetMinSize: 1,
       fleetMaxSize: 2,
-      instanceTypes: [ec2.InstanceType.of(InstanceClass.T3, InstanceSize.SMALL)],
+      instanceTypes: [ec2.InstanceType.of(InstanceClass.T3, InstanceSize.MEDIUM)],
       policyStatements: [
         // policy required to run createAmi job.
         new PolicyStatement({

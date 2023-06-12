@@ -1955,7 +1955,7 @@ yum install -y tmux htop
             },
             "Overrides": [
               {
-                "InstanceType": "t3.small",
+                "InstanceType": "t3.medium",
               },
             ],
           },
