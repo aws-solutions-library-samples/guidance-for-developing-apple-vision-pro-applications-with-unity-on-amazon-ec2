@@ -109,13 +109,9 @@ export class JenkinsUnityBuildStack extends cdk.Stack {
       // subnet: vpc.privateSubnets[0],
     });
 
-    const unixSshCredentialsIdEnv = 'SSH_CREDENTIALS_ID_UNIX';
-    const unixSshCredentialsId = 'instance-ssh-key-unix';
-
     const linuxAgent = AgentEC2Fleet.linuxFleet(this, 'JenkinsLinuxAgent', {
       vpc,
       sshKeyName: keyPair.keyPairName,
-      sshCredentialsIdEnv: unixSshCredentialsIdEnv,
       artifactBucket,
       rootVolumeSize: Size.gibibytes(30),
       dataVolumeSize: Size.gibibytes(100),
@@ -145,7 +141,6 @@ export class JenkinsUnityBuildStack extends cdk.Stack {
     const linuxAgentSmall = AgentEC2Fleet.linuxFleet(this, 'JenkinsLinuxAgentSmall', {
       vpc,
       sshKeyName: keyPair.keyPairName,
-      sshCredentialsIdEnv: unixSshCredentialsIdEnv,
       rootVolumeSize: Size.gibibytes(20),
       name: 'linux-fleet-small',
       label: 'small',
@@ -179,13 +174,9 @@ export class JenkinsUnityBuildStack extends cdk.Stack {
       ],
     });
 
-    const windowsSshCredentialsIdEnv = 'SSH_CREDENTIALS_ID_WINDOWS';
-    const windowsSshCredentialsId = 'instance-ssh-key-windows';
-
     const windowsAgent = AgentEC2Fleet.windowsFleet(this, 'JenkinsWindowsAgent', {
       vpc,
       sshKeyName: keyPair.keyPairName,
-      sshCredentialsIdEnv: windowsSshCredentialsIdEnv,
       artifactBucket,
       rootVolumeSize: Size.gibibytes(50),
       dataVolumeSize: Size.gibibytes(100),
@@ -222,7 +213,6 @@ export class JenkinsUnityBuildStack extends cdk.Stack {
           storageSize: Size.gibibytes(200),
           instanceType: 'mac1.metal',
           sshKeyName: keyPair.keyPairName,
-          sshCredentialsIdEnv: unixSshCredentialsIdEnv,
           amiId: props.macAmiId,
           name: 'mac0',
         }),
@@ -239,8 +229,6 @@ export class JenkinsUnityBuildStack extends cdk.Stack {
       environmentVariables: {
         UNITY_ACCELERATOR_URL: accelerator.endpoint,
         UNITY_BUILD_SERVER_URL: props.licenseServerBaseUrl ?? '',
-        [unixSshCredentialsIdEnv]: unixSshCredentialsId,
-        [windowsSshCredentialsIdEnv]: windowsSshCredentialsId,
       },
       containerRepository,
       macAgents: macAgents,

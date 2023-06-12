@@ -707,14 +707,6 @@ exports[`Snapshot test 1`] = `
                 "Value": "http://10.0.0.100:8080",
               },
               {
-                "Name": "SSH_CREDENTIALS_ID_UNIX",
-                "Value": "instance-ssh-key-unix",
-              },
-              {
-                "Name": "SSH_CREDENTIALS_ID_WINDOWS",
-                "Value": "instance-ssh-key-windows",
-              },
-              {
                 "Name": "AWS_REGION",
                 "Value": "us-east-2",
               },
@@ -868,7 +860,7 @@ exports[`Snapshot test 1`] = `
             ],
             "Essential": true,
             "Image": {
-              "Fn::Sub": "\${AWS::AccountId}.dkr.ecr.us-east-2.\${AWS::URLSuffix}/cdk-hnb659fds-container-assets-\${AWS::AccountId}-us-east-2:9c8a05d7c5f2ca15acd572e35773cc7c81a1d1515e7d62bb1b5da0efe79f8a79",
+              "Fn::Sub": "\${AWS::AccountId}.dkr.ecr.us-east-2.\${AWS::URLSuffix}/cdk-hnb659fds-container-assets-\${AWS::AccountId}-us-east-2:c5c0dddf6b24375ac64b5176d33ceba89b7150bd19378a4c614f33986de5415f",
             },
             "LinuxParameters": {
               "Capabilities": {},

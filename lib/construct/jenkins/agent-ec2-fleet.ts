@@ -10,7 +10,6 @@ import { readFileSync } from 'fs';
 export interface AgentEC2FleetPropsBase {
   readonly vpc: ec2.IVpc;
   readonly sshKeyName: string;
-  readonly sshCredentialsIdEnv: string;
   readonly instanceTypes: ec2.InstanceType[];
   readonly name: string;
 
@@ -58,6 +57,7 @@ export interface AgentEC2FleetProps extends AgentEC2FleetPropsBase {
   readonly userData: ec2.UserData;
   readonly rootVolumeDeviceName: string;
   readonly fsRoot: string;
+  readonly sshCredentialsId: string;
 
   readonly sshConnectTimeoutSeconds: number;
   readonly sshConnectMaxNumRetries: number;
@@ -94,7 +94,7 @@ export class AgentEC2Fleet extends Construct {
   public readonly name: string;
   public readonly label: string;
   public readonly launchTemplateId?: string;
-  public readonly sshCredentialsIdEnv: string;
+  public readonly sshCredentialsId: string;
   public readonly fsRoot: string;
   public readonly rootVolumeDeviceName: string;
 
@@ -113,7 +113,7 @@ export class AgentEC2Fleet extends Construct {
 
     this.name = props.name;
     this.label = props.label;
-    this.sshCredentialsIdEnv = props.sshCredentialsIdEnv;
+    this.sshCredentialsId = props.sshCredentialsId;
     this.fsRoot = props.fsRoot;
     this.rootVolumeDeviceName = props.rootVolumeDeviceName;
 
@@ -235,6 +235,7 @@ export class AgentEC2Fleet extends Construct {
       userData: userData,
       rootVolumeDeviceName: '/dev/xvda',
       fsRoot: '/data/jenkins-agent',
+      sshCredentialsId: 'instance-ssh-key-unix',
 
       sshConnectTimeoutSeconds: props.sshConnectTimeoutSeconds ?? 60,
       sshConnectMaxNumRetries: props.sshConnectMaxNumRetries ?? 10,
@@ -264,6 +265,7 @@ export class AgentEC2Fleet extends Construct {
           ),
       userData: userData,
       rootVolumeDeviceName: '/dev/sda1',
+      sshCredentialsId: 'instance-ssh-key-windows',
 
       ...(props.dataVolumeSize != null
         ? {

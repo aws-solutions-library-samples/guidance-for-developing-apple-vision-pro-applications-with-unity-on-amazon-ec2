@@ -15,15 +15,12 @@ import { CfnOutput, RemovalPolicy, Size } from 'aws-cdk-lib';
 export interface AgentMacProps {
   readonly vpc: IVpc;
   readonly sshKeyName: string;
-  readonly sshCredentialsIdEnv: string;
-
-  readonly artifactBucket?: IBucket;
   readonly amiId: string;
   readonly storageSize: Size;
   readonly instanceType: 'mac1.metal' | 'mac2.metal';
-  readonly subnet?: ec2.ISubnet;
-
   readonly name: string;
+  readonly artifactBucket?: IBucket;
+  readonly subnet?: ec2.ISubnet;
 }
 
 /**
@@ -31,16 +28,16 @@ export interface AgentMacProps {
  */
 export class AgentMac extends Construct {
   public readonly ipAddress: string;
-  private instance: Instance;
-
   public readonly name: string;
-  public readonly sshCredentialsIdEnv: string;
+  public readonly sshCredentialsId: string;
+
+  private readonly instance: Instance;
 
   constructor(scope: Construct, id: string, props: AgentMacProps) {
     super(scope, id);
 
     this.name = props.name;
-    this.sshCredentialsIdEnv = props.sshCredentialsIdEnv;
+    this.sshCredentialsId = 'instance-ssh-key-unix';
 
     const { vpc, instanceType, subnet = vpc.privateSubnets[0] } = props;
 
@@ -109,6 +106,6 @@ diskutil apfs resizeContainer $APFSCONT 0
   }
 
   public allowSSHFrom(other: ec2.IConnectable) {
-    this.instance?.connections.allowFrom(other, ec2.Port.tcp(22));
+    this.instance.connections.allowFrom(other, ec2.Port.tcp(22));
   }
 }

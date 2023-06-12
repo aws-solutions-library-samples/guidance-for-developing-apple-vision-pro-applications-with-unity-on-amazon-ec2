@@ -20,7 +20,7 @@ import { writeFileSync } from 'fs';
 export interface MacAgentProps {
   readonly ipAddress: string;
   readonly name: string;
-  readonly sshCredentialsIdEnv: string;
+  readonly sshCredentialsId: string;
 }
 
 export interface EC2FleetAgentProps {
@@ -31,7 +31,7 @@ export interface EC2FleetAgentProps {
   readonly label: string;
   readonly name: string;
   readonly launchTemplateId?: string;
-  readonly sshCredentialsIdEnv: string;
+  readonly sshCredentialsId: string;
   readonly fsRoot: string;
 
   readonly sshConnectTimeoutSeconds: number;
