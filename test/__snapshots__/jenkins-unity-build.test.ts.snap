@@ -64,8 +64,8 @@ exports[`Snapshot test 1`] = `
       "Default": "/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-6.1-x86_64",
       "Type": "AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>",
     },
-    "SsmParameterValueawsserviceamiwindowslatestEC2LaunchV2WindowsServer2019EnglishFullContainersLatestC96584B6F00A464EAD1953AFF4B05118Parameter": {
-      "Default": "/aws/service/ami-windows-latest/EC2LaunchV2-Windows_Server-2019-English-Full-ContainersLatest",
+    "SsmParameterValueawsserviceamiwindowslatestWindowsServer2022EnglishFullContainersLatestC96584B6F00A464EAD1953AFF4B05118Parameter": {
+      "Default": "/aws/service/ami-windows-latest/Windows_Server-2022-English-Full-ContainersLatest",
       "Type": "AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>",
     },
   },
@@ -842,7 +842,7 @@ exports[`Snapshot test 1`] = `
             ],
             "Essential": true,
             "Image": {
-              "Fn::Sub": "\${AWS::AccountId}.dkr.ecr.us-east-2.\${AWS::URLSuffix}/cdk-hnb659fds-container-assets-\${AWS::AccountId}-us-east-2:33fe4e91a5f8317f89527c8deaf9aa20b7a3e35108a9cf5c783709f311cf90c3",
+              "Fn::Sub": "\${AWS::AccountId}.dkr.ecr.us-east-2.\${AWS::URLSuffix}/cdk-hnb659fds-container-assets-\${AWS::AccountId}-us-east-2:3730c481715b73c5091225097227efafd7e5923b1a922c094e3ced8f64a5ab85",
             },
             "LinuxParameters": {
               "Capabilities": {},
@@ -2587,7 +2587,7 @@ diskutil apfs resizeContainer $APFSCONT 0
             },
           },
           "ImageId": {
-            "Ref": "SsmParameterValueawsserviceamiwindowslatestEC2LaunchV2WindowsServer2019EnglishFullContainersLatestC96584B6F00A464EAD1953AFF4B05118Parameter",
+            "Ref": "SsmParameterValueawsserviceamiwindowslatestWindowsServer2022EnglishFullContainersLatestC96584B6F00A464EAD1953AFF4B05118Parameter",
           },
           "KeyName": "TestStack-agent-ssh-key",
           "SecurityGroupIds": [
@@ -2655,11 +2655,15 @@ tasks:
           Write-Output "initialize raw disk"
           $disk | Initialize-Disk -PartitionStyle MBR
         }
+
         $partitions = $disk | Get-Partition
         if (-not $partitions) {
           Write-Output "create partition"
           $disk | New-Partition -DriveLetter $JENKINS_DRIVE -UseMaximumSize | Format-Volume -FileSystem NTFS -NewFileSystemLabel "Data"
         } else {
+          if ($disk.IsOffline) {
+            $disk | Set-Disk -IsOffline $False
+          }
           $jenkinsPartition = $partitions | Where-Object {$_.DriveLetter -eq $JENKINS_DRIVE}
           if ($jenkinsPartition) {
             Write-Output "drive $JENKINS_DRIVE already mounted"
@@ -2675,12 +2679,23 @@ tasks:
       [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072
       iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
 
-      # install git and git-lfs
+      # Install git and git-lfs
       choco install git -y --no-progress
       choco install git-lfs -y --no-progress
 
-      # install java
+      # Install java
       choco install corretto17jdk --install-args INSTALLDIR="C:\\Java" -y --no-progress
+
+      # Install Unity Hub
+      choco install unity-hub -y --no-progress
+
+      # Install Unity Editor
+      $unityVersion = '2021.3.26f1'
+      $unityVersionChangeset = 'a16dc32e0ff2'
+      & "$env:ProgramFiles\\Unity Hub\\Unity Hub.exe" -- --no-sandbox --headless install --version $unityVersion --changeset $unityVersionChangeset | Out-String -Stream
+
+      # Install iOS / Android Build Support
+      & "$env:ProgramFiles\\Unity Hub\\Unity Hub.exe" -- --no-sandbox --headless install-modules --version $unityVersion --module ios android --childModules | Out-String -Stream
 - task: enableOpenSsh
 ",
           },
