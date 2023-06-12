@@ -35,14 +35,22 @@ tasks:
           $disk | Initialize-Disk -PartitionStyle MBR
         }
 
+        # Get partition information from the volume
         $partitions = $disk | Get-Partition
         if (-not $partitions) {
+          # If no partitions present, create a new partition and format it.
           Write-Output "create partition"
           $disk | New-Partition -DriveLetter $JENKINS_DRIVE -UseMaximumSize | Format-Volume -FileSystem NTFS -NewFileSystemLabel "Data"
         } else {
+          # Check online status of the disk
           if ($disk.IsOffline) {
+            # If the disk was offline for unknown reason, change it online and reload partition information
             $disk | Set-Disk -IsOffline $False
+            Start-Sleep 5
+            $partitions = $disk | Get-Partition
           }
+
+          # Find drive for Jenkins
           $jenkinsPartition = $partitions | Where-Object {$_.DriveLetter -eq $JENKINS_DRIVE}
           if ($jenkinsPartition) {
             Write-Output "drive $JENKINS_DRIVE already mounted"
