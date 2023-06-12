@@ -30,7 +30,6 @@ export interface EC2FleetAgentProps {
 
   readonly label: string;
   readonly name: string;
-  readonly launchTemplateId?: string;
   readonly sshCredentialsId: string;
   readonly fsRoot: string;
 
@@ -96,9 +95,6 @@ export class Controller extends Construct {
     const fleetAsgNameEnv = (agent: { name: string }) =>
       `FLEET_ASG_NAME_${agent.name.toUpperCase().replace(/-/g, '_')}`;
 
-    const fleetLaunchTemplateIdEnv = (agent: { name: string }) =>
-      `FLEET_LAUNCH_TEMPLATE_ID_${agent.name.toUpperCase().replace(/-/g, '_')}`;
-
     const macHostEnv = (agent: { name: string }) => `MAC_HOST_${agent.name.toUpperCase().replace(/-/g, '_')}`;
 
     const exportingEnvironment = {
@@ -108,7 +104,6 @@ export class Controller extends Construct {
       ...Object.fromEntries(
         ec2FleetAgents.flatMap((agent) => [
           [fleetAsgNameEnv(agent), agent.fleetAsgName],
-          [fleetLaunchTemplateIdEnv(agent), agent.launchTemplateId],
         ]),
       ),
       // We need these values when we use a Docker Image from ECR repository for a Jenkins Docker Agent

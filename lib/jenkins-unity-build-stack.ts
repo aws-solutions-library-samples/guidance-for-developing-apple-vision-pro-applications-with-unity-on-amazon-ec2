@@ -122,13 +122,6 @@ export class JenkinsUnityBuildStack extends cdk.Stack {
         ec2.InstanceType.of(InstanceClass.C5N, InstanceSize.XLARGE),
         ec2.InstanceType.of(InstanceClass.C4, InstanceSize.XLARGE),
       ],
-      policyStatements: [
-        // policy required to run detachFromAsg job.
-        new PolicyStatement({
-          actions: ['ec2:DescribeImages', 'autoscaling:DetachInstances'],
-          resources: ['*'],
-        }),
-      ],
       name: 'linux-fleet',
       label: 'linux',
       fleetMinSize: 1,
@@ -147,31 +140,6 @@ export class JenkinsUnityBuildStack extends cdk.Stack {
       fleetMinSize: 1,
       fleetMaxSize: 2,
       instanceTypes: [ec2.InstanceType.of(InstanceClass.T3, InstanceSize.MEDIUM)],
-      policyStatements: [
-        // policy required to run createAmi job.
-        new PolicyStatement({
-          actions: [
-            'autoscaling:DescribeAutoScalingGroups',
-            'autoscaling:UpdateAutoScalingGroup',
-            'ec2:CreateImage',
-            'ec2:CreateTags',
-            'ec2:DescribeImages',
-            'ec2:CreateLaunchTemplateVersion',
-            'ec2:RunInstances',
-            'ec2:TerminateInstances',
-          ],
-          resources: ['*'],
-        }),
-        new PolicyStatement({
-          actions: ['iam:PassRole'],
-          resources: ['*'],
-          conditions: {
-            StringEquals: {
-              'iam:PassedToService': ['ec2.amazonaws.com'],
-            },
-          },
-        }),
-      ],
     });
 
     const windowsAgent = AgentEC2Fleet.windowsFleet(this, 'JenkinsWindowsAgent', {

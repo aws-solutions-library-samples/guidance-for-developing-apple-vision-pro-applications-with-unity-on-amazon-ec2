@@ -93,7 +93,6 @@ export class AgentEC2Fleet extends Construct {
 
   public readonly name: string;
   public readonly label: string;
-  public readonly launchTemplateId?: string;
   public readonly sshCredentialsId: string;
   public readonly fsRoot: string;
   public readonly rootVolumeDeviceName: string;
@@ -214,7 +213,6 @@ export class AgentEC2Fleet extends Construct {
     }
 
     this.launchTemplate = launchTemplate;
-    this.launchTemplateId = launchTemplate.launchTemplateId;
     this.fleetAsgName = fleet.autoScalingGroupName;
   }
 
@@ -236,7 +234,6 @@ export class AgentEC2Fleet extends Construct {
       rootVolumeDeviceName: '/dev/xvda',
       fsRoot: '/data/jenkins-agent',
       sshCredentialsId: 'instance-ssh-key-unix',
-
       sshConnectTimeoutSeconds: props.sshConnectTimeoutSeconds ?? 60,
       sshConnectMaxNumRetries: props.sshConnectMaxNumRetries ?? 10,
       sshConnectRetryWaitTime: props.sshConnectRetryWaitTime ?? 15,
@@ -266,7 +263,6 @@ export class AgentEC2Fleet extends Construct {
       userData: userData,
       rootVolumeDeviceName: '/dev/sda1',
       sshCredentialsId: 'instance-ssh-key-windows',
-
       ...(props.dataVolumeSize != null
         ? {
             fsRoot: 'D:\\Jenkins',
@@ -275,7 +271,6 @@ export class AgentEC2Fleet extends Construct {
         : {
             fsRoot: 'C:\\Jenkins',
           }),
-
       sshConnectTimeoutSeconds: props.sshConnectTimeoutSeconds ?? 60,
       sshConnectMaxNumRetries: props.sshConnectMaxNumRetries ?? 20,
       sshConnectRetryWaitTime: props.sshConnectRetryWaitTime ?? 15,

@@ -15,7 +15,5 @@ COPY config/$CONFIG_FILE_NAME /usr/share/jenkins/ref/jenkins.yaml.override
 
 # Sample Jobs
 COPY config/agentTestJob.xml /usr/share/jenkins/ref/jobs/agent-test/config.xml.override
-COPY config/createAmi.xml /usr/share/jenkins/ref/jobs/create-ami/config.xml.override
-COPY config/detachFromAsg.xml /usr/share/jenkins/ref/jobs/detach-from-asg/config.xml.override
 
 ENV JAVA_OPTS -Djenkins.install.runSetupWizard=false

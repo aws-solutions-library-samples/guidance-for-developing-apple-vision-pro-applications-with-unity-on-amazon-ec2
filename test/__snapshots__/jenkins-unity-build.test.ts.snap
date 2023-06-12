@@ -723,33 +723,15 @@ exports[`Snapshot test 1`] = `
                 },
               },
               {
-                "Name": "FLEET_LAUNCH_TEMPLATE_ID_LINUX_FLEET",
-                "Value": {
-                  "Ref": "JenkinsLinuxAgentLaunchTemplate14EE0ADC",
-                },
-              },
-              {
                 "Name": "FLEET_ASG_NAME_LINUX_FLEET_SMALL",
                 "Value": {
                   "Ref": "JenkinsLinuxAgentSmallFleetASG9671C0E4",
                 },
               },
               {
-                "Name": "FLEET_LAUNCH_TEMPLATE_ID_LINUX_FLEET_SMALL",
-                "Value": {
-                  "Ref": "JenkinsLinuxAgentSmallLaunchTemplateEE7A973D",
-                },
-              },
-              {
                 "Name": "FLEET_ASG_NAME_WINDOWS_FLEET",
                 "Value": {
                   "Ref": "JenkinsWindowsAgentFleetASG36E7B304",
-                },
-              },
-              {
-                "Name": "FLEET_LAUNCH_TEMPLATE_ID_WINDOWS_FLEET",
-                "Value": {
-                  "Ref": "JenkinsWindowsAgentLaunchTemplate067AB1A1",
                 },
               },
               {
@@ -860,7 +842,7 @@ exports[`Snapshot test 1`] = `
             ],
             "Essential": true,
             "Image": {
-              "Fn::Sub": "\${AWS::AccountId}.dkr.ecr.us-east-2.\${AWS::URLSuffix}/cdk-hnb659fds-container-assets-\${AWS::AccountId}-us-east-2:c5c0dddf6b24375ac64b5176d33ceba89b7150bd19378a4c614f33986de5415f",
+              "Fn::Sub": "\${AWS::AccountId}.dkr.ecr.us-east-2.\${AWS::URLSuffix}/cdk-hnb659fds-container-assets-\${AWS::AccountId}-us-east-2:33fe4e91a5f8317f89527c8deaf9aa20b7a3e35108a9cf5c783709f311cf90c3",
             },
             "LinuxParameters": {
               "Capabilities": {},
@@ -1534,14 +1516,6 @@ yum install -y tmux htop
               ],
             },
             {
-              "Action": [
-                "ec2:DescribeImages",
-                "autoscaling:DetachInstances",
-              ],
-              "Effect": "Allow",
-              "Resource": "*",
-            },
-            {
               "Action": "ec2:AttachVolume",
               "Effect": "Allow",
               "Resource": [
@@ -2105,48 +2079,6 @@ yum install -y tmux htop
         ],
       },
       "Type": "AWS::IAM::InstanceProfile",
-    },
-    "JenkinsLinuxAgentSmallRoleDefaultPolicy5066E9D1": {
-      "Properties": {
-        "PolicyDocument": {
-          "Statement": [
-            {
-              "Action": [
-                "autoscaling:DescribeAutoScalingGroups",
-                "autoscaling:UpdateAutoScalingGroup",
-                "ec2:CreateImage",
-                "ec2:CreateTags",
-                "ec2:DescribeImages",
-                "ec2:CreateLaunchTemplateVersion",
-                "ec2:RunInstances",
-                "ec2:TerminateInstances",
-              ],
-              "Effect": "Allow",
-              "Resource": "*",
-            },
-            {
-              "Action": "iam:PassRole",
-              "Condition": {
-                "StringEquals": {
-                  "iam:PassedToService": [
-                    "ec2.amazonaws.com",
-                  ],
-                },
-              },
-              "Effect": "Allow",
-              "Resource": "*",
-            },
-          ],
-          "Version": "2012-10-17",
-        },
-        "PolicyName": "JenkinsLinuxAgentSmallRoleDefaultPolicy5066E9D1",
-        "Roles": [
-          {
-            "Ref": "JenkinsLinuxAgentSmallRoleF5CAF5C8",
-          },
-        ],
-      },
-      "Type": "AWS::IAM::Policy",
     },
     "JenkinsLinuxAgentSmallRoleF5CAF5C8": {
       "Properties": {
