@@ -47,7 +47,7 @@ interface JenkinsUnityBuildStackProps extends cdk.StackProps {
   /**
    * The base URL for your Unity license server.
    * See this document for more details: https://docs.unity3d.com/licensing/manual/ClientConfig.html
-   * 
+   *
    * @default No license server (undefined)
    */
   readonly licenseServerBaseUrl?: string;

@@ -16,24 +16,24 @@ export interface AgentEC2FleetPropsBase {
   /**
    * Label string applied to the nodes in this fleet.
    * You can use space separated string to apply multiple labels. (e.g. `label1 label2`)
-  */
- readonly label: string;
- 
- readonly fleetMinSize: number;
- readonly fleetMaxSize: number;
- 
- readonly prefixStartSlaveCmd?: string;
- readonly suffixStartSlaveCmd?: string;
+   */
+  readonly label: string;
 
- readonly rootVolumeSize: cdk.Size;
- 
-   /**
-    * A S3 bucket this fleet has access (read/write) to.
-    * @default No bucket.
-    */
-   readonly artifactBucket?: s3.IBucket;
-   
- /**
+  readonly fleetMinSize: number;
+  readonly fleetMaxSize: number;
+
+  readonly prefixStartSlaveCmd?: string;
+  readonly suffixStartSlaveCmd?: string;
+
+  readonly rootVolumeSize: cdk.Size;
+
+  /**
+   * A S3 bucket this fleet has access (read/write) to.
+   * @default No bucket.
+   */
+  readonly artifactBucket?: s3.IBucket;
+
+  /**
    * The size of a data volume that is attached as a secondary volume to an instance.
    * A data volume will be not deleted when an instance is terminated and reattached by new instances.
    *

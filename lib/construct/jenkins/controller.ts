@@ -101,11 +101,7 @@ export class Controller extends Construct {
       ...props.environmentVariables,
       AWS_REGION: Stack.of(this).region,
       ARTIFACT_BUCKET_NAME: props.artifactBucket.bucketName,
-      ...Object.fromEntries(
-        ec2FleetAgents.flatMap((agent) => [
-          [fleetAsgNameEnv(agent), agent.fleetAsgName],
-        ]),
-      ),
+      ...Object.fromEntries(ec2FleetAgents.flatMap((agent) => [[fleetAsgNameEnv(agent), agent.fleetAsgName]])),
       // We need these values when we use a Docker Image from ECR repository for a Jenkins Docker Agent
       // https://itnext.io/how-to-run-jenkins-agents-with-cross-account-ecr-images-using-instance-roles-on-eks-2544b0fc6819
       ECR_REPOSITORY_URL: props.containerRepository?.repositoryUri ?? '',

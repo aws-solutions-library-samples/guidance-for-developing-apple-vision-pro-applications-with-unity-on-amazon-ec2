@@ -1,11 +1,4 @@
-import {
-  CfnHost,
-  EbsDeviceVolumeType,
-  Instance,
-  InstanceType,
-  IVpc,
-  OperatingSystemType,
-} from 'aws-cdk-lib/aws-ec2';
+import { CfnHost, EbsDeviceVolumeType, Instance, InstanceType, IVpc, OperatingSystemType } from 'aws-cdk-lib/aws-ec2';
 import { ManagedPolicy } from 'aws-cdk-lib/aws-iam';
 import { Construct } from 'constructs';
 import * as ec2 from 'aws-cdk-lib/aws-ec2';
