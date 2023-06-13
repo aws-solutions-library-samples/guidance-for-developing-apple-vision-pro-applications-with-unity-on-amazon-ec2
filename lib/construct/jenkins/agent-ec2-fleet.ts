@@ -249,17 +249,7 @@ export class AgentEC2Fleet extends Construct {
     return new AgentEC2Fleet(scope, id, {
       machineImage: props.amiId
         ? ec2.MachineImage.genericWindows({ [cdk.Stack.of(scope).region]: props.amiId })
-        : // Lookup AMI ID of Windows Server from SSM public parameter.
-          // https://docs.aws.amazon.com/systems-manager/latest/userguide/parameter-store-public-parameters-ami.html#public-parameters-ami-windows
-          ec2.MachineImage.fromSsmParameter(
-            // EC2LaunchV2: for use 'enableOpenSsh' feature. https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ec2launch-v2-settings.html#ec2launch-v2-enableopenssh
-            // Windows_Server-2019: for use docker image of Unity editor based on Windows Server 2019 published by GamiCI. https://hub.docker.com/r/unityci/editor
-            // ContainersLatest: for use docker environment.
-            '/aws/service/ami-windows-latest/EC2LaunchV2-Windows_Server-2019-English-Full-ContainersLatest',
-            {
-              os: ec2.OperatingSystemType.WINDOWS,
-            },
-          ),
+        : ec2.MachineImage.latestWindows(ec2.WindowsVersion.WINDOWS_SERVER_2022_ENGLISH_FULL_CONTAINERSLATEST),
       userData: userData,
       rootVolumeDeviceName: '/dev/sda1',
       sshCredentialsId: 'instance-ssh-key-windows',
@@ -272,7 +262,7 @@ export class AgentEC2Fleet extends Construct {
             fsRoot: 'C:\\Jenkins',
           }),
       sshConnectTimeoutSeconds: props.sshConnectTimeoutSeconds ?? 60,
-      sshConnectMaxNumRetries: props.sshConnectMaxNumRetries ?? 20,
+      sshConnectMaxNumRetries: props.sshConnectMaxNumRetries ?? 30,
       sshConnectRetryWaitTime: props.sshConnectRetryWaitTime ?? 15,
       ...(props as AgentEC2FleetPropsBase),
     });

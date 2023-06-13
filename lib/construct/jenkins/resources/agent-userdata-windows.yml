@@ -34,11 +34,30 @@ tasks:
           Write-Output "initialize raw disk"
           $disk | Initialize-Disk -PartitionStyle MBR
         }
+
+        # Get partition information from the volume
         $partitions = $disk | Get-Partition
         if (-not $partitions) {
+          # If no partitions present, create a new partition and format it.
           Write-Output "create partition"
           $disk | New-Partition -DriveLetter $JENKINS_DRIVE -UseMaximumSize | Format-Volume -FileSystem NTFS -NewFileSystemLabel "Data"
         } else {
+          if ($disk.IsOffline) {
+            # If the disk was offline for unknown reason, change it online and reload partition information.
+            Write-Output "Disk is offline, change to online."
+            $disk | Set-Disk -IsOffline $false
+            Start-Sleep 5
+
+            $disk = Get-Disk | Where-Object {$_.SerialNumber -CLike "$serialNumber*"}
+            $partitions = $disk | Get-Partition
+          }
+          if ($disk.IsReadOnly) {
+            # If the disk was read only for unknown reason, change it writable.
+            Write-Output "Disk is read only, change to writable."
+            $disk | Set-Disk -IsReadOnly $false
+          }
+
+          # Find drive for Jenkins
           $jenkinsPartition = $partitions | Where-Object {$_.DriveLetter -eq $JENKINS_DRIVE}
           if ($jenkinsPartition) {
             Write-Output "drive $JENKINS_DRIVE already mounted"
@@ -54,10 +73,21 @@ tasks:
       [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072
       iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
 
-      # install git and git-lfs
+      # Install git and git-lfs
       choco install git -y --no-progress
       choco install git-lfs -y --no-progress
 
-      # install java
+      # Install java
       choco install corretto17jdk --install-args INSTALLDIR="C:\Java" -y --no-progress
+
+      # Install Unity Hub
+      choco install unity-hub -y --no-progress
+
+      # Install Unity Editor
+      $unityVersion = '2021.3.26f1'
+      $unityVersionChangeset = 'a16dc32e0ff2'
+      & "$env:ProgramFiles\Unity Hub\Unity Hub.exe" -- --no-sandbox --headless install --version $unityVersion --changeset $unityVersionChangeset | Out-String -Stream
+
+      # Install iOS / Android Build Support
+      & "$env:ProgramFiles\Unity Hub\Unity Hub.exe" -- --no-sandbox --headless install-modules --version $unityVersion --module ios android --childModules | Out-String -Stream
 - task: enableOpenSsh
