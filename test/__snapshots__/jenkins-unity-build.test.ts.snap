@@ -842,7 +842,7 @@ exports[`Snapshot test 1`] = `
             ],
             "Essential": true,
             "Image": {
-              "Fn::Sub": "\${AWS::AccountId}.dkr.ecr.us-east-2.\${AWS::URLSuffix}/cdk-hnb659fds-container-assets-\${AWS::AccountId}-us-east-2:3730c481715b73c5091225097227efafd7e5923b1a922c094e3ced8f64a5ab85",
+              "Fn::Sub": "\${AWS::AccountId}.dkr.ecr.us-east-2.\${AWS::URLSuffix}/cdk-hnb659fds-container-assets-\${AWS::AccountId}-us-east-2:8b220441740e064aaea571f967480aca5461a360a69042a15e1e2f739b047b9f",
             },
             "LinuxParameters": {
               "Capabilities": {},
@@ -2656,14 +2656,29 @@ tasks:
           $disk | Initialize-Disk -PartitionStyle MBR
         }
 
+        # Get partition information from the volume
         $partitions = $disk | Get-Partition
         if (-not $partitions) {
+          # If no partitions present, create a new partition and format it.
           Write-Output "create partition"
           $disk | New-Partition -DriveLetter $JENKINS_DRIVE -UseMaximumSize | Format-Volume -FileSystem NTFS -NewFileSystemLabel "Data"
         } else {
           if ($disk.IsOffline) {
-            $disk | Set-Disk -IsOffline $False
+            # If the disk was offline for unknown reason, change it online and reload partition information.
+            Write-Output "Disk is offline, change to online."
+            $disk | Set-Disk -IsOffline $false
+            Start-Sleep 5
+
+            $disk = Get-Disk | Where-Object {$_.SerialNumber -CLike "$serialNumber*"}
+            $partitions = $disk | Get-Partition
           }
+          if ($disk.IsReadOnly) {
+            # If the disk was read only for unknown reason, change it writable.
+            Write-Output "Disk is read only, change to writable."
+            $disk | Set-Disk -IsReadOnly $false
+          }
+
+          # Find drive for Jenkins
           $jenkinsPartition = $partitions | Where-Object {$_.DriveLetter -eq $JENKINS_DRIVE}
           if ($jenkinsPartition) {
             Write-Output "drive $JENKINS_DRIVE already mounted"

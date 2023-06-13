@@ -42,12 +42,19 @@ tasks:
           Write-Output "create partition"
           $disk | New-Partition -DriveLetter $JENKINS_DRIVE -UseMaximumSize | Format-Volume -FileSystem NTFS -NewFileSystemLabel "Data"
         } else {
-          # Check online status of the disk
           if ($disk.IsOffline) {
-            # If the disk was offline for unknown reason, change it online and reload partition information
-            $disk | Set-Disk -IsOffline $False
+            # If the disk was offline for unknown reason, change it online and reload partition information.
+            Write-Output "Disk is offline, change to online."
+            $disk | Set-Disk -IsOffline $false
             Start-Sleep 5
+
+            $disk = Get-Disk | Where-Object {$_.SerialNumber -CLike "$serialNumber*"}
             $partitions = $disk | Get-Partition
+          }
+          if ($disk.IsReadOnly) {
+            # If the disk was read only for unknown reason, change it writable.
+            Write-Output "Disk is read only, change to writable."
+            $disk | Set-Disk -IsReadOnly $false
           }
 
           # Find drive for Jenkins
