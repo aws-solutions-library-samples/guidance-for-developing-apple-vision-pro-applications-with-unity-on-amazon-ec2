@@ -11,8 +11,7 @@ Features include:
 * Jenkins agents on Amazon EC2 Linux / Windows Spot fleet and EC2 Mac instances
 * Optional container support for Jenkins agents
 * Unity Accelerator on EC2 Linux
-* Periodic AMI replacement to keep build cache warm
-* A warm pool of Amazon EBS volumes to maintain intermediate caches
+* Amazon EBS volume pool to keep build caches warm and reuse them across jobs
 * Highly automated provisioning through AWS Cloud Development Kit (CDK)
 
 ## Overview
