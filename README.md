@@ -23,6 +23,8 @@ Please also read [How it works section](#how-it-works) for additional considerat
 
 All the AWS resources in the diagram are provisioned automatically using AWS CDK.
 
+Please also refer to this project to deploy [Unity floating licese servers](https://unity.com/products/unity-build-server) on AWS: [aws-samples/unity-build-server-with-aws-cdk](https://github.com/aws-samples/unity-build-server-with-aws-cdk).
+
 ## Deploy
 To deploy this project to your own AWS account, please follow the steps below.
 
