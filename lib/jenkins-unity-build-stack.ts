@@ -154,7 +154,6 @@ export class JenkinsUnityBuildStack extends cdk.Stack {
         ec2.InstanceType.of(InstanceClass.M5A, InstanceSize.XLARGE),
         ec2.InstanceType.of(InstanceClass.M5N, InstanceSize.XLARGE),
         ec2.InstanceType.of(InstanceClass.M5, InstanceSize.XLARGE),
-        ec2.InstanceType.of(InstanceClass.M4, InstanceSize.XLARGE),
       ],
       name: 'windows-fleet',
       label: 'windows',

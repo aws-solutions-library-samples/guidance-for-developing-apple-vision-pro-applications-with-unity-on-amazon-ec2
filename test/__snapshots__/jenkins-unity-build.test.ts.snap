@@ -2542,9 +2542,6 @@ diskutil apfs resizeContainer $APFSCONT 0
               {
                 "InstanceType": "m5.xlarge",
               },
-              {
-                "InstanceType": "m4.xlarge",
-              },
             ],
           },
         },
