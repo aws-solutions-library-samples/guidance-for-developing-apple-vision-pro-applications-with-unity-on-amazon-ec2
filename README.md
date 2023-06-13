@@ -128,8 +128,8 @@ You can obtain an AMI ID for Mac instances from [the AMI Catalog](https://consol
 
 You will also need to **check the quota** for your AWS account to run a Mac instance. See [`Service Quotas` page](https://console.aws.amazon.com/servicequotas/home/services/ec2/quotas). You have to increase the quotas with the following name:
 
-* Running Dedicated mac1 Hosts: the number of Intel Mac instances
-* Running Dedicated mac2 Hosts: the number of M1 Mac instances (Only if you select `mac2.metal` as the `instanceType` property)
+* `Running Dedicated mac1 Hosts`: the number of Intel Mac instances
+* `Running Dedicated mac2 Hosts`: the number of M1 Mac instances (Only if you select `mac2.metal` as the `instanceType` property)
 
 ![mac quota](docs/imgs/mac-quota.png)
 
@@ -155,9 +155,6 @@ After the deployment, you can test the system using the pre-installed Jenkins jo
 
 * Run `agent-test` job to test all registered Jenkins agents (EC2 Linux, Mac, Docker).
     * the job definition can be found at [agentTestJob.xml](lib/construct/jenkins/resources/config/agentTestJob.xml)
-* Run `detach-from-asg` job to create an AMI from a Linux agent and update its ASG configuration.
-    * the job definition can be found at [detachFromAsg.xml](lib/construct/jenkins/resources/config/detachFromAsg.xml)
-    * it invokes the `createAmi` job to actually create a AMI
 
 To build a Unity client or asset bundle, you can freely use Linux agents and Mac agents to implement your build pipeline.
 The available agent labels are the following:
