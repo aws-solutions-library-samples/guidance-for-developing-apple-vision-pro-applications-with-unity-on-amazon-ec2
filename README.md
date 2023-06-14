@@ -27,6 +27,8 @@ Please also refer to this project to deploy [Unity floating licese servers](http
 ## Deploy
 To deploy this project to your own AWS account, please follow the steps below.
 
+日本語のデプロイ手順もあります: [deployment_ja.md](docs/deployment_ja.md)
+
 ### 0. Prerequisites
 You must have the following dependencies installed to deploy this sample:
 
