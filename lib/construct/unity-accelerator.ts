@@ -46,6 +46,9 @@ export class UnityAccelerator extends Construct {
       instanceType,
       machineImage: ec2.MachineImage.latestAmazonLinux2023({
         userData,
+        // Uncomment this line to avoid from accidental replacement of the instance.
+        // You need to set account and region of the stack explicitly for this to work.
+        // cachedInContext: true,
       }),
       blockDevices: [
         {
