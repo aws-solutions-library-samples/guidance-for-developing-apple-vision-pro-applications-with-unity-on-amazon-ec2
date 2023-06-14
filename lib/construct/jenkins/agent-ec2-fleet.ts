@@ -4,8 +4,8 @@ import * as ec2 from 'aws-cdk-lib/aws-ec2';
 import * as autoscaling from 'aws-cdk-lib/aws-autoscaling';
 import * as s3 from 'aws-cdk-lib/aws-s3';
 import * as iam from 'aws-cdk-lib/aws-iam';
-
 import { readFileSync } from 'fs';
+import { join } from 'path';
 
 export interface AgentEC2FleetPropsBase {
   readonly vpc: ec2.IVpc;
@@ -221,7 +221,8 @@ export class AgentEC2Fleet extends Construct {
   }
 
   public static linuxFleet(scope: Construct, id: string, props: AgentEC2FleetLinuxProps) {
-    const script = readFileSync('./lib/construct/jenkins/resources/agent-userdata.sh', 'utf8');
+    const script = readFileSync(join(__dirname, 'resources', 'agent-userdata.sh'), 'utf8');
+
     const commands = script.replace('<KIND_TAG>', `${cdk.Stack.of(scope).stackName}-${id}`).split('\n');
 
     const userData = ec2.UserData.forLinux();
@@ -242,7 +243,7 @@ export class AgentEC2Fleet extends Construct {
   }
 
   public static windowsFleet(scope: Construct, id: string, props: AgentEC2FleetWindowsProps) {
-    const script = readFileSync('./lib/construct/jenkins/resources/agent-userdata-windows.yml', 'utf8');
+    const script = readFileSync(join(__dirname, 'resources', 'agent-userdata-windows.yml'), 'utf8');
     const userDataContent = script.replace('<KIND_TAG>', `${cdk.Stack.of(scope).stackName}-${id}`);
     const userData = ec2.UserData.custom(userDataContent);
 

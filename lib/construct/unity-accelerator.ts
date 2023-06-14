@@ -4,6 +4,7 @@ import { ManagedPolicy } from 'aws-cdk-lib/aws-iam';
 import * as servicediscovery from 'aws-cdk-lib/aws-servicediscovery';
 import { CfnOutput } from 'aws-cdk-lib';
 import { readFileSync } from 'fs';
+import { join } from 'path';
 
 export interface UnityAcceleratorProps {
   readonly vpc: ec2.IVpc;
@@ -33,7 +34,7 @@ export class UnityAccelerator extends Construct {
       name: 'accelerator',
     });
 
-    let script = readFileSync('./lib/construct/resources/unity-accelerator-init-config.yaml', 'utf8');
+    let script = readFileSync(join(__dirname, 'resources', 'unity-accelerator-init-config.yaml'), 'utf8');
     // Remove all the comments (begins with a # ) since CFn does not support letters other than ASCII.
     script = script
       .split('\n')
