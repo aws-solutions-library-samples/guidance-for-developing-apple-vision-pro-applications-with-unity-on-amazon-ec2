@@ -81,7 +81,7 @@ export class JenkinsUnityBuildStack extends cdk.Stack {
       encryption: BucketEncryption.S3_MANAGED,
       enforceSSL: true,
       serverAccessLogsBucket: logBucket,
-      serverAccessLogsPrefix: 'artifact-bucket-access-logs',
+      serverAccessLogsPrefix: 'artifactBucketAccessLogs/',
       blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
     });
 

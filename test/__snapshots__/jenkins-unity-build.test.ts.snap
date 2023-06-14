@@ -86,7 +86,7 @@ exports[`Snapshot test 1`] = `
           "DestinationBucketName": {
             "Ref": "LogBucketCC3B17E8",
           },
-          "LogFilePrefix": "artifact-bucket-access-logs",
+          "LogFilePrefix": "artifactBucketAccessLogs/",
         },
         "PublicAccessBlockConfiguration": {
           "BlockPublicAcls": true,
