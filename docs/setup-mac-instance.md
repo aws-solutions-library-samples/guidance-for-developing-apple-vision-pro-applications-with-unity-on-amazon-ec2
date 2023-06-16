@@ -31,6 +31,8 @@ aws ssm start-session \
     --parameters '{"portNumber":["5900"], "localPortNumber":["5900"]}'
 ```
 
+Note that you need to install AWS CLI Session Manager plugin to run the command: [Install the Session Manager plugin for the AWS CLI](https://docs.aws.amazon.com/systems-manager/latest/userguide/session-manager-working-with-install-plugin.html).
+
 You should see a message like `Port 5900 opened for sessionId ...` if successful.
 Note that you have to keep the session open while you are accessing the instance in the next step.
 
