@@ -11,8 +11,7 @@ import { AgentMac } from './construct/jenkins/agent-mac';
 import { AgentKeyPair } from './construct/jenkins/key-pair';
 import { UnityAccelerator } from './construct/unity-accelerator';
 import { Size, Stack } from 'aws-cdk-lib';
-import { InstanceClass, InstanceSize, IVpc, Vpc } from 'aws-cdk-lib/aws-ec2';
-import { PolicyStatement } from 'aws-cdk-lib/aws-iam';
+import { InstanceClass, InstanceSize } from 'aws-cdk-lib/aws-ec2';
 
 interface JenkinsUnityBuildStackProps extends cdk.StackProps {
   /**
@@ -175,7 +174,7 @@ export class JenkinsUnityBuildStack extends cdk.Stack {
           vpc,
           artifactBucket,
           // Some AZs don't support Mac instances and you will see an error on CFn deployment.
-          // In that case, please change the index of privateSubnets (e.g. privateSubnets[0])
+          // In that case, please change the index of subnets (e.g. privateSubnets[0] or isolatedSubnets[1])
           subnet: vpc.privateSubnets[1],
           storageSize: Size.gibibytes(200),
           instanceType: 'mac1.metal',

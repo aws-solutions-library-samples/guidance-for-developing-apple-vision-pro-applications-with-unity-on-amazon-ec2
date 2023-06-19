@@ -139,12 +139,13 @@ You will also need to **check the quota** for your AWS account to run a Mac inst
 When all of the above are confirmed, run `npx cdk deploy` command again and your Mac instance will be provisioned and registered as a Jenkins agent.
 
 **NOTE:** It is possible that the availability zone in which you tried to deploy the instance does not support Mac instances yet.
-If you see a provisioning error, you can change the AZ using the code in [`jenkins-unity-build-stack.ts`](lib/jenkins-unity-build-stack.ts).
+Or your vpc (when imported) does not have private subnets (with NAT gateway) available.
+If you see a provisioning error, you can change a subnet using the code in [`jenkins-unity-build-stack.ts`](lib/jenkins-unity-build-stack.ts).
 
 ```ts
     new AgentMac(this, 'JenkinsMacAgent1', {
       vpc,
-      // change this to subnet: vpc.privateSubnets[0]
+      // change this to subnet: vpc.privateSubnets[0], vpc.isolatedSubnets[0], vpc.isolatedSubnets[1], etc.
       subnet: vpc.privateSubnets[1],
 ```
 
