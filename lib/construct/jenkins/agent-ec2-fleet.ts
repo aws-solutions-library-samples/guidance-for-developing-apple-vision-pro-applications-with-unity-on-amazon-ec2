@@ -125,6 +125,10 @@ export class AgentEC2Fleet extends Construct {
 
     const { vpc, subnets = vpc.privateSubnets, instanceTypes, dataVolumeSize } = props;
 
+    if (subnets.length == 0) {
+      throw new Error('No subnet is available. Please specify one or more valid subnets to deploy the fleet.');
+    }
+
     const launchTemplate = new ec2.LaunchTemplate(this, 'LaunchTemplate', {
       machineImage: props.machineImage,
       blockDevices: [

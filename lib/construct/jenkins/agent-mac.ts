@@ -13,7 +13,7 @@ export interface AgentMacProps {
   readonly instanceType: 'mac1.metal' | 'mac2.metal';
   readonly name: string;
   readonly artifactBucket?: IBucket;
-  readonly subnet?: ec2.ISubnet;
+  readonly subnet: ec2.ISubnet;
 }
 
 /**
@@ -32,7 +32,13 @@ export class AgentMac extends Construct {
     this.name = props.name;
     this.sshCredentialsId = 'instance-ssh-key-unix';
 
-    const { vpc, instanceType, subnet = vpc.privateSubnets[0] } = props;
+    const { vpc, instanceType, subnet } = props;
+
+    if (subnet == null) {
+      throw new Error(
+        'Invalid subnet. Please try different subnet type (privateSubnets, isolatedSubnets, or publicSubnets) or index.',
+      );
+    }
 
     const host = new CfnHost(this, 'DedicatedHost', {
       availabilityZone: subnet.availabilityZone,

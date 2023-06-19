@@ -23,7 +23,7 @@ export class UnityAccelerator extends Construct {
     const {
       vpc,
       namespace,
-      subnet = vpc.privateSubnets[0],
+      subnet,
       instanceType = ec2.InstanceType.of(ec2.InstanceClass.T3, ec2.InstanceSize.LARGE),
     } = props;
     // The port Accelerator uses: https://docs.unity3d.com/Manual/UnityAccelerator.html#docker
@@ -60,7 +60,7 @@ export class UnityAccelerator extends Construct {
           }),
         },
       ],
-      vpcSubnets: { subnets: [subnet] },
+      vpcSubnets: subnet == null ? undefined : { subnets: [subnet] },
     });
     // You can enable termination protection by uncommenting this line.
     // (instance.node.defaultChild as ec2.CfnInstance).disableApiTermination = true;
