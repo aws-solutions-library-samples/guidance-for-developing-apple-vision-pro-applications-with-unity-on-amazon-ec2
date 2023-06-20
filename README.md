@@ -258,6 +258,21 @@ By default, we provision only one Mac instance. You can add more Mac instances b
 3. Deploy
     * Run `npx cdk deploy` command. When the deployment is complete, you will see a new Mac instance registered as a Jenkins agent.
 
+### Accessing the Jenkins controller file system
+If you want to directly access the Jenkins file system, you can [open an interactive shell](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs-exec.html) on the Jenkins controller container.
+
+In the [ECS management console](https://console.aws.amazon.com/ecs/v2/clusters), find the cluster name and the running task id of the Jenkins controller. Then enter the command below (replace `CLUSTER_NAME` and `TASK_ID`):
+
+```sh
+aws ecs execute-command --cluster CLUSTER_NAME \
+    --task TASK_ID \
+    --container main \
+    --interactive \
+    --command "/bin/bash"
+```
+
+You can now look into the file system directly: `cd /var/jenkins_home`
+
 ## How it works
 This project requires several architectural considerations, which we will cover in this section.
 
