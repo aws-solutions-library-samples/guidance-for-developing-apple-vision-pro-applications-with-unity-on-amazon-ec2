@@ -22,10 +22,6 @@ export interface AgentEC2FleetPropsBase {
   readonly fleetMinSize: number;
   readonly fleetMaxSize: number;
 
-  readonly jvmOptions?: string;
-  readonly prefixStartSlaveCmd?: string;
-  readonly suffixStartSlaveCmd?: string;
-
   readonly rootVolumeSize: cdk.Size;
 
   /**
@@ -63,6 +59,10 @@ export interface AgentEC2FleetProps extends AgentEC2FleetPropsBase {
   readonly sshConnectTimeoutSeconds: number;
   readonly sshConnectMaxNumRetries: number;
   readonly sshConnectRetryWaitTime: number;
+
+  readonly jvmOptions: string;
+  readonly prefixStartSlaveCmd: string;
+  readonly suffixStartSlaveCmd: string;
 }
 
 export interface AgentEC2FleetPropsCommon extends AgentEC2FleetPropsBase {
@@ -75,6 +75,10 @@ export interface AgentEC2FleetPropsCommon extends AgentEC2FleetPropsBase {
   readonly sshConnectTimeoutSeconds?: number;
   readonly sshConnectMaxNumRetries?: number;
   readonly sshConnectRetryWaitTime?: number;
+
+  readonly jvmOptions?: string;
+  readonly prefixStartSlaveCmd?: string;
+  readonly suffixStartSlaveCmd?: string;
 }
 
 export interface AgentEC2FleetLinuxProps extends AgentEC2FleetPropsCommon {}
@@ -102,9 +106,9 @@ export class AgentEC2Fleet extends Construct {
   public readonly sshConnectMaxNumRetries: number;
   public readonly sshConnectRetryWaitTime: number;
 
-  public readonly jvmOptions?: string;
-  public readonly prefixStartSlaveCmd?: string;
-  public readonly suffixStartSlaveCmd?: string;
+  public readonly jvmOptions: string;
+  public readonly prefixStartSlaveCmd: string;
+  public readonly suffixStartSlaveCmd: string;
 
   constructor(scope: Construct, id: string, props: AgentEC2FleetProps) {
     super(scope, id);
@@ -240,7 +244,10 @@ export class AgentEC2Fleet extends Construct {
         : ec2.MachineImage.latestAmazonLinux2023(),
       userData: userData,
       rootVolumeDeviceName: '/dev/xvda',
-      fsRoot: '/data/jenkins-agent',
+      fsRoot: props.fsRoot ?? '/data/jenkins-agent',
+      jvmOptions: props.jvmOptions ?? '',
+      prefixStartSlaveCmd: props.prefixStartSlaveCmd ?? '',
+      suffixStartSlaveCmd: props.suffixStartSlaveCmd ?? '',
       sshCredentialsId: 'instance-ssh-key-unix',
       sshConnectTimeoutSeconds: props.sshConnectTimeoutSeconds ?? 60,
       sshConnectMaxNumRetries: props.sshConnectMaxNumRetries ?? 10,
@@ -260,17 +267,21 @@ export class AgentEC2Fleet extends Construct {
         : ec2.MachineImage.latestWindows(ec2.WindowsVersion.WINDOWS_SERVER_2022_ENGLISH_FULL_CONTAINERSLATEST),
       userData: userData,
       rootVolumeDeviceName: '/dev/sda1',
-      sshCredentialsId: 'instance-ssh-key-windows',
 
-      jvmOptions: '-Dfile.encoding=UTF-8 -Dsun.jnu.encoding=UTF-8',
+      jvmOptions: props.jvmOptions ?? '-Dfile.encoding=UTF-8 -Dsun.jnu.encoding=UTF-8',
       ...(props.dataVolumeSize != null
         ? {
-            fsRoot: 'D:\\Jenkins',
-            prefixStartSlaveCmd: 'cd /d D:\\ && ',
+            fsRoot: props.fsRoot ?? 'D:\\Jenkins',
+            prefixStartSlaveCmd: props.prefixStartSlaveCmd ?? 'cd /d D:\\ && ',
+            suffixStartSlaveCmd: props.suffixStartSlaveCmd ?? '',
           }
         : {
-            fsRoot: 'C:\\Jenkins',
+            fsRoot: props.fsRoot ?? 'C:\\Jenkins',
+            prefixStartSlaveCmd: props.prefixStartSlaveCmd ?? '',
+            suffixStartSlaveCmd: props.suffixStartSlaveCmd ?? '',
           }),
+
+      sshCredentialsId: 'instance-ssh-key-windows',
       sshConnectTimeoutSeconds: props.sshConnectTimeoutSeconds ?? 60,
       sshConnectMaxNumRetries: props.sshConnectMaxNumRetries ?? 30,
       sshConnectRetryWaitTime: props.sshConnectRetryWaitTime ?? 15,
