@@ -22,6 +22,7 @@ export interface AgentEC2FleetPropsBase {
   readonly fleetMinSize: number;
   readonly fleetMaxSize: number;
 
+  readonly jvmOptions?: string;
   readonly prefixStartSlaveCmd?: string;
   readonly suffixStartSlaveCmd?: string;
 
@@ -101,6 +102,7 @@ export class AgentEC2Fleet extends Construct {
   public readonly sshConnectMaxNumRetries: number;
   public readonly sshConnectRetryWaitTime: number;
 
+  public readonly jvmOptions?: string;
   public readonly prefixStartSlaveCmd?: string;
   public readonly suffixStartSlaveCmd?: string;
 
@@ -120,6 +122,7 @@ export class AgentEC2Fleet extends Construct {
     this.sshConnectMaxNumRetries = props.sshConnectMaxNumRetries;
     this.sshConnectRetryWaitTime = props.sshConnectRetryWaitTime;
 
+    this.jvmOptions = props.jvmOptions;
     this.prefixStartSlaveCmd = props.prefixStartSlaveCmd;
     this.suffixStartSlaveCmd = props.suffixStartSlaveCmd;
 
@@ -258,6 +261,8 @@ export class AgentEC2Fleet extends Construct {
       userData: userData,
       rootVolumeDeviceName: '/dev/sda1',
       sshCredentialsId: 'instance-ssh-key-windows',
+
+      jvmOptions: '-Dfile.encoding=UTF-8 -Dsun.jnu.encoding=UTF-8',
       ...(props.dataVolumeSize != null
         ? {
             fsRoot: 'D:\\Jenkins',

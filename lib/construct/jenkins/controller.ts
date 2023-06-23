@@ -37,6 +37,7 @@ export interface EC2FleetAgentProps {
   readonly sshConnectMaxNumRetries: number;
   readonly sshConnectRetryWaitTime: number;
 
+  readonly jvmOptions?: string;
   readonly prefixStartSlaveCmd?: string;
   readonly suffixStartSlaveCmd?: string;
 }
