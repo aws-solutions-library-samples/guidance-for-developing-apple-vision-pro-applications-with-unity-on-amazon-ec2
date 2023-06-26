@@ -51,6 +51,7 @@ export class UnityAccelerator extends Construct {
         // You need to set account and region of the stack explicitly for this to work.
         // cachedInContext: true,
       }),
+      ssmSessionPermissions: true,
       blockDevices: [
         {
           deviceName: '/dev/xvda',
@@ -64,8 +65,6 @@ export class UnityAccelerator extends Construct {
     });
     // You can enable termination protection by uncommenting this line.
     // (instance.node.defaultChild as ec2.CfnInstance).disableApiTermination = true;
-
-    instance.role.addManagedPolicy(ManagedPolicy.fromAwsManagedPolicyName('AmazonSSMManagedInstanceCore'));
 
     instance.connections.allowFrom(ec2.Peer.ipv4(vpc.vpcCidrBlock), ec2.Port.tcp(servicePort));
 

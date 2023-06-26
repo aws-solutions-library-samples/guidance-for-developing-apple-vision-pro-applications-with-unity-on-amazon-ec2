@@ -89,13 +89,13 @@ diskutil apfs resizeContainer $APFSCONT 0
           }),
         },
       ],
+      ssmSessionPermissions: true,
     });
     // You can enable termination protection by uncommenting this line.
     // (instance.node.defaultChild as ec2.CfnInstance).disableApiTermination = true;
 
     instance.instance.tenancy = 'host';
     instance.instance.hostId = host.attrHostId;
-    instance.role.addManagedPolicy(ManagedPolicy.fromAwsManagedPolicyName('AmazonSSMManagedInstanceCore'));
     props.artifactBucket?.grantReadWrite(instance);
 
     this.instance = instance;
