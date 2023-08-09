@@ -186,7 +186,7 @@ export class AgentEC2Fleet extends Construct {
 
     if (dataVolumeSize != null) {
       const kind = `${cdk.Stack.of(this).stackName}-${id}`;
-      const volumesPerAz = Math.floor(props.fleetMaxSize / subnets.length);
+      const volumesPerAz = Math.ceil(props.fleetMaxSize / subnets.length);
 
       // create a pool of EBS volumes
       subnets
