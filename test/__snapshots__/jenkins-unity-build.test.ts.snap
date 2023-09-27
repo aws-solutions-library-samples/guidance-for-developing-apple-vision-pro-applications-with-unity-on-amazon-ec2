@@ -64,8 +64,8 @@ exports[`Snapshot test 1`] = `
       "Default": "/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-6.1-x86_64",
       "Type": "AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>",
     },
-    "SsmParameterValueawsserviceamiwindowslatestWindowsServer2022EnglishFullContainersLatestC96584B6F00A464EAD1953AFF4B05118Parameter": {
-      "Default": "/aws/service/ami-windows-latest/Windows_Server-2022-English-Full-ContainersLatest",
+    "SsmParameterValueawsserviceamiwindowslatestWindowsServer2022EnglishFullBaseC96584B6F00A464EAD1953AFF4B05118Parameter": {
+      "Default": "/aws/service/ami-windows-latest/Windows_Server-2022-English-Full-Base",
       "Type": "AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>",
     },
   },
@@ -217,7 +217,7 @@ exports[`Snapshot test 1`] = `
           "S3Bucket": {
             "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-us-east-2",
           },
-          "S3Key": "350185a1069fa20a23a583e20c77f6844218bd73097902362dc94f1a108f5d89.zip",
+          "S3Key": "5194f926380567b6fdffc61629afdad2afc818614cb227df45e499c69db163a7.zip",
         },
         "Description": {
           "Fn::Join": [
@@ -231,7 +231,7 @@ exports[`Snapshot test 1`] = `
             ],
           ],
         },
-        "Handler": "__entrypoint__.handler",
+        "Handler": "index.handler",
         "MemorySize": 128,
         "Role": {
           "Fn::GetAtt": [
@@ -239,7 +239,7 @@ exports[`Snapshot test 1`] = `
             "Arn",
           ],
         },
-        "Runtime": "nodejs16.x",
+        "Runtime": "nodejs18.x",
         "Timeout": 900,
       },
       "Type": "AWS::Lambda::Function",
@@ -281,12 +281,19 @@ exports[`Snapshot test 1`] = `
       "DependsOn": [
         "JenkinsControllerServiceLBPublicListenerECSGroup2B1CBE4E",
         "JenkinsControllerServiceLBPublicListener92C1276E",
+        "JenkinsControllerTaskDefinitionTaskRoleDefaultPolicy96CF6745",
+        "JenkinsControllerTaskDefinitionTaskRoleDFC317F9",
       ],
       "Properties": {
         "Cluster": {
           "Ref": "JenkinsControllerClusterE5BC789D",
         },
         "DeploymentConfiguration": {
+          "Alarms": {
+            "AlarmNames": [],
+            "Enable": false,
+            "Rollback": false,
+          },
           "DeploymentCircuitBreaker": {
             "Enable": true,
             "Rollback": true,
@@ -522,6 +529,10 @@ exports[`Snapshot test 1`] = `
       "Type": "AWS::EC2::SecurityGroupEgress",
     },
     "JenkinsControllerServiceSecurityGroup8CBE094C": {
+      "DependsOn": [
+        "JenkinsControllerTaskDefinitionTaskRoleDefaultPolicy96CF6745",
+        "JenkinsControllerTaskDefinitionTaskRoleDFC317F9",
+      ],
       "Properties": {
         "GroupDescription": "TestStack/JenkinsController/Service/Service/SecurityGroup",
         "SecurityGroupEgress": [
@@ -538,6 +549,10 @@ exports[`Snapshot test 1`] = `
       "Type": "AWS::EC2::SecurityGroup",
     },
     "JenkinsControllerServiceSecurityGroupfromTestStackJenkinsControllerServiceLBSecurityGroup69D548DA8080E236CD2D": {
+      "DependsOn": [
+        "JenkinsControllerTaskDefinitionTaskRoleDefaultPolicy96CF6745",
+        "JenkinsControllerTaskDefinitionTaskRoleDFC317F9",
+      ],
       "Properties": {
         "Description": "Load balancer to target",
         "FromPort": 8080,
@@ -1306,6 +1321,10 @@ exports[`Snapshot test 1`] = `
       },
     },
     "JenkinsLinuxAgentLaunchTemplate14EE0ADC": {
+      "DependsOn": [
+        "JenkinsLinuxAgentRoleDefaultPolicy836C304C",
+        "JenkinsLinuxAgentRoleC583C5E9",
+      ],
       "Properties": {
         "LaunchTemplateData": {
           "BlockDeviceMappings": [
@@ -1943,6 +1962,9 @@ yum install -y tmux htop
       },
     },
     "JenkinsLinuxAgentSmallLaunchTemplateEE7A973D": {
+      "DependsOn": [
+        "JenkinsLinuxAgentSmallRoleF5CAF5C8",
+      ],
       "Properties": {
         "LaunchTemplateData": {
           "BlockDeviceMappings": [
@@ -2562,6 +2584,10 @@ diskutil apfs resizeContainer $APFSCONT 0
       },
     },
     "JenkinsWindowsAgentLaunchTemplate067AB1A1": {
+      "DependsOn": [
+        "JenkinsWindowsAgentRoleDefaultPolicyDBFF2EE3",
+        "JenkinsWindowsAgentRole976AA548",
+      ],
       "Properties": {
         "LaunchTemplateData": {
           "BlockDeviceMappings": [
@@ -2584,7 +2610,7 @@ diskutil apfs resizeContainer $APFSCONT 0
             },
           },
           "ImageId": {
-            "Ref": "SsmParameterValueawsserviceamiwindowslatestWindowsServer2022EnglishFullContainersLatestC96584B6F00A464EAD1953AFF4B05118Parameter",
+            "Ref": "SsmParameterValueawsserviceamiwindowslatestWindowsServer2022EnglishFullBaseC96584B6F00A464EAD1953AFF4B05118Parameter",
           },
           "KeyName": "TestStack-agent-ssh-key",
           "SecurityGroupIds": [
