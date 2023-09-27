@@ -264,7 +264,7 @@ export class AgentEC2Fleet extends Construct {
     return new AgentEC2Fleet(scope, id, {
       machineImage: props.amiId
         ? ec2.MachineImage.genericWindows({ [cdk.Stack.of(scope).region]: props.amiId })
-        : ec2.MachineImage.latestWindows(ec2.WindowsVersion.WINDOWS_SERVER_2022_ENGLISH_FULL_CONTAINERSLATEST),
+        : ec2.MachineImage.latestWindows(ec2.WindowsVersion.WINDOWS_SERVER_2022_ENGLISH_FULL_BASE),
       userData: userData,
       rootVolumeDeviceName: '/dev/sda1',
 
