@@ -112,21 +112,44 @@ export class JenkinsUnityBuildStack extends cdk.Stack {
       vpc,
       sshKeyName: keyPair.keyPairName,
       artifactBucket,
-      rootVolumeSize: Size.gibibytes(30),
-      dataVolumeSize: Size.gibibytes(100),
+      rootVolumeSize: Size.gibibytes(50),
+      // dataVolumeSize: Size.gibibytes(100),
       // You may want to add several instance types to avoid from insufficient Spot capacity.
-      instanceTypes: [
-        ec2.InstanceType.of(InstanceClass.C5, InstanceSize.XLARGE),
-        ec2.InstanceType.of(InstanceClass.C5A, InstanceSize.XLARGE),
-        ec2.InstanceType.of(InstanceClass.C5N, InstanceSize.XLARGE),
-        ec2.InstanceType.of(InstanceClass.C4, InstanceSize.XLARGE),
-      ],
+      instanceTypes: [ec2.InstanceType.of(InstanceClass.C5, InstanceSize.XLARGE)],
       name: 'linux-fleet',
       label: 'linux',
       fleetMinSize: 1,
       fleetMaxSize: 4,
       // You can explicitly set a subnet agents will run in
       // subnets: [vpc.privateSubnets[0]],
+    });
+
+    const linuxAgent2XLarge = AgentEC2Fleet.linuxFleet(this, 'JenkinsLinuxAgent2XLarge', {
+      vpc,
+      sshKeyName: keyPair.keyPairName,
+      artifactBucket,
+      rootVolumeSize: Size.gibibytes(50),
+      name: 'linux-fleet-2xlarge',
+      label: '2xlarge',
+      fleetMinSize: 1,
+      fleetMaxSize: 2,
+      // volumeIops: 16000,
+      // volumeThroughput: 1000,
+      instanceTypes: [ec2.InstanceType.of(InstanceClass.C5, InstanceSize.XLARGE2)],
+    });
+
+    const linuxAgent4XLarge = AgentEC2Fleet.linuxFleet(this, 'JenkinsLinuxAgent4XLarge', {
+      vpc,
+      sshKeyName: keyPair.keyPairName,
+      artifactBucket,
+      rootVolumeSize: Size.gibibytes(50),
+      name: 'linux-fleet-4xlarge',
+      label: '4xlarge',
+      fleetMinSize: 1,
+      fleetMaxSize: 2,
+      volumeIops: 16000,
+      volumeThroughput: 1000,
+      instanceTypes: [ec2.InstanceType.of(InstanceClass.C5, InstanceSize.XLARGE4)],
     });
 
     // agents for small tasks
@@ -141,28 +164,7 @@ export class JenkinsUnityBuildStack extends cdk.Stack {
       instanceTypes: [ec2.InstanceType.of(InstanceClass.T3, InstanceSize.MEDIUM)],
     });
 
-    const windowsAgent = AgentEC2Fleet.windowsFleet(this, 'JenkinsWindowsAgent', {
-      vpc,
-      sshKeyName: keyPair.keyPairName,
-      artifactBucket,
-      rootVolumeSize: Size.gibibytes(50),
-      dataVolumeSize: Size.gibibytes(100),
-      // You may want to add several instance types to avoid from insufficient Spot capacity.
-      instanceTypes: [
-        ec2.InstanceType.of(InstanceClass.M6A, InstanceSize.XLARGE),
-        ec2.InstanceType.of(InstanceClass.M5A, InstanceSize.XLARGE),
-        ec2.InstanceType.of(InstanceClass.M5N, InstanceSize.XLARGE),
-        ec2.InstanceType.of(InstanceClass.M5, InstanceSize.XLARGE),
-      ],
-      name: 'windows-fleet',
-      label: 'windows',
-      fleetMinSize: 1,
-      fleetMaxSize: 4,
-      // You can explicitly set a subnet agents will run in
-      // subnets: [vpc.privateSubnets[0]],
-    });
-
-    const ec2FleetAgents = [linuxAgent, linuxAgentSmall, windowsAgent];
+    const ec2FleetAgents = [linuxAgent, linuxAgentSmall, linuxAgent4XLarge, linuxAgent2XLarge];
 
     const macAgents = [];
 
