@@ -166,6 +166,7 @@ exports[`Snapshot test 1`] = `
             },
             {
               "Action": [
+                "s3:PutBucketPolicy",
                 "s3:GetBucket*",
                 "s3:List*",
                 "s3:DeleteObject*",
@@ -217,7 +218,7 @@ exports[`Snapshot test 1`] = `
           "S3Bucket": {
             "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-us-east-2",
           },
-          "S3Key": "5194f926380567b6fdffc61629afdad2afc818614cb227df45e499c69db163a7.zip",
+          "S3Key": "b7f33614a69548d6bafe224d751a7ef238cde19097415e553fe8b63a4c8fd8a6.zip",
         },
         "Description": {
           "Fn::Join": [
@@ -267,6 +268,9 @@ exports[`Snapshot test 1`] = `
       "Type": "AWS::IAM::Role",
     },
     "JenkinsControllerClusterE5BC789D": {
+      "DependsOn": [
+        "JenkinsControllerEcsSlrFB603D5A",
+      ],
       "Properties": {
         "ClusterSettings": [
           {
@@ -276,6 +280,21 @@ exports[`Snapshot test 1`] = `
         ],
       },
       "Type": "AWS::ECS::Cluster",
+    },
+    "JenkinsControllerEcsSlrFB603D5A": {
+      "DeletionPolicy": "Delete",
+      "Properties": {
+        "ServiceToken": {
+          "Fn::GetAtt": [
+            "UpsertSlrCustomResourceHandler8f7be66a3315474baea16ceca43d27c35E89C93F",
+            "Arn",
+          ],
+        },
+        "awsServiceName": "ecs.amazonaws.com",
+        "waitTimeSeconds": 60,
+      },
+      "Type": "Custom::UpsertServiceLinkedRole",
+      "UpdateReplacePolicy": "Delete",
     },
     "JenkinsControllerServiceDF0B0414": {
       "DependsOn": [
@@ -1332,7 +1351,6 @@ exports[`Snapshot test 1`] = `
               "DeviceName": "/dev/xvda",
               "Ebs": {
                 "Encrypted": true,
-                "Throughput": 150,
                 "VolumeSize": 30,
                 "VolumeType": "gp3",
               },
@@ -1972,7 +1990,6 @@ yum install -y tmux htop
               "DeviceName": "/dev/xvda",
               "Ebs": {
                 "Encrypted": true,
-                "Throughput": 150,
                 "VolumeSize": 20,
                 "VolumeType": "gp3",
               },
@@ -2182,7 +2199,6 @@ yum install -y tmux htop
           ],
         },
         "Encrypted": true,
-        "Iops": 3000,
         "MultiAttachEnabled": false,
         "Size": 100,
         "Tags": [
@@ -2195,7 +2211,6 @@ yum install -y tmux htop
             "Value": "TestStack-JenkinsLinuxAgent-0-0",
           },
         ],
-        "Throughput": 200,
         "VolumeType": "gp3",
       },
       "Type": "AWS::EC2::Volume",
@@ -2213,7 +2228,6 @@ yum install -y tmux htop
           ],
         },
         "Encrypted": true,
-        "Iops": 3000,
         "MultiAttachEnabled": false,
         "Size": 100,
         "Tags": [
@@ -2226,7 +2240,6 @@ yum install -y tmux htop
             "Value": "TestStack-JenkinsLinuxAgent-0-1",
           },
         ],
-        "Throughput": 200,
         "VolumeType": "gp3",
       },
       "Type": "AWS::EC2::Volume",
@@ -2244,7 +2257,6 @@ yum install -y tmux htop
           ],
         },
         "Encrypted": true,
-        "Iops": 3000,
         "MultiAttachEnabled": false,
         "Size": 100,
         "Tags": [
@@ -2257,7 +2269,6 @@ yum install -y tmux htop
             "Value": "TestStack-JenkinsLinuxAgent-1-0",
           },
         ],
-        "Throughput": 200,
         "VolumeType": "gp3",
       },
       "Type": "AWS::EC2::Volume",
@@ -2275,7 +2286,6 @@ yum install -y tmux htop
           ],
         },
         "Encrypted": true,
-        "Iops": 3000,
         "MultiAttachEnabled": false,
         "Size": 100,
         "Tags": [
@@ -2288,7 +2298,6 @@ yum install -y tmux htop
             "Value": "TestStack-JenkinsLinuxAgent-1-1",
           },
         ],
-        "Throughput": 200,
         "VolumeType": "gp3",
       },
       "Type": "AWS::EC2::Volume",
@@ -2595,7 +2604,6 @@ diskutil apfs resizeContainer $APFSCONT 0
               "DeviceName": "/dev/sda1",
               "Ebs": {
                 "Encrypted": true,
-                "Throughput": 150,
                 "VolumeSize": 50,
                 "VolumeType": "gp3",
               },
@@ -3228,7 +3236,6 @@ tasks:
           ],
         },
         "Encrypted": true,
-        "Iops": 3000,
         "MultiAttachEnabled": false,
         "Size": 100,
         "Tags": [
@@ -3241,7 +3248,6 @@ tasks:
             "Value": "TestStack-JenkinsWindowsAgent-0-0",
           },
         ],
-        "Throughput": 200,
         "VolumeType": "gp3",
       },
       "Type": "AWS::EC2::Volume",
@@ -3259,7 +3265,6 @@ tasks:
           ],
         },
         "Encrypted": true,
-        "Iops": 3000,
         "MultiAttachEnabled": false,
         "Size": 100,
         "Tags": [
@@ -3272,7 +3277,6 @@ tasks:
             "Value": "TestStack-JenkinsWindowsAgent-0-1",
           },
         ],
-        "Throughput": 200,
         "VolumeType": "gp3",
       },
       "Type": "AWS::EC2::Volume",
@@ -3290,7 +3294,6 @@ tasks:
           ],
         },
         "Encrypted": true,
-        "Iops": 3000,
         "MultiAttachEnabled": false,
         "Size": 100,
         "Tags": [
@@ -3303,7 +3306,6 @@ tasks:
             "Value": "TestStack-JenkinsWindowsAgent-1-0",
           },
         ],
-        "Throughput": 200,
         "VolumeType": "gp3",
       },
       "Type": "AWS::EC2::Volume",
@@ -3321,7 +3323,6 @@ tasks:
           ],
         },
         "Encrypted": true,
-        "Iops": 3000,
         "MultiAttachEnabled": false,
         "Size": 100,
         "Tags": [
@@ -3334,7 +3335,6 @@ tasks:
             "Value": "TestStack-JenkinsWindowsAgent-1-1",
           },
         ],
-        "Throughput": 200,
         "VolumeType": "gp3",
       },
       "Type": "AWS::EC2::Volume",
@@ -3444,6 +3444,7 @@ tasks:
             },
             {
               "Action": [
+                "s3:PutBucketPolicy",
                 "s3:GetBucket*",
                 "s3:List*",
                 "s3:DeleteObject*",
@@ -3816,6 +3817,81 @@ runcmd:
         },
       },
       "Type": "AWS::EC2::SecurityGroup",
+    },
+    "UpsertSlrCustomResourceHandler8f7be66a3315474baea16ceca43d27c35E89C93F": {
+      "DependsOn": [
+        "UpsertSlrCustomResourceHandler8f7be66a3315474baea16ceca43d27c3ServiceRoleDefaultPolicy2922032B",
+        "UpsertSlrCustomResourceHandler8f7be66a3315474baea16ceca43d27c3ServiceRole3F877DF6",
+      ],
+      "Properties": {
+        "Code": {
+          "ZipFile": ""use strict";var i=Object.defineProperty;var l=Object.getOwnPropertyDescriptor;var d=Object.getOwnPropertyNames;var p=Object.prototype.hasOwnProperty;var m=(e,s)=>{for(var r in s)i(e,r,{get:s[r],enumerable:!0})},u=(e,s,r,a)=>{if(s&&typeof s=="object"||typeof s=="function")for(let t of d(s))!p.call(e,t)&&t!==r&&i(e,t,{get:()=>s[t],enumerable:!(a=l(s,t))||a.enumerable});return e};var S=e=>u(i({},"__esModule",{value:!0}),e);var y={};m(y,{handler:()=>R});module.exports=S(y);var o=require("@aws-sdk/client-iam"),n=require("timers/promises"),g=new o.IAMClient({}),R=async(e,s)=>{try{switch(e.RequestType){case"Create":console.log(\`trying to create a service linked role for \${e.ResourceProperties.awsServiceName}\`);let r=new o.CreateServiceLinkedRoleCommand({AWSServiceName:e.ResourceProperties.awsServiceName,Description:e.ResourceProperties.description,CustomSuffix:e.ResourceProperties.customSuffix});await g.send(r),console.log("the service linked role created successfully, now waiting for IAM propagation"),await(0,n.setTimeout)(e.ResourceProperties.waitTimeSeconds*1e3);break;case"Update":break;case"Delete":break}await c("SUCCESS",e,s)}catch(r){r instanceof o.InvalidInputException?(console.log(\`The service linked role seems to already exist, skipping the creation... \${r.message}\`),await c("SUCCESS",e,s)):await c("FAILED",e,s,r.message)}},c=async(e,s,r,a)=>{let t=JSON.stringify({Status:e,Reason:a??"See the details in CloudWatch Log Stream: "+r.logStreamName,PhysicalResourceId:r.logStreamName,StackId:s.StackId,RequestId:s.RequestId,LogicalResourceId:s.LogicalResourceId,NoEcho:!1,Data:{}});await(await fetch(s.ResponseURL,{method:"PUT",body:t,headers:{"Content-Type":"","Content-Length":t.length.toString()}})).text()};0&&(module.exports={handler});
+",
+        },
+        "Handler": "index.handler",
+        "MemorySize": 128,
+        "Role": {
+          "Fn::GetAtt": [
+            "UpsertSlrCustomResourceHandler8f7be66a3315474baea16ceca43d27c3ServiceRole3F877DF6",
+            "Arn",
+          ],
+        },
+        "Runtime": "nodejs18.x",
+        "Timeout": 180,
+      },
+      "Type": "AWS::Lambda::Function",
+    },
+    "UpsertSlrCustomResourceHandler8f7be66a3315474baea16ceca43d27c3ServiceRole3F877DF6": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "lambda.amazonaws.com",
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "ManagedPolicyArns": [
+          {
+            "Fn::Join": [
+              "",
+              [
+                "arn:",
+                {
+                  "Ref": "AWS::Partition",
+                },
+                ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+              ],
+            ],
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Role",
+    },
+    "UpsertSlrCustomResourceHandler8f7be66a3315474baea16ceca43d27c3ServiceRoleDefaultPolicy2922032B": {
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": "iam:CreateServiceLinkedRole",
+              "Effect": "Allow",
+              "Resource": "*",
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "PolicyName": "UpsertSlrCustomResourceHandler8f7be66a3315474baea16ceca43d27c3ServiceRoleDefaultPolicy2922032B",
+        "Roles": [
+          {
+            "Ref": "UpsertSlrCustomResourceHandler8f7be66a3315474baea16ceca43d27c3ServiceRole3F877DF6",
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Policy",
     },
     "Vpc8378EB38": {
       "Properties": {

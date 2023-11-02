@@ -16,6 +16,7 @@ import { IRepository } from 'aws-cdk-lib/aws-ecr';
 import { Cluster } from 'aws-cdk-lib/aws-ecs';
 import * as ejs from 'ejs';
 import { writeFileSync } from 'fs';
+import { ServiceLinkedRole } from 'upsert-slr';
 
 export interface MacAgentProps {
   readonly ipAddress: string;
@@ -70,10 +71,18 @@ export class Controller extends Construct {
     const { vpc, allowedCidrs = [] } = props;
     allowedCidrs.push(vpc.vpcCidrBlock);
 
+    // https://docs.aws.amazon.com/AmazonECS/latest/developerguide/using-service-linked-roles.html
+    const slr = new ServiceLinkedRole(this, 'EcsSlr', {
+      awsServiceName: 'ecs.amazonaws.com',
+    });
+
     const cluster = new Cluster(this, 'Cluster', {
       vpc,
       containerInsights: true,
     });
+
+    // don't create the cluster before ECS service linked role is created
+    cluster.node.defaultChild!.node.addDependency(slr);
 
     const fileSystem = new efs.FileSystem(this, 'Storage', {
       vpc,
