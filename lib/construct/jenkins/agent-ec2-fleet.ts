@@ -11,6 +11,10 @@ export interface AgentEC2FleetPropsBase {
   readonly vpc: ec2.IVpc;
   readonly sshKeyName: string;
   readonly instanceTypes: ec2.InstanceType[];
+
+  /**
+   * Name of the fleet. This must be a unique identifier across all the fleets.
+   */
   readonly name: string;
 
   /**
@@ -47,6 +51,18 @@ export interface AgentEC2FleetPropsBase {
    * @default No additional policies added.
    */
   readonly policyStatements?: iam.PolicyStatement[];
+
+  /**
+   * Iops for gp3 volumes. Set integer from 3000 to 16000.
+   * @default 3000
+   */
+  readonly volumeIops?: number;
+
+  /**
+   * Throughput for gp3 volumes. Set integer from 125 to 1000.
+   * @default 125 MiB/s
+   */
+  readonly volumeThroughput?: number;
 }
 
 export interface AgentEC2FleetProps extends AgentEC2FleetPropsBase {
@@ -144,6 +160,7 @@ export class AgentEC2Fleet extends Construct {
           volume: ec2.BlockDeviceVolume.ebs(props.rootVolumeSize.toGibibytes(), {
             volumeType: ec2.EbsDeviceVolumeType.GP3,
             encrypted: true,
+            iops: props.volumeIops,
           }),
         },
       ],
@@ -163,7 +180,7 @@ export class AgentEC2Fleet extends Construct {
     // https://github.com/aws-cloudformation/cloudformation-coverage-roadmap/issues/824
     (launchTemplate.node.defaultChild as cdk.CfnResource).addPropertyOverride(
       'LaunchTemplateData.BlockDeviceMappings.0.Ebs.Throughput',
-      150,
+      props.volumeThroughput,
     );
 
     props.artifactBucket?.grantReadWrite(launchTemplate);
@@ -202,8 +219,8 @@ export class AgentEC2Fleet extends Construct {
             availabilityZone: info.az,
             size: cdk.Size.gibibytes(dataVolumeSize.toGibibytes()),
             volumeType: ec2.EbsDeviceVolumeType.GP3,
-            throughput: 200,
-            iops: 3000,
+            throughput: props.volumeThroughput,
+            iops: props.volumeIops,
             encrypted: true,
             removalPolicy: cdk.RemovalPolicy.DESTROY,
           });

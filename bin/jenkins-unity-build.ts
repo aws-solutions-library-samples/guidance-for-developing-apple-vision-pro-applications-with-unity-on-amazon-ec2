@@ -2,7 +2,6 @@
 import 'source-map-support/register';
 import * as cdk from 'aws-cdk-lib';
 import { JenkinsUnityBuildStack } from '../lib/jenkins-unity-build-stack';
-import { AwsPrototypingChecks } from '@aws-prototyping-sdk/pdk-nag';
 
 const app = new cdk.App();
 new JenkinsUnityBuildStack(app, 'JenkinsUnityBuildStack', {
@@ -30,6 +29,3 @@ new JenkinsUnityBuildStack(app, 'JenkinsUnityBuildStack', {
   // You can setup one using this project: https://github.com/aws-samples/unity-build-server-with-aws-cdk
   // licenseServerBaseUrl: 'http://10.0.0.100:8080',
 });
-
-// Uncomment to enable vulnerability analysis by cdk-nag
-// cdk.Aspects.of(app).add(new AwsPrototypingChecks());
