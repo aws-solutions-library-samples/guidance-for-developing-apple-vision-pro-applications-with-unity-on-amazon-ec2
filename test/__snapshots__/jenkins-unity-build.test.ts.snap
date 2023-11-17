@@ -876,7 +876,7 @@ exports[`Snapshot test 1`] = `
             ],
             "Essential": true,
             "Image": {
-              "Fn::Sub": "\${AWS::AccountId}.dkr.ecr.us-east-2.\${AWS::URLSuffix}/cdk-hnb659fds-container-assets-\${AWS::AccountId}-us-east-2:c18fd707fb9a53bc41fab4920d4ea0defec7f8dea60f20f4daa5409a965f9423",
+              "Fn::Sub": "\${AWS::AccountId}.dkr.ecr.us-east-2.\${AWS::URLSuffix}/cdk-hnb659fds-container-assets-\${AWS::AccountId}-us-east-2:7be28314dff4fcdb76b593845d75884da36497efe3d6b38552a0fda17d8a45eb",
             },
             "LinuxParameters": {
               "Capabilities": {},
@@ -1160,6 +1160,10 @@ exports[`Snapshot test 1`] = `
                 "ec2:TerminateInstances",
                 "ec2:DescribeInstanceStatus",
                 "ec2:DescribeSpotFleetRequests",
+                "ec2:DescribeFleets",
+                "ec2:DescribeFleetInstances",
+                "ec2:ModifyFleet",
+                "ec2:DescribeInstanceTypes",
                 "autoscaling:DescribeAutoScalingGroups",
                 "autoscaling:UpdateAutoScalingGroup",
                 "iam:ListInstanceProfiles",
