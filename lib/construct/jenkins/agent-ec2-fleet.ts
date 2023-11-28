@@ -63,6 +63,12 @@ export interface AgentEC2FleetPropsBase {
    * @default 125 MiB/s
    */
   readonly volumeThroughput?: number;
+
+  /**
+   * The number of executors in a single Jenkins agent node.
+   * @default 1
+   */
+  readonly numExecutors?: number;
 }
 
 export interface AgentEC2FleetProps extends AgentEC2FleetPropsBase {
@@ -111,6 +117,7 @@ export class AgentEC2Fleet extends Construct {
 
   public readonly fleetMinSize: number;
   public readonly fleetMaxSize: number;
+  public readonly numExecutors: number;
 
   public readonly name: string;
   public readonly label: string;
@@ -131,6 +138,7 @@ export class AgentEC2Fleet extends Construct {
 
     this.fleetMinSize = props.fleetMinSize;
     this.fleetMaxSize = props.fleetMaxSize;
+    this.numExecutors = props.numExecutors ?? 1;
 
     this.name = props.name;
     this.label = props.label;

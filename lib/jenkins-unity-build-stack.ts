@@ -138,6 +138,7 @@ export class JenkinsUnityBuildStack extends cdk.Stack {
       label: 'small',
       fleetMinSize: 1,
       fleetMaxSize: 2,
+      numExecutors: 5,
       instanceTypes: [ec2.InstanceType.of(InstanceClass.T3, InstanceSize.MEDIUM)],
     });
 
