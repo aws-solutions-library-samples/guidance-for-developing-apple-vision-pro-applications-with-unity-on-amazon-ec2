@@ -273,6 +273,13 @@ aws ecs execute-command --cluster CLUSTER_NAME \
 
 You can now look into the file system directly: `cd /var/jenkins_home`
 
+### Adding a Jenkins agent using a WebSocket connection (instead of SSH)
+You can add a Jenkins agent using a WebSocket connection, instead of SSH. This does not require to allow connection from Jenkins controller to your agent server. Your agent server only requires a connection to the ALB of Jenkins controller.
+
+To add a Jenkins agent with a WebSocket connection, add a node from `System Configuration -> Nodes -> New Node` and configure the launch method as follows:
+
+![websocket connection](docs/imgs/websocket.png)
+
 ## How it works
 This project requires several architectural considerations, which we will cover in this section.
 
