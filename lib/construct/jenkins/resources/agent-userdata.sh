@@ -44,6 +44,12 @@ if [ "$VOLUME_ID" ];then
     printf "\nUUID=${UUID}  ${JENKINS_DIR}  xfs  defaults,nofail  0  2\n" >> /etc/fstab
 fi
 
+# Set linux parameters to avoid errors when trying to connect an instance via SSM during Unity build
+# https://stackoverflow.com/questions/69337154/aws-ec2-terminal-session-terminated-with-plugin-with-name-standard-stream-not-f
+echo "fs.file-max=100000" >> /etc/sysctl.conf
+echo "fs.inotify.max_user_watches=1048576" >> /etc/sysctl.conf
+echo "fs.inotify.max_user_instances=256" >> /etc/sysctl.conf
+
 # install docker
 yum install -y docker
 systemctl enable docker
