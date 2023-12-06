@@ -30,6 +30,13 @@ interface JenkinsUnityBuildStackProps extends cdk.StackProps {
   readonly macAmiId?: string;
 
   /**
+   * Set this to true if you use Windows fleetF.
+   *
+   * @default No Windows fleet is provisioned.
+   */
+  readonly useWindows?: boolean;
+
+  /**
    * You can optionally pass a VPC to deploy the stack
    *
    * @default VPC is created automatically
@@ -108,62 +115,68 @@ export class JenkinsUnityBuildStack extends cdk.Stack {
       // subnet: vpc.privateSubnets[0],
     });
 
-    const linuxAgent = AgentEC2Fleet.linuxFleet(this, 'JenkinsLinuxAgent', {
-      vpc,
-      sshKeyName: keyPair.keyPairName,
-      artifactBucket,
-      rootVolumeSize: Size.gibibytes(30),
-      dataVolumeSize: Size.gibibytes(100),
-      // You may want to add several instance types to avoid from insufficient Spot capacity.
-      instanceTypes: [
-        ec2.InstanceType.of(InstanceClass.C5, InstanceSize.XLARGE),
-        ec2.InstanceType.of(InstanceClass.C5A, InstanceSize.XLARGE),
-        ec2.InstanceType.of(InstanceClass.C5N, InstanceSize.XLARGE),
-        ec2.InstanceType.of(InstanceClass.C4, InstanceSize.XLARGE),
-      ],
-      name: 'linux-fleet',
-      label: 'linux',
-      fleetMinSize: 1,
-      fleetMaxSize: 4,
-      // You can explicitly set a subnet agents will run in
-      // subnets: [vpc.privateSubnets[0]],
-    });
+    const ec2FleetAgents = [];
+
+    ec2FleetAgents.push(
+      AgentEC2Fleet.linuxFleet(this, 'JenkinsLinuxAgent', {
+        vpc,
+        sshKeyName: keyPair.keyPairName,
+        artifactBucket,
+        rootVolumeSize: Size.gibibytes(30),
+        dataVolumeSize: Size.gibibytes(100),
+        // You may want to add several instance types to avoid from insufficient Spot capacity.
+        instanceTypes: [
+          ec2.InstanceType.of(InstanceClass.C5, InstanceSize.XLARGE),
+          ec2.InstanceType.of(InstanceClass.C5A, InstanceSize.XLARGE),
+          ec2.InstanceType.of(InstanceClass.C5N, InstanceSize.XLARGE),
+          ec2.InstanceType.of(InstanceClass.C4, InstanceSize.XLARGE),
+        ],
+        name: 'linux-fleet',
+        label: 'linux',
+        fleetMinSize: 1,
+        fleetMaxSize: 4,
+        // You can explicitly set a subnet agents will run in
+        // subnets: [vpc.privateSubnets[0]],
+      }),
+    );
 
     // agents for small tasks
-    const linuxAgentSmall = AgentEC2Fleet.linuxFleet(this, 'JenkinsLinuxAgentSmall', {
-      vpc,
-      sshKeyName: keyPair.keyPairName,
-      rootVolumeSize: Size.gibibytes(20),
-      name: 'linux-fleet-small',
-      label: 'small',
-      fleetMinSize: 1,
-      fleetMaxSize: 2,
-      numExecutors: 5,
-      instanceTypes: [ec2.InstanceType.of(InstanceClass.T3, InstanceSize.MEDIUM)],
-    });
+    ec2FleetAgents.push(
+      AgentEC2Fleet.linuxFleet(this, 'JenkinsLinuxAgentSmall', {
+        vpc,
+        sshKeyName: keyPair.keyPairName,
+        rootVolumeSize: Size.gibibytes(20),
+        name: 'linux-fleet-small',
+        label: 'small',
+        fleetMinSize: 1,
+        fleetMaxSize: 2,
+        numExecutors: 5,
+        instanceTypes: [ec2.InstanceType.of(InstanceClass.T3, InstanceSize.MEDIUM)],
+      }),
+    );
 
-    const windowsAgent = AgentEC2Fleet.windowsFleet(this, 'JenkinsWindowsAgent', {
-      vpc,
-      sshKeyName: keyPair.keyPairName,
-      artifactBucket,
-      rootVolumeSize: Size.gibibytes(50),
-      dataVolumeSize: Size.gibibytes(100),
-      // You may want to add several instance types to avoid from insufficient Spot capacity.
-      instanceTypes: [
-        ec2.InstanceType.of(InstanceClass.M6A, InstanceSize.XLARGE),
-        ec2.InstanceType.of(InstanceClass.M5A, InstanceSize.XLARGE),
-        ec2.InstanceType.of(InstanceClass.M5N, InstanceSize.XLARGE),
-        ec2.InstanceType.of(InstanceClass.M5, InstanceSize.XLARGE),
-      ],
-      name: 'windows-fleet',
-      label: 'windows',
-      fleetMinSize: 1,
-      fleetMaxSize: 4,
-      // You can explicitly set a subnet agents will run in
-      // subnets: [vpc.privateSubnets[0]],
-    });
-
-    const ec2FleetAgents = [linuxAgent, linuxAgentSmall, windowsAgent];
+    if (props.useWindows ?? false) {
+      ec2FleetAgents.push(
+        AgentEC2Fleet.windowsFleet(this, 'JenkinsWindowsAgent', {
+          vpc,
+          sshKeyName: keyPair.keyPairName,
+          artifactBucket,
+          rootVolumeSize: Size.gibibytes(50),
+          dataVolumeSize: Size.gibibytes(100),
+          // You may want to add several instance types to avoid from insufficient Spot capacity.
+          instanceTypes: [
+            ec2.InstanceType.of(InstanceClass.M6A, InstanceSize.XLARGE),
+            ec2.InstanceType.of(InstanceClass.M5A, InstanceSize.XLARGE),
+            ec2.InstanceType.of(InstanceClass.M5N, InstanceSize.XLARGE),
+            ec2.InstanceType.of(InstanceClass.M5, InstanceSize.XLARGE),
+          ],
+          name: 'windows-fleet',
+          label: 'windows',
+          fleetMinSize: 1,
+          fleetMaxSize: 4,
+        }),
+      );
+    }
 
     const macAgents = [];
 
