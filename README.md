@@ -3,6 +3,8 @@
 
 日本語の記事はこちら: [Unityモバイルアプリのビルドパイプラインを実装する](https://aws.amazon.com/jp/blogs/news/unity-mobile-app-build-pipeline/)
 
+AWS blog: [Implementing a Build Pipeline for Unity Mobile Apps](https://aws.amazon.com/blogs/gametech/implementing-a-build-pipeline-for-unity-mobile-apps/)
+
 This is a starter kit for Unity build pipeline with Jenkins and Amazon EC2 Linux/Mac instances on AWS.
 
 Features include:
