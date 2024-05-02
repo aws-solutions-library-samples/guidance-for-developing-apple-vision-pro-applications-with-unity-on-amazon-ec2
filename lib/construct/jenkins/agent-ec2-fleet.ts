@@ -9,7 +9,7 @@ import { join } from 'path';
 
 export interface AgentEC2FleetPropsBase {
   readonly vpc: ec2.IVpc;
-  readonly sshKeyName: string;
+  readonly sshKey: ec2.IKeyPair;
   readonly instanceTypes: ec2.InstanceType[];
 
   /**
@@ -172,7 +172,7 @@ export class AgentEC2Fleet extends Construct {
           }),
         },
       ],
-      keyName: props.sshKeyName,
+      keyPair: props.sshKey,
       userData: props.userData,
       role: new iam.Role(this, 'Role', {
         assumedBy: new iam.ServicePrincipal('ec2.amazonaws.com'),

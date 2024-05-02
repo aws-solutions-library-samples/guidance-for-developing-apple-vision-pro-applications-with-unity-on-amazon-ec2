@@ -7,10 +7,10 @@ import { CfnOutput, RemovalPolicy, Size } from 'aws-cdk-lib';
 
 export interface AgentMacProps {
   readonly vpc: IVpc;
-  readonly sshKeyName: string;
+  readonly sshKey: ec2.IKeyPair;
   readonly amiId: string;
   readonly storageSize: Size;
-  readonly instanceType: 'mac1.metal' | 'mac2.metal';
+  readonly instanceType: string;
   readonly name: string;
   readonly artifactBucket?: IBucket;
   readonly subnet: ec2.ISubnet;
@@ -49,7 +49,7 @@ export class AgentMac extends Construct {
     host.applyRemovalPolicy(RemovalPolicy.RETAIN);
 
     // Brew installation path differs with mac1 (Intel) and mac2 (M1)
-    const brewPath = instanceType == 'mac2.metal' ? '/opt/homebrew' : '/usr/local';
+    const brewPath = instanceType == 'mac1.metal' ? '/usr/local' : '/opt/homebrew';
     const userData = ec2.UserData.custom(`#!/bin/zsh
 #install openjdk@17
 su ec2-user -c '${brewPath}/bin/brew install openjdk@17 jq'
@@ -79,7 +79,7 @@ diskutil apfs resizeContainer $APFSCONT 0
         }),
       },
       vpcSubnets: { subnets: [subnet] },
-      keyName: props.sshKeyName,
+      keyPair: props.sshKey,
       blockDevices: [
         {
           deviceName: '/dev/sda1',

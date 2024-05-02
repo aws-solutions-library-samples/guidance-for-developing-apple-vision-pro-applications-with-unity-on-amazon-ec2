@@ -27,9 +27,9 @@ exports[`Snapshot test 1`] = `
         ],
       },
     },
-    "JenkinsMacAgent1InstanceId39041E59": {
+    "MacAgentmac0InstanceId1810F5C5": {
       "Value": {
-        "Ref": "JenkinsMacAgent1Instance609468B3",
+        "Ref": "MacAgentmac0InstanceFC156968",
       },
     },
     "UnityAcceleratorEndpointC89B3A26": {
@@ -218,7 +218,7 @@ exports[`Snapshot test 1`] = `
           "S3Bucket": {
             "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-us-east-2",
           },
-          "S3Key": "b7f33614a69548d6bafe224d751a7ef238cde19097415e553fe8b63a4c8fd8a6.zip",
+          "S3Key": "2eb6a831b107939f63cfebf68e6316e1a40f79fc99cae0fee9b333bac8d29bc4.zip",
         },
         "Description": {
           "Fn::Join": [
@@ -366,9 +366,7 @@ exports[`Snapshot test 1`] = `
     },
     "JenkinsControllerServiceLB06787F02": {
       "DependsOn": [
-        "LogBucketAutoDeleteObjectsCustomResource7762F42C",
         "LogBucketPolicy900DBE48",
-        "LogBucketCC3B17E8",
         "VpcPublicSubnet1DefaultRoute3DA9E72A",
         "VpcPublicSubnet1RouteTableAssociation97140677",
         "VpcPublicSubnet2DefaultRoute97F91067",
@@ -417,11 +415,6 @@ exports[`Snapshot test 1`] = `
       "Type": "AWS::ElasticLoadBalancingV2::LoadBalancer",
     },
     "JenkinsControllerServiceLBPublicListener92C1276E": {
-      "DependsOn": [
-        "LogBucketAutoDeleteObjectsCustomResource7762F42C",
-        "LogBucketPolicy900DBE48",
-        "LogBucketCC3B17E8",
-      ],
       "Properties": {
         "DefaultActions": [
           {
@@ -440,11 +433,6 @@ exports[`Snapshot test 1`] = `
       "Type": "AWS::ElasticLoadBalancingV2::Listener",
     },
     "JenkinsControllerServiceLBPublicListenerECSGroup2B1CBE4E": {
-      "DependsOn": [
-        "LogBucketAutoDeleteObjectsCustomResource7762F42C",
-        "LogBucketPolicy900DBE48",
-        "LogBucketCC3B17E8",
-      ],
       "Properties": {
         "HealthCheckIntervalSeconds": 15,
         "HealthCheckPath": "/login",
@@ -473,11 +461,6 @@ exports[`Snapshot test 1`] = `
       "Type": "AWS::ElasticLoadBalancingV2::TargetGroup",
     },
     "JenkinsControllerServiceLBSecurityGroup00DC39C4": {
-      "DependsOn": [
-        "LogBucketAutoDeleteObjectsCustomResource7762F42C",
-        "LogBucketPolicy900DBE48",
-        "LogBucketCC3B17E8",
-      ],
       "Properties": {
         "GroupDescription": "Automatically created Security Group for ELB TestStackJenkinsControllerServiceLB86F74D18",
         "SecurityGroupIngress": [
@@ -522,11 +505,6 @@ exports[`Snapshot test 1`] = `
       "Type": "AWS::EC2::SecurityGroup",
     },
     "JenkinsControllerServiceLBSecurityGrouptoTestStackJenkinsControllerServiceSecurityGroupFCB7D6F8808050DEB582": {
-      "DependsOn": [
-        "LogBucketAutoDeleteObjectsCustomResource7762F42C",
-        "LogBucketPolicy900DBE48",
-        "LogBucketCC3B17E8",
-      ],
       "Properties": {
         "Description": "Load balancer to target",
         "DestinationSecurityGroupId": {
@@ -753,19 +731,19 @@ exports[`Snapshot test 1`] = `
               {
                 "Name": "FLEET_ASG_NAME_LINUX_FLEET",
                 "Value": {
-                  "Ref": "JenkinsLinuxAgentFleetASG75788F44",
+                  "Ref": "LinuxFleetlinuxfleetFleetASGA9014471",
                 },
               },
               {
                 "Name": "FLEET_ASG_NAME_LINUX_FLEET_SMALL",
                 "Value": {
-                  "Ref": "JenkinsLinuxAgentSmallFleetASG9671C0E4",
+                  "Ref": "LinuxFleetlinuxfleetsmallFleetASG0510F11C",
                 },
               },
               {
                 "Name": "FLEET_ASG_NAME_WINDOWS_FLEET",
                 "Value": {
-                  "Ref": "JenkinsWindowsAgentFleetASG36E7B304",
+                  "Ref": "WindowsFleetwindowsfleetFleetASGA23DC6C7",
                 },
               },
               {
@@ -851,7 +829,7 @@ exports[`Snapshot test 1`] = `
                 "Name": "MAC_HOST_MAC0",
                 "Value": {
                   "Fn::GetAtt": [
-                    "JenkinsMacAgent1Instance609468B3",
+                    "MacAgentmac0InstanceFC156968",
                     "PrivateIp",
                   ],
                 },
@@ -876,7 +854,7 @@ exports[`Snapshot test 1`] = `
             ],
             "Essential": true,
             "Image": {
-              "Fn::Sub": "\${AWS::AccountId}.dkr.ecr.us-east-2.\${AWS::URLSuffix}/cdk-hnb659fds-container-assets-\${AWS::AccountId}-us-east-2:97939004bb261f49c811a962677a47c78fb24112931c6874eabbdc846b718081",
+              "Fn::Sub": "\${AWS::AccountId}.dkr.ecr.us-east-2.\${AWS::URLSuffix}/cdk-hnb659fds-container-assets-\${AWS::AccountId}-us-east-2:0471a9815eb6c5f78b0da4b184b652622a8b421f5f5224c79d26809b0d546855",
             },
             "LinuxParameters": {
               "Capabilities": {},
@@ -924,7 +902,7 @@ exports[`Snapshot test 1`] = `
                       ":parameter/ec2/keypair/",
                       {
                         "Fn::GetAtt": [
-                          "KeyPair0151ACB6",
+                          "KeyPair1622897B",
                           "KeyPairId",
                         ],
                       },
@@ -1046,7 +1024,7 @@ exports[`Snapshot test 1`] = `
                     ":parameter/ec2/keypair/",
                     {
                       "Fn::GetAtt": [
-                        "KeyPair0151ACB6",
+                        "KeyPair1622897B",
                         "KeyPairId",
                       ],
                     },
@@ -1289,7 +1267,15 @@ exports[`Snapshot test 1`] = `
       "Type": "AWS::Logs::LogGroup",
       "UpdateReplacePolicy": "Retain",
     },
-    "JenkinsLinuxAgentFleetASG75788F44": {
+    "KeyPair1622897B": {
+      "Properties": {
+        "KeyFormat": "pem",
+        "KeyName": "TestStackKeyPairBD6954B3",
+        "KeyType": "rsa",
+      },
+      "Type": "AWS::EC2::KeyPair",
+    },
+    "LinuxFleetlinuxfleetFleetASGA9014471": {
       "Properties": {
         "MaxSize": "1",
         "MinSize": "1",
@@ -1302,11 +1288,11 @@ exports[`Snapshot test 1`] = `
           "LaunchTemplate": {
             "LaunchTemplateSpecification": {
               "LaunchTemplateId": {
-                "Ref": "JenkinsLinuxAgentLaunchTemplate14EE0ADC",
+                "Ref": "LinuxFleetlinuxfleetLaunchTemplate002F96A3",
               },
               "Version": {
                 "Fn::GetAtt": [
-                  "JenkinsLinuxAgentLaunchTemplate14EE0ADC",
+                  "LinuxFleetlinuxfleetLaunchTemplate002F96A3",
                   "LatestVersionNumber",
                 ],
               },
@@ -1343,10 +1329,10 @@ exports[`Snapshot test 1`] = `
         },
       },
     },
-    "JenkinsLinuxAgentLaunchTemplate14EE0ADC": {
+    "LinuxFleetlinuxfleetLaunchTemplate002F96A3": {
       "DependsOn": [
-        "JenkinsLinuxAgentRoleDefaultPolicy836C304C",
-        "JenkinsLinuxAgentRoleC583C5E9",
+        "LinuxFleetlinuxfleetRoleDefaultPolicy93DB6924",
+        "LinuxFleetlinuxfleetRoleD915FA87",
       ],
       "Properties": {
         "LaunchTemplateData": {
@@ -1363,7 +1349,7 @@ exports[`Snapshot test 1`] = `
           "IamInstanceProfile": {
             "Arn": {
               "Fn::GetAtt": [
-                "JenkinsLinuxAgentLaunchTemplateProfile56F6A661",
+                "LinuxFleetlinuxfleetLaunchTemplateProfile27F50C10",
                 "Arn",
               ],
             },
@@ -1371,11 +1357,13 @@ exports[`Snapshot test 1`] = `
           "ImageId": {
             "Ref": "SsmParameterValueawsserviceamiamazonlinuxlatestal2023amikernel61x8664C96584B6F00A464EAD1953AFF4B05118Parameter",
           },
-          "KeyName": "TestStack-agent-ssh-key",
+          "KeyName": {
+            "Ref": "KeyPair1622897B",
+          },
           "SecurityGroupIds": [
             {
               "Fn::GetAtt": [
-                "JenkinsLinuxAgentSecurityGroup04FA787D",
+                "LinuxFleetlinuxfleetSecurityGroup4BBB4D4A",
                 "GroupId",
               ],
             },
@@ -1386,7 +1374,7 @@ exports[`Snapshot test 1`] = `
               "Tags": [
                 {
                   "Key": "Name",
-                  "Value": "TestStack/JenkinsLinuxAgent/LaunchTemplate",
+                  "Value": "TestStack/LinuxFleet-linux-fleet/LaunchTemplate",
                 },
               ],
             },
@@ -1395,7 +1383,7 @@ exports[`Snapshot test 1`] = `
               "Tags": [
                 {
                   "Key": "Name",
-                  "Value": "TestStack/JenkinsLinuxAgent/LaunchTemplate",
+                  "Value": "TestStack/LinuxFleet-linux-fleet/LaunchTemplate",
                 },
               ],
             },
@@ -1417,7 +1405,7 @@ INSTANCE_ID=\`curl -H "X-aws-ec2-metadata-token: $TOKEN" -s http://169.254.169.2
 REGION=\`curl -H "X-aws-ec2-metadata-token: $TOKEN" -s http://169.254.169.254/latest/meta-data/placement/region\`
 # find a volume with the same kind tag as the instance
 # choose a random volume to use evenly across all volumes of the same kind
-VOLUME_ID=$(aws ec2 describe-volumes --filters Name=tag:Kind,Values=TestStack-JenkinsLinuxAgent Name=availability-zone,Values=$AZ Name=status,Values=available --query 'Volumes[*].[VolumeId]' --output text --region $REGION | shuf | head -1)
+VOLUME_ID=$(aws ec2 describe-volumes --filters Name=tag:Kind,Values=TestStack-LinuxFleet-linux-fleet Name=availability-zone,Values=$AZ Name=status,Values=available --query 'Volumes[*].[VolumeId]' --output text --region $REGION | shuf | head -1)
 
 if [ "$VOLUME_ID" ];then
     echo "found volume $VOLUME_ID"
@@ -1478,7 +1466,7 @@ yum install -y tmux htop
             "Tags": [
               {
                 "Key": "Name",
-                "Value": "TestStack/JenkinsLinuxAgent/LaunchTemplate",
+                "Value": "TestStack/LinuxFleet-linux-fleet/LaunchTemplate",
               },
             ],
           },
@@ -1486,17 +1474,17 @@ yum install -y tmux htop
       },
       "Type": "AWS::EC2::LaunchTemplate",
     },
-    "JenkinsLinuxAgentLaunchTemplateProfile56F6A661": {
+    "LinuxFleetlinuxfleetLaunchTemplateProfile27F50C10": {
       "Properties": {
         "Roles": [
           {
-            "Ref": "JenkinsLinuxAgentRoleC583C5E9",
+            "Ref": "LinuxFleetlinuxfleetRoleD915FA87",
           },
         ],
       },
       "Type": "AWS::IAM::InstanceProfile",
     },
-    "JenkinsLinuxAgentRoleC583C5E9": {
+    "LinuxFleetlinuxfleetRoleD915FA87": {
       "Properties": {
         "AssumeRolePolicyDocument": {
           "Statement": [
@@ -1527,7 +1515,7 @@ yum install -y tmux htop
       },
       "Type": "AWS::IAM::Role",
     },
-    "JenkinsLinuxAgentRoleDefaultPolicy836C304C": {
+    "LinuxFleetlinuxfleetRoleDefaultPolicy93DB6924": {
       "Properties": {
         "PolicyDocument": {
           "Statement": [
@@ -1586,7 +1574,7 @@ yum install -y tmux htop
                       },
                       ":volume/",
                       {
-                        "Ref": "JenkinsLinuxAgentVolumev1004DCF206B",
+                        "Ref": "LinuxFleetlinuxfleetVolumev10025552D41",
                       },
                     ],
                   ],
@@ -1627,7 +1615,7 @@ yum install -y tmux htop
                       },
                       ":volume/",
                       {
-                        "Ref": "JenkinsLinuxAgentVolumev1004DCF206B",
+                        "Ref": "LinuxFleetlinuxfleetVolumev10025552D41",
                       },
                     ],
                   ],
@@ -1668,7 +1656,7 @@ yum install -y tmux htop
                       },
                       ":volume/",
                       {
-                        "Ref": "JenkinsLinuxAgentVolumev10160D220CD",
+                        "Ref": "LinuxFleetlinuxfleetVolumev101A6F8CDEC",
                       },
                     ],
                   ],
@@ -1709,7 +1697,7 @@ yum install -y tmux htop
                       },
                       ":volume/",
                       {
-                        "Ref": "JenkinsLinuxAgentVolumev10160D220CD",
+                        "Ref": "LinuxFleetlinuxfleetVolumev101A6F8CDEC",
                       },
                     ],
                   ],
@@ -1750,7 +1738,7 @@ yum install -y tmux htop
                       },
                       ":volume/",
                       {
-                        "Ref": "JenkinsLinuxAgentVolumev1108A60EC8D",
+                        "Ref": "LinuxFleetlinuxfleetVolumev110CEC5B85C",
                       },
                     ],
                   ],
@@ -1791,7 +1779,7 @@ yum install -y tmux htop
                       },
                       ":volume/",
                       {
-                        "Ref": "JenkinsLinuxAgentVolumev1108A60EC8D",
+                        "Ref": "LinuxFleetlinuxfleetVolumev110CEC5B85C",
                       },
                     ],
                   ],
@@ -1832,7 +1820,7 @@ yum install -y tmux htop
                       },
                       ":volume/",
                       {
-                        "Ref": "JenkinsLinuxAgentVolumev11166BF26DE",
+                        "Ref": "LinuxFleetlinuxfleetVolumev1112D6154FD",
                       },
                     ],
                   ],
@@ -1873,7 +1861,7 @@ yum install -y tmux htop
                       },
                       ":volume/",
                       {
-                        "Ref": "JenkinsLinuxAgentVolumev11166BF26DE",
+                        "Ref": "LinuxFleetlinuxfleetVolumev1112D6154FD",
                       },
                     ],
                   ],
@@ -1904,18 +1892,18 @@ yum install -y tmux htop
           ],
           "Version": "2012-10-17",
         },
-        "PolicyName": "JenkinsLinuxAgentRoleDefaultPolicy836C304C",
+        "PolicyName": "LinuxFleetlinuxfleetRoleDefaultPolicy93DB6924",
         "Roles": [
           {
-            "Ref": "JenkinsLinuxAgentRoleC583C5E9",
+            "Ref": "LinuxFleetlinuxfleetRoleD915FA87",
           },
         ],
       },
       "Type": "AWS::IAM::Policy",
     },
-    "JenkinsLinuxAgentSecurityGroup04FA787D": {
+    "LinuxFleetlinuxfleetSecurityGroup4BBB4D4A": {
       "Properties": {
-        "GroupDescription": "TestStack/JenkinsLinuxAgent/SecurityGroup",
+        "GroupDescription": "TestStack/LinuxFleet-linux-fleet/SecurityGroup",
         "SecurityGroupEgress": [
           {
             "CidrIp": "0.0.0.0/0",
@@ -1929,13 +1917,13 @@ yum install -y tmux htop
       },
       "Type": "AWS::EC2::SecurityGroup",
     },
-    "JenkinsLinuxAgentSecurityGroupfromTestStackJenkinsControllerServiceSecurityGroupFCB7D6F8228F42F393": {
+    "LinuxFleetlinuxfleetSecurityGroupfromTestStackJenkinsControllerServiceSecurityGroupFCB7D6F822C63CE113": {
       "Properties": {
         "Description": "from TestStackJenkinsControllerServiceSecurityGroupFCB7D6F8:22",
         "FromPort": 22,
         "GroupId": {
           "Fn::GetAtt": [
-            "JenkinsLinuxAgentSecurityGroup04FA787D",
+            "LinuxFleetlinuxfleetSecurityGroup4BBB4D4A",
             "GroupId",
           ],
         },
@@ -1950,7 +1938,123 @@ yum install -y tmux htop
       },
       "Type": "AWS::EC2::SecurityGroupIngress",
     },
-    "JenkinsLinuxAgentSmallFleetASG9671C0E4": {
+    "LinuxFleetlinuxfleetVolumev10025552D41": {
+      "DeletionPolicy": "Delete",
+      "Properties": {
+        "AvailabilityZone": {
+          "Fn::Select": [
+            0,
+            {
+              "Fn::GetAZs": "",
+            },
+          ],
+        },
+        "Encrypted": true,
+        "MultiAttachEnabled": false,
+        "Size": 100,
+        "Tags": [
+          {
+            "Key": "Kind",
+            "Value": "TestStack-LinuxFleet-linux-fleet",
+          },
+          {
+            "Key": "Name",
+            "Value": "TestStack-LinuxFleet-linux-fleet-0-0",
+          },
+        ],
+        "VolumeType": "gp3",
+      },
+      "Type": "AWS::EC2::Volume",
+      "UpdateReplacePolicy": "Delete",
+    },
+    "LinuxFleetlinuxfleetVolumev101A6F8CDEC": {
+      "DeletionPolicy": "Delete",
+      "Properties": {
+        "AvailabilityZone": {
+          "Fn::Select": [
+            0,
+            {
+              "Fn::GetAZs": "",
+            },
+          ],
+        },
+        "Encrypted": true,
+        "MultiAttachEnabled": false,
+        "Size": 100,
+        "Tags": [
+          {
+            "Key": "Kind",
+            "Value": "TestStack-LinuxFleet-linux-fleet",
+          },
+          {
+            "Key": "Name",
+            "Value": "TestStack-LinuxFleet-linux-fleet-0-1",
+          },
+        ],
+        "VolumeType": "gp3",
+      },
+      "Type": "AWS::EC2::Volume",
+      "UpdateReplacePolicy": "Delete",
+    },
+    "LinuxFleetlinuxfleetVolumev110CEC5B85C": {
+      "DeletionPolicy": "Delete",
+      "Properties": {
+        "AvailabilityZone": {
+          "Fn::Select": [
+            1,
+            {
+              "Fn::GetAZs": "",
+            },
+          ],
+        },
+        "Encrypted": true,
+        "MultiAttachEnabled": false,
+        "Size": 100,
+        "Tags": [
+          {
+            "Key": "Kind",
+            "Value": "TestStack-LinuxFleet-linux-fleet",
+          },
+          {
+            "Key": "Name",
+            "Value": "TestStack-LinuxFleet-linux-fleet-1-0",
+          },
+        ],
+        "VolumeType": "gp3",
+      },
+      "Type": "AWS::EC2::Volume",
+      "UpdateReplacePolicy": "Delete",
+    },
+    "LinuxFleetlinuxfleetVolumev1112D6154FD": {
+      "DeletionPolicy": "Delete",
+      "Properties": {
+        "AvailabilityZone": {
+          "Fn::Select": [
+            1,
+            {
+              "Fn::GetAZs": "",
+            },
+          ],
+        },
+        "Encrypted": true,
+        "MultiAttachEnabled": false,
+        "Size": 100,
+        "Tags": [
+          {
+            "Key": "Kind",
+            "Value": "TestStack-LinuxFleet-linux-fleet",
+          },
+          {
+            "Key": "Name",
+            "Value": "TestStack-LinuxFleet-linux-fleet-1-1",
+          },
+        ],
+        "VolumeType": "gp3",
+      },
+      "Type": "AWS::EC2::Volume",
+      "UpdateReplacePolicy": "Delete",
+    },
+    "LinuxFleetlinuxfleetsmallFleetASG0510F11C": {
       "Properties": {
         "MaxSize": "1",
         "MinSize": "1",
@@ -1963,11 +2067,11 @@ yum install -y tmux htop
           "LaunchTemplate": {
             "LaunchTemplateSpecification": {
               "LaunchTemplateId": {
-                "Ref": "JenkinsLinuxAgentSmallLaunchTemplateEE7A973D",
+                "Ref": "LinuxFleetlinuxfleetsmallLaunchTemplate48023D08",
               },
               "Version": {
                 "Fn::GetAtt": [
-                  "JenkinsLinuxAgentSmallLaunchTemplateEE7A973D",
+                  "LinuxFleetlinuxfleetsmallLaunchTemplate48023D08",
                   "LatestVersionNumber",
                 ],
               },
@@ -1995,9 +2099,10 @@ yum install -y tmux htop
         },
       },
     },
-    "JenkinsLinuxAgentSmallLaunchTemplateEE7A973D": {
+    "LinuxFleetlinuxfleetsmallLaunchTemplate48023D08": {
       "DependsOn": [
-        "JenkinsLinuxAgentSmallRoleF5CAF5C8",
+        "LinuxFleetlinuxfleetsmallRoleDefaultPolicyC6118F08",
+        "LinuxFleetlinuxfleetsmallRole6F4F59F8",
       ],
       "Properties": {
         "LaunchTemplateData": {
@@ -2006,7 +2111,7 @@ yum install -y tmux htop
               "DeviceName": "/dev/xvda",
               "Ebs": {
                 "Encrypted": true,
-                "VolumeSize": 20,
+                "VolumeSize": 30,
                 "VolumeType": "gp3",
               },
             },
@@ -2014,7 +2119,7 @@ yum install -y tmux htop
           "IamInstanceProfile": {
             "Arn": {
               "Fn::GetAtt": [
-                "JenkinsLinuxAgentSmallLaunchTemplateProfile6D16D303",
+                "LinuxFleetlinuxfleetsmallLaunchTemplateProfile314F0453",
                 "Arn",
               ],
             },
@@ -2022,11 +2127,13 @@ yum install -y tmux htop
           "ImageId": {
             "Ref": "SsmParameterValueawsserviceamiamazonlinuxlatestal2023amikernel61x8664C96584B6F00A464EAD1953AFF4B05118Parameter",
           },
-          "KeyName": "TestStack-agent-ssh-key",
+          "KeyName": {
+            "Ref": "KeyPair1622897B",
+          },
           "SecurityGroupIds": [
             {
               "Fn::GetAtt": [
-                "JenkinsLinuxAgentSmallSecurityGroupA0746C5C",
+                "LinuxFleetlinuxfleetsmallSecurityGroup075E4AA4",
                 "GroupId",
               ],
             },
@@ -2037,7 +2144,7 @@ yum install -y tmux htop
               "Tags": [
                 {
                   "Key": "Name",
-                  "Value": "TestStack/JenkinsLinuxAgentSmall/LaunchTemplate",
+                  "Value": "TestStack/LinuxFleet-linux-fleet-small/LaunchTemplate",
                 },
               ],
             },
@@ -2046,7 +2153,7 @@ yum install -y tmux htop
               "Tags": [
                 {
                   "Key": "Name",
-                  "Value": "TestStack/JenkinsLinuxAgentSmall/LaunchTemplate",
+                  "Value": "TestStack/LinuxFleet-linux-fleet-small/LaunchTemplate",
                 },
               ],
             },
@@ -2068,7 +2175,7 @@ INSTANCE_ID=\`curl -H "X-aws-ec2-metadata-token: $TOKEN" -s http://169.254.169.2
 REGION=\`curl -H "X-aws-ec2-metadata-token: $TOKEN" -s http://169.254.169.254/latest/meta-data/placement/region\`
 # find a volume with the same kind tag as the instance
 # choose a random volume to use evenly across all volumes of the same kind
-VOLUME_ID=$(aws ec2 describe-volumes --filters Name=tag:Kind,Values=TestStack-JenkinsLinuxAgentSmall Name=availability-zone,Values=$AZ Name=status,Values=available --query 'Volumes[*].[VolumeId]' --output text --region $REGION | shuf | head -1)
+VOLUME_ID=$(aws ec2 describe-volumes --filters Name=tag:Kind,Values=TestStack-LinuxFleet-linux-fleet-small Name=availability-zone,Values=$AZ Name=status,Values=available --query 'Volumes[*].[VolumeId]' --output text --region $REGION | shuf | head -1)
 
 if [ "$VOLUME_ID" ];then
     echo "found volume $VOLUME_ID"
@@ -2129,7 +2236,7 @@ yum install -y tmux htop
             "Tags": [
               {
                 "Key": "Name",
-                "Value": "TestStack/JenkinsLinuxAgentSmall/LaunchTemplate",
+                "Value": "TestStack/LinuxFleet-linux-fleet-small/LaunchTemplate",
               },
             ],
           },
@@ -2137,17 +2244,17 @@ yum install -y tmux htop
       },
       "Type": "AWS::EC2::LaunchTemplate",
     },
-    "JenkinsLinuxAgentSmallLaunchTemplateProfile6D16D303": {
+    "LinuxFleetlinuxfleetsmallLaunchTemplateProfile314F0453": {
       "Properties": {
         "Roles": [
           {
-            "Ref": "JenkinsLinuxAgentSmallRoleF5CAF5C8",
+            "Ref": "LinuxFleetlinuxfleetsmallRole6F4F59F8",
           },
         ],
       },
       "Type": "AWS::IAM::InstanceProfile",
     },
-    "JenkinsLinuxAgentSmallRoleF5CAF5C8": {
+    "LinuxFleetlinuxfleetsmallRole6F4F59F8": {
       "Properties": {
         "AssumeRolePolicyDocument": {
           "Statement": [
@@ -2178,299 +2285,7 @@ yum install -y tmux htop
       },
       "Type": "AWS::IAM::Role",
     },
-    "JenkinsLinuxAgentSmallSecurityGroupA0746C5C": {
-      "Properties": {
-        "GroupDescription": "TestStack/JenkinsLinuxAgentSmall/SecurityGroup",
-        "SecurityGroupEgress": [
-          {
-            "CidrIp": "0.0.0.0/0",
-            "Description": "Allow all outbound traffic by default",
-            "IpProtocol": "-1",
-          },
-        ],
-        "VpcId": {
-          "Ref": "Vpc8378EB38",
-        },
-      },
-      "Type": "AWS::EC2::SecurityGroup",
-    },
-    "JenkinsLinuxAgentSmallSecurityGroupfromTestStackJenkinsControllerServiceSecurityGroupFCB7D6F822535DAB4E": {
-      "Properties": {
-        "Description": "from TestStackJenkinsControllerServiceSecurityGroupFCB7D6F8:22",
-        "FromPort": 22,
-        "GroupId": {
-          "Fn::GetAtt": [
-            "JenkinsLinuxAgentSmallSecurityGroupA0746C5C",
-            "GroupId",
-          ],
-        },
-        "IpProtocol": "tcp",
-        "SourceSecurityGroupId": {
-          "Fn::GetAtt": [
-            "JenkinsControllerServiceSecurityGroup8CBE094C",
-            "GroupId",
-          ],
-        },
-        "ToPort": 22,
-      },
-      "Type": "AWS::EC2::SecurityGroupIngress",
-    },
-    "JenkinsLinuxAgentVolumev1004DCF206B": {
-      "DeletionPolicy": "Delete",
-      "Properties": {
-        "AvailabilityZone": {
-          "Fn::Select": [
-            0,
-            {
-              "Fn::GetAZs": "",
-            },
-          ],
-        },
-        "Encrypted": true,
-        "MultiAttachEnabled": false,
-        "Size": 100,
-        "Tags": [
-          {
-            "Key": "Kind",
-            "Value": "TestStack-JenkinsLinuxAgent",
-          },
-          {
-            "Key": "Name",
-            "Value": "TestStack-JenkinsLinuxAgent-0-0",
-          },
-        ],
-        "VolumeType": "gp3",
-      },
-      "Type": "AWS::EC2::Volume",
-      "UpdateReplacePolicy": "Delete",
-    },
-    "JenkinsLinuxAgentVolumev10160D220CD": {
-      "DeletionPolicy": "Delete",
-      "Properties": {
-        "AvailabilityZone": {
-          "Fn::Select": [
-            0,
-            {
-              "Fn::GetAZs": "",
-            },
-          ],
-        },
-        "Encrypted": true,
-        "MultiAttachEnabled": false,
-        "Size": 100,
-        "Tags": [
-          {
-            "Key": "Kind",
-            "Value": "TestStack-JenkinsLinuxAgent",
-          },
-          {
-            "Key": "Name",
-            "Value": "TestStack-JenkinsLinuxAgent-0-1",
-          },
-        ],
-        "VolumeType": "gp3",
-      },
-      "Type": "AWS::EC2::Volume",
-      "UpdateReplacePolicy": "Delete",
-    },
-    "JenkinsLinuxAgentVolumev1108A60EC8D": {
-      "DeletionPolicy": "Delete",
-      "Properties": {
-        "AvailabilityZone": {
-          "Fn::Select": [
-            1,
-            {
-              "Fn::GetAZs": "",
-            },
-          ],
-        },
-        "Encrypted": true,
-        "MultiAttachEnabled": false,
-        "Size": 100,
-        "Tags": [
-          {
-            "Key": "Kind",
-            "Value": "TestStack-JenkinsLinuxAgent",
-          },
-          {
-            "Key": "Name",
-            "Value": "TestStack-JenkinsLinuxAgent-1-0",
-          },
-        ],
-        "VolumeType": "gp3",
-      },
-      "Type": "AWS::EC2::Volume",
-      "UpdateReplacePolicy": "Delete",
-    },
-    "JenkinsLinuxAgentVolumev11166BF26DE": {
-      "DeletionPolicy": "Delete",
-      "Properties": {
-        "AvailabilityZone": {
-          "Fn::Select": [
-            1,
-            {
-              "Fn::GetAZs": "",
-            },
-          ],
-        },
-        "Encrypted": true,
-        "MultiAttachEnabled": false,
-        "Size": 100,
-        "Tags": [
-          {
-            "Key": "Kind",
-            "Value": "TestStack-JenkinsLinuxAgent",
-          },
-          {
-            "Key": "Name",
-            "Value": "TestStack-JenkinsLinuxAgent-1-1",
-          },
-        ],
-        "VolumeType": "gp3",
-      },
-      "Type": "AWS::EC2::Volume",
-      "UpdateReplacePolicy": "Delete",
-    },
-    "JenkinsMacAgent1DedicatedHostA0E9B9BB": {
-      "DeletionPolicy": "Retain",
-      "Properties": {
-        "AvailabilityZone": {
-          "Fn::Select": [
-            1,
-            {
-              "Fn::GetAZs": "",
-            },
-          ],
-        },
-        "InstanceType": "mac1.metal",
-      },
-      "Type": "AWS::EC2::Host",
-      "UpdateReplacePolicy": "Retain",
-    },
-    "JenkinsMacAgent1Instance609468B3": {
-      "DependsOn": [
-        "JenkinsMacAgent1InstanceInstanceRoleDefaultPolicy7D35E4C4",
-        "JenkinsMacAgent1InstanceInstanceRole37F9A48B",
-      ],
-      "Properties": {
-        "AvailabilityZone": {
-          "Fn::Select": [
-            1,
-            {
-              "Fn::GetAZs": "",
-            },
-          ],
-        },
-        "BlockDeviceMappings": [
-          {
-            "DeviceName": "/dev/sda1",
-            "Ebs": {
-              "Encrypted": true,
-              "VolumeSize": 200,
-              "VolumeType": "gp3",
-            },
-          },
-        ],
-        "HostId": {
-          "Fn::GetAtt": [
-            "JenkinsMacAgent1DedicatedHostA0E9B9BB",
-            "HostId",
-          ],
-        },
-        "IamInstanceProfile": {
-          "Ref": "JenkinsMacAgent1InstanceInstanceProfileD673B46F",
-        },
-        "ImageId": "ami-013846afc111c94b0",
-        "InstanceType": "mac1.metal",
-        "KeyName": "TestStack-agent-ssh-key",
-        "SecurityGroupIds": [
-          {
-            "Fn::GetAtt": [
-              "JenkinsMacAgent1InstanceInstanceSecurityGroupFD9F49AE",
-              "GroupId",
-            ],
-          },
-        ],
-        "SubnetId": {
-          "Ref": "VpcPrivateSubnet2Subnet3788AAA1",
-        },
-        "Tags": [
-          {
-            "Key": "Name",
-            "Value": "TestStack/JenkinsMacAgent1/Instance",
-          },
-        ],
-        "Tenancy": "host",
-        "UserData": {
-          "Fn::Base64": "#!/bin/zsh
-#install openjdk@17
-su ec2-user -c '/usr/local/bin/brew install openjdk@17 jq'
-ln -sfn /usr/local/opt/openjdk@17/libexec/openjdk.jdk /Library/Java/JavaVirtualMachines/openjdk-17.jdk
-java -version
-
-# resize disk to match the ebs volume
-# https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-mac-instances.html#mac-instance-increase-volume
-PDISK=$(diskutil list physical external | head -n1 | cut -d" " -f1)
-APFSCONT=$(diskutil list physical external | grep "Apple_APFS" | tr -s " " | cut -d" " -f8)
-yes | diskutil repairDisk $PDISK
-diskutil apfs resizeContainer $APFSCONT 0
-
-# Start the ARD Agent
-# https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-mac-instances.html#connect-to-mac-instance
-/System/Library/CoreServices/RemoteManagement/ARDAgent.app/Contents/Resources/kickstart -activate -configure -access -on -restart -agent -privs -all
-    ",
-        },
-      },
-      "Type": "AWS::EC2::Instance",
-    },
-    "JenkinsMacAgent1InstanceInstanceProfileD673B46F": {
-      "Properties": {
-        "Roles": [
-          {
-            "Ref": "JenkinsMacAgent1InstanceInstanceRole37F9A48B",
-          },
-        ],
-      },
-      "Type": "AWS::IAM::InstanceProfile",
-    },
-    "JenkinsMacAgent1InstanceInstanceRole37F9A48B": {
-      "Properties": {
-        "AssumeRolePolicyDocument": {
-          "Statement": [
-            {
-              "Action": "sts:AssumeRole",
-              "Effect": "Allow",
-              "Principal": {
-                "Service": "ec2.amazonaws.com",
-              },
-            },
-          ],
-          "Version": "2012-10-17",
-        },
-        "ManagedPolicyArns": [
-          {
-            "Fn::Join": [
-              "",
-              [
-                "arn:",
-                {
-                  "Ref": "AWS::Partition",
-                },
-                ":iam::aws:policy/AmazonSSMManagedInstanceCore",
-              ],
-            ],
-          },
-        ],
-        "Tags": [
-          {
-            "Key": "Name",
-            "Value": "TestStack/JenkinsMacAgent1/Instance",
-          },
-        ],
-      },
-      "Type": "AWS::IAM::Role",
-    },
-    "JenkinsMacAgent1InstanceInstanceRoleDefaultPolicy7D35E4C4": {
+    "LinuxFleetlinuxfleetsmallRoleDefaultPolicyC6118F08": {
       "Properties": {
         "PolicyDocument": {
           "Statement": [
@@ -2514,710 +2329,18 @@ diskutil apfs resizeContainer $APFSCONT 0
           ],
           "Version": "2012-10-17",
         },
-        "PolicyName": "JenkinsMacAgent1InstanceInstanceRoleDefaultPolicy7D35E4C4",
+        "PolicyName": "LinuxFleetlinuxfleetsmallRoleDefaultPolicyC6118F08",
         "Roles": [
           {
-            "Ref": "JenkinsMacAgent1InstanceInstanceRole37F9A48B",
+            "Ref": "LinuxFleetlinuxfleetsmallRole6F4F59F8",
           },
         ],
       },
       "Type": "AWS::IAM::Policy",
     },
-    "JenkinsMacAgent1InstanceInstanceSecurityGroupFD9F49AE": {
+    "LinuxFleetlinuxfleetsmallSecurityGroup075E4AA4": {
       "Properties": {
-        "GroupDescription": "TestStack/JenkinsMacAgent1/Instance/InstanceSecurityGroup",
-        "SecurityGroupEgress": [
-          {
-            "CidrIp": "0.0.0.0/0",
-            "Description": "Allow all outbound traffic by default",
-            "IpProtocol": "-1",
-          },
-        ],
-        "Tags": [
-          {
-            "Key": "Name",
-            "Value": "TestStack/JenkinsMacAgent1/Instance",
-          },
-        ],
-        "VpcId": {
-          "Ref": "Vpc8378EB38",
-        },
-      },
-      "Type": "AWS::EC2::SecurityGroup",
-    },
-    "JenkinsMacAgent1InstanceInstanceSecurityGroupfromTestStackJenkinsControllerServiceSecurityGroupFCB7D6F822A4CEA2EA": {
-      "Properties": {
-        "Description": "from TestStackJenkinsControllerServiceSecurityGroupFCB7D6F8:22",
-        "FromPort": 22,
-        "GroupId": {
-          "Fn::GetAtt": [
-            "JenkinsMacAgent1InstanceInstanceSecurityGroupFD9F49AE",
-            "GroupId",
-          ],
-        },
-        "IpProtocol": "tcp",
-        "SourceSecurityGroupId": {
-          "Fn::GetAtt": [
-            "JenkinsControllerServiceSecurityGroup8CBE094C",
-            "GroupId",
-          ],
-        },
-        "ToPort": 22,
-      },
-      "Type": "AWS::EC2::SecurityGroupIngress",
-    },
-    "JenkinsWindowsAgentFleetASG36E7B304": {
-      "Properties": {
-        "MaxSize": "1",
-        "MinSize": "1",
-        "MixedInstancesPolicy": {
-          "InstancesDistribution": {
-            "OnDemandBaseCapacity": 0,
-            "OnDemandPercentageAboveBaseCapacity": 0,
-            "SpotAllocationStrategy": "price-capacity-optimized",
-          },
-          "LaunchTemplate": {
-            "LaunchTemplateSpecification": {
-              "LaunchTemplateId": {
-                "Ref": "JenkinsWindowsAgentLaunchTemplate067AB1A1",
-              },
-              "Version": {
-                "Fn::GetAtt": [
-                  "JenkinsWindowsAgentLaunchTemplate067AB1A1",
-                  "LatestVersionNumber",
-                ],
-              },
-            },
-            "Overrides": [
-              {
-                "InstanceType": "m6a.xlarge",
-              },
-              {
-                "InstanceType": "m5a.xlarge",
-              },
-              {
-                "InstanceType": "m5n.xlarge",
-              },
-              {
-                "InstanceType": "m5.xlarge",
-              },
-            ],
-          },
-        },
-        "VPCZoneIdentifier": [
-          {
-            "Ref": "VpcPrivateSubnet1Subnet536B997A",
-          },
-          {
-            "Ref": "VpcPrivateSubnet2Subnet3788AAA1",
-          },
-        ],
-      },
-      "Type": "AWS::AutoScaling::AutoScalingGroup",
-      "UpdatePolicy": {
-        "AutoScalingScheduledAction": {
-          "IgnoreUnmodifiedGroupSizeProperties": true,
-        },
-      },
-    },
-    "JenkinsWindowsAgentLaunchTemplate067AB1A1": {
-      "DependsOn": [
-        "JenkinsWindowsAgentRoleDefaultPolicyDBFF2EE3",
-        "JenkinsWindowsAgentRole976AA548",
-      ],
-      "Properties": {
-        "LaunchTemplateData": {
-          "BlockDeviceMappings": [
-            {
-              "DeviceName": "/dev/sda1",
-              "Ebs": {
-                "Encrypted": true,
-                "VolumeSize": 50,
-                "VolumeType": "gp3",
-              },
-            },
-          ],
-          "IamInstanceProfile": {
-            "Arn": {
-              "Fn::GetAtt": [
-                "JenkinsWindowsAgentLaunchTemplateProfile92B75BA8",
-                "Arn",
-              ],
-            },
-          },
-          "ImageId": {
-            "Ref": "SsmParameterValueawsserviceamiwindowslatestWindowsServer2022EnglishFullBaseC96584B6F00A464EAD1953AFF4B05118Parameter",
-          },
-          "KeyName": "TestStack-agent-ssh-key",
-          "SecurityGroupIds": [
-            {
-              "Fn::GetAtt": [
-                "JenkinsWindowsAgentSecurityGroup0420B640",
-                "GroupId",
-              ],
-            },
-          ],
-          "TagSpecifications": [
-            {
-              "ResourceType": "instance",
-              "Tags": [
-                {
-                  "Key": "Name",
-                  "Value": "TestStack/JenkinsWindowsAgent/LaunchTemplate",
-                },
-              ],
-            },
-            {
-              "ResourceType": "volume",
-              "Tags": [
-                {
-                  "Key": "Name",
-                  "Value": "TestStack/JenkinsWindowsAgent/LaunchTemplate",
-                },
-              ],
-            },
-          ],
-          "UserData": {
-            "Fn::Base64": "version: 1.1
-tasks:
-- task: executeScript
-  inputs:
-  - frequency: once
-    type: powershell
-    runAs: admin
-    content: |-
-      $instanceMetadata = Get-EC2InstanceMetadata -Category @("AvailabilityZone", "InstanceId", "Region")
-      $AZ = $instanceMetadata[0]
-      $INSTANCE_ID = $instanceMetadata[1]
-      $REGION = $instanceMetadata[2].SystemName
-
-      $VOLUME_ID = Get-EC2Volume -Filter @(@{Name="tag:Kind"; Values="TestStack-JenkinsWindowsAgent"}, @{Name="availability-zone"; Values=$AZ}, @{Name="status"; Values="available"}) -Region $REGION -Select "Volumes.VolumeId" | Select-Object -First 1
-      if ($VOLUME_ID) {
-        $JENKINS_DRIVE = "D"
-
-        Write-Output "found volume \${VOLUME_ID}"
-
-        $DEVICE_NAME = "/dev/xvdf"
-        # There is possibly a race condition between other instances.
-        # We may want to retry attach-volume according to the return code (currently omitted).
-        Add-EC2Volume -Device $DEVICE_NAME -InstanceId $INSTANCE_ID -VolumeId $VOLUME_ID -Region $REGION
-
-        # we should do polling for the volume status instead, but it usually finishes in a few seconds...
-        Start-Sleep 10
-
-        # basically following this doc: https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ec2-windows-volumes.html
-        $serialNumber = $VOLUME_ID.Replace("vol-","vol")
-        $disk = Get-Disk | Where-Object {$_.SerialNumber -CLike "$serialNumber*"}
-
-        # basically following this doc: https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ebs-using-volumes.html
-        if ($disk.PartitionStyle -eq "RAW") {
-          Write-Output "initialize raw disk"
-          $disk | Initialize-Disk -PartitionStyle MBR
-        }
-
-        # Get partition information from the volume
-        $partitions = $disk | Get-Partition
-        if (-not $partitions) {
-          # If no partitions present, create a new partition and format it.
-          Write-Output "create partition"
-          $disk | New-Partition -DriveLetter $JENKINS_DRIVE -UseMaximumSize | Format-Volume -FileSystem NTFS -NewFileSystemLabel "Data"
-        } else {
-          if ($disk.IsOffline) {
-            # If the disk was offline for unknown reason, change it online and reload partition information.
-            Write-Output "Disk is offline, change to online."
-            $disk | Set-Disk -IsOffline $false
-            Start-Sleep 5
-
-            $disk = Get-Disk | Where-Object {$_.SerialNumber -CLike "$serialNumber*"}
-            $partitions = $disk | Get-Partition
-          }
-          if ($disk.IsReadOnly) {
-            # If the disk was read only for unknown reason, change it writable.
-            Write-Output "Disk is read only, change to writable."
-            $disk | Set-Disk -IsReadOnly $false
-          }
-
-          # Find drive for Jenkins
-          $jenkinsPartition = $partitions | Where-Object {$_.DriveLetter -eq $JENKINS_DRIVE}
-          if ($jenkinsPartition) {
-            Write-Output "drive $JENKINS_DRIVE already mounted"
-          } else {
-            Write-Output "change drive letter of first partition to $JENKINS_DRIVE"
-            $partitions | Select-Object -First 1 | Set-Partition -NewDriveLetter $JENKINS_DRIVE
-          }
-        }
-      }
-
-      # Install chocolatey package manager: https://chocolatey.org/install
-      Set-ExecutionPolicy Bypass -Scope Process -Force
-      [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072
-      iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
-
-      # Install git and git-lfs
-      choco install git -y --no-progress
-      choco install git-lfs -y --no-progress
-
-      # Install java
-      choco install corretto17jdk --install-args INSTALLDIR="C:\\Java" -y --no-progress
-
-      # Install Unity Hub
-      choco install unity-hub -y --no-progress
-
-      # Install Unity Editor
-      $unityVersion = '2021.3.26f1'
-      $unityVersionChangeset = 'a16dc32e0ff2'
-      & "$env:ProgramFiles\\Unity Hub\\Unity Hub.exe" -- --no-sandbox --headless install --version $unityVersion --changeset $unityVersionChangeset | Out-String -Stream
-
-      # Install iOS / Android Build Support
-      & "$env:ProgramFiles\\Unity Hub\\Unity Hub.exe" -- --no-sandbox --headless install-modules --version $unityVersion --module ios android --childModules | Out-String -Stream
-- task: enableOpenSsh
-",
-          },
-        },
-        "TagSpecifications": [
-          {
-            "ResourceType": "launch-template",
-            "Tags": [
-              {
-                "Key": "Name",
-                "Value": "TestStack/JenkinsWindowsAgent/LaunchTemplate",
-              },
-            ],
-          },
-        ],
-      },
-      "Type": "AWS::EC2::LaunchTemplate",
-    },
-    "JenkinsWindowsAgentLaunchTemplateProfile92B75BA8": {
-      "Properties": {
-        "Roles": [
-          {
-            "Ref": "JenkinsWindowsAgentRole976AA548",
-          },
-        ],
-      },
-      "Type": "AWS::IAM::InstanceProfile",
-    },
-    "JenkinsWindowsAgentRole976AA548": {
-      "Properties": {
-        "AssumeRolePolicyDocument": {
-          "Statement": [
-            {
-              "Action": "sts:AssumeRole",
-              "Effect": "Allow",
-              "Principal": {
-                "Service": "ec2.amazonaws.com",
-              },
-            },
-          ],
-          "Version": "2012-10-17",
-        },
-        "ManagedPolicyArns": [
-          {
-            "Fn::Join": [
-              "",
-              [
-                "arn:",
-                {
-                  "Ref": "AWS::Partition",
-                },
-                ":iam::aws:policy/AmazonSSMManagedInstanceCore",
-              ],
-            ],
-          },
-        ],
-      },
-      "Type": "AWS::IAM::Role",
-    },
-    "JenkinsWindowsAgentRoleDefaultPolicyDBFF2EE3": {
-      "Properties": {
-        "PolicyDocument": {
-          "Statement": [
-            {
-              "Action": [
-                "s3:GetObject*",
-                "s3:GetBucket*",
-                "s3:List*",
-                "s3:DeleteObject*",
-                "s3:PutObject",
-                "s3:PutObjectLegalHold",
-                "s3:PutObjectRetention",
-                "s3:PutObjectTagging",
-                "s3:PutObjectVersionTagging",
-                "s3:Abort*",
-              ],
-              "Effect": "Allow",
-              "Resource": [
-                {
-                  "Fn::GetAtt": [
-                    "ArtifactBucket7410C9EF",
-                    "Arn",
-                  ],
-                },
-                {
-                  "Fn::Join": [
-                    "",
-                    [
-                      {
-                        "Fn::GetAtt": [
-                          "ArtifactBucket7410C9EF",
-                          "Arn",
-                        ],
-                      },
-                      "/*",
-                    ],
-                  ],
-                },
-              ],
-            },
-            {
-              "Action": "ec2:AttachVolume",
-              "Effect": "Allow",
-              "Resource": [
-                {
-                  "Fn::Join": [
-                    "",
-                    [
-                      "arn:",
-                      {
-                        "Ref": "AWS::Partition",
-                      },
-                      ":ec2:us-east-2:",
-                      {
-                        "Ref": "AWS::AccountId",
-                      },
-                      ":volume/",
-                      {
-                        "Ref": "JenkinsWindowsAgentVolumev100306AD8C2",
-                      },
-                    ],
-                  ],
-                },
-                {
-                  "Fn::Join": [
-                    "",
-                    [
-                      "arn:",
-                      {
-                        "Ref": "AWS::Partition",
-                      },
-                      ":ec2:us-east-2:",
-                      {
-                        "Ref": "AWS::AccountId",
-                      },
-                      ":instance/*",
-                    ],
-                  ],
-                },
-              ],
-            },
-            {
-              "Action": "ec2:DetachVolume",
-              "Effect": "Allow",
-              "Resource": [
-                {
-                  "Fn::Join": [
-                    "",
-                    [
-                      "arn:",
-                      {
-                        "Ref": "AWS::Partition",
-                      },
-                      ":ec2:us-east-2:",
-                      {
-                        "Ref": "AWS::AccountId",
-                      },
-                      ":volume/",
-                      {
-                        "Ref": "JenkinsWindowsAgentVolumev100306AD8C2",
-                      },
-                    ],
-                  ],
-                },
-                {
-                  "Fn::Join": [
-                    "",
-                    [
-                      "arn:",
-                      {
-                        "Ref": "AWS::Partition",
-                      },
-                      ":ec2:us-east-2:",
-                      {
-                        "Ref": "AWS::AccountId",
-                      },
-                      ":instance/*",
-                    ],
-                  ],
-                },
-              ],
-            },
-            {
-              "Action": "ec2:AttachVolume",
-              "Effect": "Allow",
-              "Resource": [
-                {
-                  "Fn::Join": [
-                    "",
-                    [
-                      "arn:",
-                      {
-                        "Ref": "AWS::Partition",
-                      },
-                      ":ec2:us-east-2:",
-                      {
-                        "Ref": "AWS::AccountId",
-                      },
-                      ":volume/",
-                      {
-                        "Ref": "JenkinsWindowsAgentVolumev10169FCBE04",
-                      },
-                    ],
-                  ],
-                },
-                {
-                  "Fn::Join": [
-                    "",
-                    [
-                      "arn:",
-                      {
-                        "Ref": "AWS::Partition",
-                      },
-                      ":ec2:us-east-2:",
-                      {
-                        "Ref": "AWS::AccountId",
-                      },
-                      ":instance/*",
-                    ],
-                  ],
-                },
-              ],
-            },
-            {
-              "Action": "ec2:DetachVolume",
-              "Effect": "Allow",
-              "Resource": [
-                {
-                  "Fn::Join": [
-                    "",
-                    [
-                      "arn:",
-                      {
-                        "Ref": "AWS::Partition",
-                      },
-                      ":ec2:us-east-2:",
-                      {
-                        "Ref": "AWS::AccountId",
-                      },
-                      ":volume/",
-                      {
-                        "Ref": "JenkinsWindowsAgentVolumev10169FCBE04",
-                      },
-                    ],
-                  ],
-                },
-                {
-                  "Fn::Join": [
-                    "",
-                    [
-                      "arn:",
-                      {
-                        "Ref": "AWS::Partition",
-                      },
-                      ":ec2:us-east-2:",
-                      {
-                        "Ref": "AWS::AccountId",
-                      },
-                      ":instance/*",
-                    ],
-                  ],
-                },
-              ],
-            },
-            {
-              "Action": "ec2:AttachVolume",
-              "Effect": "Allow",
-              "Resource": [
-                {
-                  "Fn::Join": [
-                    "",
-                    [
-                      "arn:",
-                      {
-                        "Ref": "AWS::Partition",
-                      },
-                      ":ec2:us-east-2:",
-                      {
-                        "Ref": "AWS::AccountId",
-                      },
-                      ":volume/",
-                      {
-                        "Ref": "JenkinsWindowsAgentVolumev11077A8DA6F",
-                      },
-                    ],
-                  ],
-                },
-                {
-                  "Fn::Join": [
-                    "",
-                    [
-                      "arn:",
-                      {
-                        "Ref": "AWS::Partition",
-                      },
-                      ":ec2:us-east-2:",
-                      {
-                        "Ref": "AWS::AccountId",
-                      },
-                      ":instance/*",
-                    ],
-                  ],
-                },
-              ],
-            },
-            {
-              "Action": "ec2:DetachVolume",
-              "Effect": "Allow",
-              "Resource": [
-                {
-                  "Fn::Join": [
-                    "",
-                    [
-                      "arn:",
-                      {
-                        "Ref": "AWS::Partition",
-                      },
-                      ":ec2:us-east-2:",
-                      {
-                        "Ref": "AWS::AccountId",
-                      },
-                      ":volume/",
-                      {
-                        "Ref": "JenkinsWindowsAgentVolumev11077A8DA6F",
-                      },
-                    ],
-                  ],
-                },
-                {
-                  "Fn::Join": [
-                    "",
-                    [
-                      "arn:",
-                      {
-                        "Ref": "AWS::Partition",
-                      },
-                      ":ec2:us-east-2:",
-                      {
-                        "Ref": "AWS::AccountId",
-                      },
-                      ":instance/*",
-                    ],
-                  ],
-                },
-              ],
-            },
-            {
-              "Action": "ec2:AttachVolume",
-              "Effect": "Allow",
-              "Resource": [
-                {
-                  "Fn::Join": [
-                    "",
-                    [
-                      "arn:",
-                      {
-                        "Ref": "AWS::Partition",
-                      },
-                      ":ec2:us-east-2:",
-                      {
-                        "Ref": "AWS::AccountId",
-                      },
-                      ":volume/",
-                      {
-                        "Ref": "JenkinsWindowsAgentVolumev1113BA2ED6E",
-                      },
-                    ],
-                  ],
-                },
-                {
-                  "Fn::Join": [
-                    "",
-                    [
-                      "arn:",
-                      {
-                        "Ref": "AWS::Partition",
-                      },
-                      ":ec2:us-east-2:",
-                      {
-                        "Ref": "AWS::AccountId",
-                      },
-                      ":instance/*",
-                    ],
-                  ],
-                },
-              ],
-            },
-            {
-              "Action": "ec2:DetachVolume",
-              "Effect": "Allow",
-              "Resource": [
-                {
-                  "Fn::Join": [
-                    "",
-                    [
-                      "arn:",
-                      {
-                        "Ref": "AWS::Partition",
-                      },
-                      ":ec2:us-east-2:",
-                      {
-                        "Ref": "AWS::AccountId",
-                      },
-                      ":volume/",
-                      {
-                        "Ref": "JenkinsWindowsAgentVolumev1113BA2ED6E",
-                      },
-                    ],
-                  ],
-                },
-                {
-                  "Fn::Join": [
-                    "",
-                    [
-                      "arn:",
-                      {
-                        "Ref": "AWS::Partition",
-                      },
-                      ":ec2:us-east-2:",
-                      {
-                        "Ref": "AWS::AccountId",
-                      },
-                      ":instance/*",
-                    ],
-                  ],
-                },
-              ],
-            },
-            {
-              "Action": "ec2:DescribeVolumes",
-              "Effect": "Allow",
-              "Resource": "*",
-            },
-          ],
-          "Version": "2012-10-17",
-        },
-        "PolicyName": "JenkinsWindowsAgentRoleDefaultPolicyDBFF2EE3",
-        "Roles": [
-          {
-            "Ref": "JenkinsWindowsAgentRole976AA548",
-          },
-        ],
-      },
-      "Type": "AWS::IAM::Policy",
-    },
-    "JenkinsWindowsAgentSecurityGroup0420B640": {
-      "Properties": {
-        "GroupDescription": "TestStack/JenkinsWindowsAgent/SecurityGroup",
+        "GroupDescription": "TestStack/LinuxFleet-linux-fleet-small/SecurityGroup",
         "SecurityGroupEgress": [
           {
             "CidrIp": "0.0.0.0/0",
@@ -3231,13 +2354,13 @@ tasks:
       },
       "Type": "AWS::EC2::SecurityGroup",
     },
-    "JenkinsWindowsAgentSecurityGroupfromTestStackJenkinsControllerServiceSecurityGroupFCB7D6F8225D3EAF22": {
+    "LinuxFleetlinuxfleetsmallSecurityGroupfromTestStackJenkinsControllerServiceSecurityGroupFCB7D6F8227BB4B201": {
       "Properties": {
         "Description": "from TestStackJenkinsControllerServiceSecurityGroupFCB7D6F8:22",
         "FromPort": 22,
         "GroupId": {
           "Fn::GetAtt": [
-            "JenkinsWindowsAgentSecurityGroup0420B640",
+            "LinuxFleetlinuxfleetsmallSecurityGroup075E4AA4",
             "GroupId",
           ],
         },
@@ -3251,128 +2374,6 @@ tasks:
         "ToPort": 22,
       },
       "Type": "AWS::EC2::SecurityGroupIngress",
-    },
-    "JenkinsWindowsAgentVolumev100306AD8C2": {
-      "DeletionPolicy": "Delete",
-      "Properties": {
-        "AvailabilityZone": {
-          "Fn::Select": [
-            0,
-            {
-              "Fn::GetAZs": "",
-            },
-          ],
-        },
-        "Encrypted": true,
-        "MultiAttachEnabled": false,
-        "Size": 100,
-        "Tags": [
-          {
-            "Key": "Kind",
-            "Value": "TestStack-JenkinsWindowsAgent",
-          },
-          {
-            "Key": "Name",
-            "Value": "TestStack-JenkinsWindowsAgent-0-0",
-          },
-        ],
-        "VolumeType": "gp3",
-      },
-      "Type": "AWS::EC2::Volume",
-      "UpdateReplacePolicy": "Delete",
-    },
-    "JenkinsWindowsAgentVolumev10169FCBE04": {
-      "DeletionPolicy": "Delete",
-      "Properties": {
-        "AvailabilityZone": {
-          "Fn::Select": [
-            0,
-            {
-              "Fn::GetAZs": "",
-            },
-          ],
-        },
-        "Encrypted": true,
-        "MultiAttachEnabled": false,
-        "Size": 100,
-        "Tags": [
-          {
-            "Key": "Kind",
-            "Value": "TestStack-JenkinsWindowsAgent",
-          },
-          {
-            "Key": "Name",
-            "Value": "TestStack-JenkinsWindowsAgent-0-1",
-          },
-        ],
-        "VolumeType": "gp3",
-      },
-      "Type": "AWS::EC2::Volume",
-      "UpdateReplacePolicy": "Delete",
-    },
-    "JenkinsWindowsAgentVolumev11077A8DA6F": {
-      "DeletionPolicy": "Delete",
-      "Properties": {
-        "AvailabilityZone": {
-          "Fn::Select": [
-            1,
-            {
-              "Fn::GetAZs": "",
-            },
-          ],
-        },
-        "Encrypted": true,
-        "MultiAttachEnabled": false,
-        "Size": 100,
-        "Tags": [
-          {
-            "Key": "Kind",
-            "Value": "TestStack-JenkinsWindowsAgent",
-          },
-          {
-            "Key": "Name",
-            "Value": "TestStack-JenkinsWindowsAgent-1-0",
-          },
-        ],
-        "VolumeType": "gp3",
-      },
-      "Type": "AWS::EC2::Volume",
-      "UpdateReplacePolicy": "Delete",
-    },
-    "JenkinsWindowsAgentVolumev1113BA2ED6E": {
-      "DeletionPolicy": "Delete",
-      "Properties": {
-        "AvailabilityZone": {
-          "Fn::Select": [
-            1,
-            {
-              "Fn::GetAZs": "",
-            },
-          ],
-        },
-        "Encrypted": true,
-        "MultiAttachEnabled": false,
-        "Size": 100,
-        "Tags": [
-          {
-            "Key": "Kind",
-            "Value": "TestStack-JenkinsWindowsAgent",
-          },
-          {
-            "Key": "Name",
-            "Value": "TestStack-JenkinsWindowsAgent-1-1",
-          },
-        ],
-        "VolumeType": "gp3",
-      },
-      "Type": "AWS::EC2::Volume",
-      "UpdateReplacePolicy": "Delete",
-    },
-    "KeyPair0151ACB6": {
-      "Properties": {
-        "KeyName": "TestStack-agent-ssh-key",
-      },
-      "Type": "AWS::EC2::KeyPair",
     },
     "LogBucketAutoDeleteObjectsCustomResource7762F42C": {
       "DeletionPolicy": "Delete",
@@ -3594,6 +2595,243 @@ tasks:
       },
       "Type": "AWS::S3::BucketPolicy",
     },
+    "MacAgentmac0DedicatedHost6D71A96A": {
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "AvailabilityZone": {
+          "Fn::Select": [
+            0,
+            {
+              "Fn::GetAZs": "",
+            },
+          ],
+        },
+        "InstanceType": "mac1.metal",
+      },
+      "Type": "AWS::EC2::Host",
+      "UpdateReplacePolicy": "Retain",
+    },
+    "MacAgentmac0InstanceFC156968": {
+      "DependsOn": [
+        "MacAgentmac0InstanceInstanceRoleDefaultPolicyEFD60D03",
+        "MacAgentmac0InstanceInstanceRole155461F8",
+      ],
+      "Properties": {
+        "AvailabilityZone": {
+          "Fn::Select": [
+            0,
+            {
+              "Fn::GetAZs": "",
+            },
+          ],
+        },
+        "BlockDeviceMappings": [
+          {
+            "DeviceName": "/dev/sda1",
+            "Ebs": {
+              "Encrypted": true,
+              "VolumeSize": 200,
+              "VolumeType": "gp3",
+            },
+          },
+        ],
+        "HostId": {
+          "Fn::GetAtt": [
+            "MacAgentmac0DedicatedHost6D71A96A",
+            "HostId",
+          ],
+        },
+        "IamInstanceProfile": {
+          "Ref": "MacAgentmac0InstanceInstanceProfile53DAC6EA",
+        },
+        "ImageId": "ami-013846afc111c94b0",
+        "InstanceType": "mac1.metal",
+        "KeyName": {
+          "Ref": "KeyPair1622897B",
+        },
+        "SecurityGroupIds": [
+          {
+            "Fn::GetAtt": [
+              "MacAgentmac0InstanceInstanceSecurityGroup7F252EB1",
+              "GroupId",
+            ],
+          },
+        ],
+        "SubnetId": {
+          "Ref": "VpcPrivateSubnet1Subnet536B997A",
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "TestStack/MacAgent-mac0/Instance",
+          },
+        ],
+        "Tenancy": "host",
+        "UserData": {
+          "Fn::Base64": "#!/bin/zsh
+#install openjdk@17
+su ec2-user -c '/usr/local/bin/brew install openjdk@17 jq'
+ln -sfn /usr/local/opt/openjdk@17/libexec/openjdk.jdk /Library/Java/JavaVirtualMachines/openjdk-17.jdk
+java -version
+
+# resize disk to match the ebs volume
+# https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-mac-instances.html#mac-instance-increase-volume
+PDISK=$(diskutil list physical external | head -n1 | cut -d" " -f1)
+APFSCONT=$(diskutil list physical external | grep "Apple_APFS" | tr -s " " | cut -d" " -f8)
+yes | diskutil repairDisk $PDISK
+diskutil apfs resizeContainer $APFSCONT 0
+
+# Start the ARD Agent
+# https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-mac-instances.html#connect-to-mac-instance
+/System/Library/CoreServices/RemoteManagement/ARDAgent.app/Contents/Resources/kickstart -activate -configure -access -on -restart -agent -privs -all
+    ",
+        },
+      },
+      "Type": "AWS::EC2::Instance",
+    },
+    "MacAgentmac0InstanceInstanceProfile53DAC6EA": {
+      "Properties": {
+        "Roles": [
+          {
+            "Ref": "MacAgentmac0InstanceInstanceRole155461F8",
+          },
+        ],
+      },
+      "Type": "AWS::IAM::InstanceProfile",
+    },
+    "MacAgentmac0InstanceInstanceRole155461F8": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "ec2.amazonaws.com",
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "ManagedPolicyArns": [
+          {
+            "Fn::Join": [
+              "",
+              [
+                "arn:",
+                {
+                  "Ref": "AWS::Partition",
+                },
+                ":iam::aws:policy/AmazonSSMManagedInstanceCore",
+              ],
+            ],
+          },
+        ],
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "TestStack/MacAgent-mac0/Instance",
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Role",
+    },
+    "MacAgentmac0InstanceInstanceRoleDefaultPolicyEFD60D03": {
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "s3:GetObject*",
+                "s3:GetBucket*",
+                "s3:List*",
+                "s3:DeleteObject*",
+                "s3:PutObject",
+                "s3:PutObjectLegalHold",
+                "s3:PutObjectRetention",
+                "s3:PutObjectTagging",
+                "s3:PutObjectVersionTagging",
+                "s3:Abort*",
+              ],
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "ArtifactBucket7410C9EF",
+                    "Arn",
+                  ],
+                },
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      {
+                        "Fn::GetAtt": [
+                          "ArtifactBucket7410C9EF",
+                          "Arn",
+                        ],
+                      },
+                      "/*",
+                    ],
+                  ],
+                },
+              ],
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "PolicyName": "MacAgentmac0InstanceInstanceRoleDefaultPolicyEFD60D03",
+        "Roles": [
+          {
+            "Ref": "MacAgentmac0InstanceInstanceRole155461F8",
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Policy",
+    },
+    "MacAgentmac0InstanceInstanceSecurityGroup7F252EB1": {
+      "Properties": {
+        "GroupDescription": "TestStack/MacAgent-mac0/Instance/InstanceSecurityGroup",
+        "SecurityGroupEgress": [
+          {
+            "CidrIp": "0.0.0.0/0",
+            "Description": "Allow all outbound traffic by default",
+            "IpProtocol": "-1",
+          },
+        ],
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "TestStack/MacAgent-mac0/Instance",
+          },
+        ],
+        "VpcId": {
+          "Ref": "Vpc8378EB38",
+        },
+      },
+      "Type": "AWS::EC2::SecurityGroup",
+    },
+    "MacAgentmac0InstanceInstanceSecurityGroupfromTestStackJenkinsControllerServiceSecurityGroupFCB7D6F8224B4B4A09": {
+      "Properties": {
+        "Description": "from TestStackJenkinsControllerServiceSecurityGroupFCB7D6F8:22",
+        "FromPort": 22,
+        "GroupId": {
+          "Fn::GetAtt": [
+            "MacAgentmac0InstanceInstanceSecurityGroup7F252EB1",
+            "GroupId",
+          ],
+        },
+        "IpProtocol": "tcp",
+        "SourceSecurityGroupId": {
+          "Fn::GetAtt": [
+            "JenkinsControllerServiceSecurityGroup8CBE094C",
+            "GroupId",
+          ],
+        },
+        "ToPort": 22,
+      },
+      "Type": "AWS::EC2::SecurityGroupIngress",
+    },
     "Namespace9B63B8C8": {
       "Properties": {
         "Name": "build",
@@ -3668,7 +2906,7 @@ tasks:
       "Properties": {
         "AvailabilityZone": {
           "Fn::Select": [
-            0,
+            1,
             {
               "Fn::GetAZs": "",
             },
@@ -3700,7 +2938,7 @@ tasks:
           },
         ],
         "SubnetId": {
-          "Ref": "VpcPrivateSubnet1Subnet536B997A",
+          "Ref": "VpcPrivateSubnet2Subnet3788AAA1",
         },
         "Tags": [
           {
@@ -3853,7 +3091,7 @@ runcmd:
       ],
       "Properties": {
         "Code": {
-          "ZipFile": ""use strict";var i=Object.defineProperty;var l=Object.getOwnPropertyDescriptor;var d=Object.getOwnPropertyNames;var p=Object.prototype.hasOwnProperty;var m=(e,s)=>{for(var r in s)i(e,r,{get:s[r],enumerable:!0})},u=(e,s,r,a)=>{if(s&&typeof s=="object"||typeof s=="function")for(let t of d(s))!p.call(e,t)&&t!==r&&i(e,t,{get:()=>s[t],enumerable:!(a=l(s,t))||a.enumerable});return e};var S=e=>u(i({},"__esModule",{value:!0}),e);var y={};m(y,{handler:()=>R});module.exports=S(y);var o=require("@aws-sdk/client-iam"),n=require("timers/promises"),g=new o.IAMClient({}),R=async(e,s)=>{try{switch(e.RequestType){case"Create":console.log(\`trying to create a service linked role for \${e.ResourceProperties.awsServiceName}\`);let r=new o.CreateServiceLinkedRoleCommand({AWSServiceName:e.ResourceProperties.awsServiceName,Description:e.ResourceProperties.description,CustomSuffix:e.ResourceProperties.customSuffix});await g.send(r),console.log("the service linked role created successfully, now waiting for IAM propagation"),await(0,n.setTimeout)(e.ResourceProperties.waitTimeSeconds*1e3);break;case"Update":break;case"Delete":break}await c("SUCCESS",e,s)}catch(r){r instanceof o.InvalidInputException?(console.log(\`The service linked role seems to already exist, skipping the creation... \${r.message}\`),await c("SUCCESS",e,s)):await c("FAILED",e,s,r.message)}},c=async(e,s,r,a)=>{let t=JSON.stringify({Status:e,Reason:a??"See the details in CloudWatch Log Stream: "+r.logStreamName,PhysicalResourceId:r.logStreamName,StackId:s.StackId,RequestId:s.RequestId,LogicalResourceId:s.LogicalResourceId,NoEcho:!1,Data:{}});await(await fetch(s.ResponseURL,{method:"PUT",body:t,headers:{"Content-Type":"","Content-Length":t.length.toString()}})).text()};0&&(module.exports={handler});
+          "ZipFile": ""use strict";var i=Object.defineProperty;var l=Object.getOwnPropertyDescriptor;var u=Object.getOwnPropertyNames;var m=Object.prototype.hasOwnProperty;var S=(e,s)=>{for(var r in s)i(e,r,{get:s[r],enumerable:!0})},R=(e,s,r,a)=>{if(s&&typeof s=="object"||typeof s=="function")for(let t of u(s))!m.call(e,t)&&t!==r&&i(e,t,{get:()=>s[t],enumerable:!(a=l(s,t))||a.enumerable});return e};var g=e=>R(i({},"__esModule",{value:!0}),e);var h={};S(h,{handler:()=>f});module.exports=g(h);var o=require("@aws-sdk/client-iam"),p=require("timers/promises"),y=new o.IAMClient({}),f=async(e,s)=>{try{switch(e.RequestType){case"Create":case"Update":console.log(\`trying to create a service linked role for \${e.ResourceProperties.awsServiceName}\`);try{let r=new o.CreateServiceLinkedRoleCommand({AWSServiceName:e.ResourceProperties.awsServiceName,Description:e.ResourceProperties.description,CustomSuffix:e.ResourceProperties.customSuffix});await y.send(r),console.log("the service linked role created successfully, now waiting for IAM propagation"),await(0,p.setTimeout)(e.ResourceProperties.waitTimeSeconds*1e3)}catch(r){if(r instanceof o.InvalidInputException){console.log(\`The service linked role seems to already exist, skipping the creation... \${r.message}\`);break}else throw r}break;case"Delete":break}await n("SUCCESS",e,s)}catch(r){await n("FAILED",e,s,r.message)}},n=async(e,s,r,a)=>{let t=s.ResourceProperties,d=\`\${t.awsServiceName}-\${t.customSuffix??""}\`,c=JSON.stringify({Status:e,Reason:(a??"")+" See the details in CloudWatch Log Stream: "+r.logStreamName,PhysicalResourceId:d,StackId:s.StackId,RequestId:s.RequestId,LogicalResourceId:s.LogicalResourceId,NoEcho:!1,Data:{}});await(await fetch(s.ResponseURL,{method:"PUT",body:c,headers:{"Content-Type":"","Content-Length":c.length.toString()}})).text()};0&&(module.exports={handler});
 ",
         },
         "Handler": "index.handler",
@@ -4275,6 +3513,810 @@ runcmd:
         },
       },
       "Type": "AWS::EC2::VPCGatewayAttachment",
+    },
+    "WindowsFleetwindowsfleetFleetASGA23DC6C7": {
+      "Properties": {
+        "MaxSize": "1",
+        "MinSize": "1",
+        "MixedInstancesPolicy": {
+          "InstancesDistribution": {
+            "OnDemandBaseCapacity": 0,
+            "OnDemandPercentageAboveBaseCapacity": 0,
+            "SpotAllocationStrategy": "price-capacity-optimized",
+          },
+          "LaunchTemplate": {
+            "LaunchTemplateSpecification": {
+              "LaunchTemplateId": {
+                "Ref": "WindowsFleetwindowsfleetLaunchTemplate4F3AD218",
+              },
+              "Version": {
+                "Fn::GetAtt": [
+                  "WindowsFleetwindowsfleetLaunchTemplate4F3AD218",
+                  "LatestVersionNumber",
+                ],
+              },
+            },
+            "Overrides": [
+              {
+                "InstanceType": "m6a.xlarge",
+              },
+              {
+                "InstanceType": "m5a.xlarge",
+              },
+              {
+                "InstanceType": "m5n.xlarge",
+              },
+              {
+                "InstanceType": "m5.xlarge",
+              },
+            ],
+          },
+        },
+        "VPCZoneIdentifier": [
+          {
+            "Ref": "VpcPrivateSubnet1Subnet536B997A",
+          },
+          {
+            "Ref": "VpcPrivateSubnet2Subnet3788AAA1",
+          },
+        ],
+      },
+      "Type": "AWS::AutoScaling::AutoScalingGroup",
+      "UpdatePolicy": {
+        "AutoScalingScheduledAction": {
+          "IgnoreUnmodifiedGroupSizeProperties": true,
+        },
+      },
+    },
+    "WindowsFleetwindowsfleetLaunchTemplate4F3AD218": {
+      "DependsOn": [
+        "WindowsFleetwindowsfleetRoleDefaultPolicy5FE270DB",
+        "WindowsFleetwindowsfleetRoleC5484228",
+      ],
+      "Properties": {
+        "LaunchTemplateData": {
+          "BlockDeviceMappings": [
+            {
+              "DeviceName": "/dev/sda1",
+              "Ebs": {
+                "Encrypted": true,
+                "VolumeSize": 50,
+                "VolumeType": "gp3",
+              },
+            },
+          ],
+          "IamInstanceProfile": {
+            "Arn": {
+              "Fn::GetAtt": [
+                "WindowsFleetwindowsfleetLaunchTemplateProfile9F36A454",
+                "Arn",
+              ],
+            },
+          },
+          "ImageId": {
+            "Ref": "SsmParameterValueawsserviceamiwindowslatestWindowsServer2022EnglishFullBaseC96584B6F00A464EAD1953AFF4B05118Parameter",
+          },
+          "KeyName": {
+            "Ref": "KeyPair1622897B",
+          },
+          "SecurityGroupIds": [
+            {
+              "Fn::GetAtt": [
+                "WindowsFleetwindowsfleetSecurityGroup12D0DAF2",
+                "GroupId",
+              ],
+            },
+          ],
+          "TagSpecifications": [
+            {
+              "ResourceType": "instance",
+              "Tags": [
+                {
+                  "Key": "Name",
+                  "Value": "TestStack/WindowsFleet-windows-fleet/LaunchTemplate",
+                },
+              ],
+            },
+            {
+              "ResourceType": "volume",
+              "Tags": [
+                {
+                  "Key": "Name",
+                  "Value": "TestStack/WindowsFleet-windows-fleet/LaunchTemplate",
+                },
+              ],
+            },
+          ],
+          "UserData": {
+            "Fn::Base64": "version: 1.1
+tasks:
+- task: executeScript
+  inputs:
+  - frequency: once
+    type: powershell
+    runAs: admin
+    content: |-
+      $instanceMetadata = Get-EC2InstanceMetadata -Category @("AvailabilityZone", "InstanceId", "Region")
+      $AZ = $instanceMetadata[0]
+      $INSTANCE_ID = $instanceMetadata[1]
+      $REGION = $instanceMetadata[2].SystemName
+
+      $VOLUME_ID = Get-EC2Volume -Filter @(@{Name="tag:Kind"; Values="TestStack-WindowsFleet-windows-fleet"}, @{Name="availability-zone"; Values=$AZ}, @{Name="status"; Values="available"}) -Region $REGION -Select "Volumes.VolumeId" | Select-Object -First 1
+      if ($VOLUME_ID) {
+        $JENKINS_DRIVE = "D"
+
+        Write-Output "found volume \${VOLUME_ID}"
+
+        $DEVICE_NAME = "/dev/xvdf"
+        # There is possibly a race condition between other instances.
+        # We may want to retry attach-volume according to the return code (currently omitted).
+        Add-EC2Volume -Device $DEVICE_NAME -InstanceId $INSTANCE_ID -VolumeId $VOLUME_ID -Region $REGION
+
+        # we should do polling for the volume status instead, but it usually finishes in a few seconds...
+        Start-Sleep 10
+
+        # basically following this doc: https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ec2-windows-volumes.html
+        $serialNumber = $VOLUME_ID.Replace("vol-","vol")
+        $disk = Get-Disk | Where-Object {$_.SerialNumber -CLike "$serialNumber*"}
+
+        # basically following this doc: https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ebs-using-volumes.html
+        if ($disk.PartitionStyle -eq "RAW") {
+          Write-Output "initialize raw disk"
+          $disk | Initialize-Disk -PartitionStyle MBR
+        }
+
+        # Get partition information from the volume
+        $partitions = $disk | Get-Partition
+        if (-not $partitions) {
+          # If no partitions present, create a new partition and format it.
+          Write-Output "create partition"
+          $disk | New-Partition -DriveLetter $JENKINS_DRIVE -UseMaximumSize | Format-Volume -FileSystem NTFS -NewFileSystemLabel "Data"
+        } else {
+          if ($disk.IsOffline) {
+            # If the disk was offline for unknown reason, change it online and reload partition information.
+            Write-Output "Disk is offline, change to online."
+            $disk | Set-Disk -IsOffline $false
+            Start-Sleep 5
+
+            $disk = Get-Disk | Where-Object {$_.SerialNumber -CLike "$serialNumber*"}
+            $partitions = $disk | Get-Partition
+          }
+          if ($disk.IsReadOnly) {
+            # If the disk was read only for unknown reason, change it writable.
+            Write-Output "Disk is read only, change to writable."
+            $disk | Set-Disk -IsReadOnly $false
+          }
+
+          # Find drive for Jenkins
+          $jenkinsPartition = $partitions | Where-Object {$_.DriveLetter -eq $JENKINS_DRIVE}
+          if ($jenkinsPartition) {
+            Write-Output "drive $JENKINS_DRIVE already mounted"
+          } else {
+            Write-Output "change drive letter of first partition to $JENKINS_DRIVE"
+            $partitions | Select-Object -First 1 | Set-Partition -NewDriveLetter $JENKINS_DRIVE
+          }
+        }
+      }
+
+      # Install chocolatey package manager: https://chocolatey.org/install
+      Set-ExecutionPolicy Bypass -Scope Process -Force
+      [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072
+      iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+
+      # Install git and git-lfs
+      choco install git -y --no-progress
+      choco install git-lfs -y --no-progress
+
+      # Install java
+      choco install corretto17jdk --install-args INSTALLDIR="C:\\Java" -y --no-progress
+
+      # Install Unity Hub
+      choco install unity-hub -y --no-progress
+
+      # Install Unity Editor
+      $unityVersion = '2021.3.26f1'
+      $unityVersionChangeset = 'a16dc32e0ff2'
+      & "$env:ProgramFiles\\Unity Hub\\Unity Hub.exe" -- --no-sandbox --headless install --version $unityVersion --changeset $unityVersionChangeset | Out-String -Stream
+
+      # Install iOS / Android Build Support
+      & "$env:ProgramFiles\\Unity Hub\\Unity Hub.exe" -- --no-sandbox --headless install-modules --version $unityVersion --module ios android --childModules | Out-String -Stream
+- task: enableOpenSsh
+",
+          },
+        },
+        "TagSpecifications": [
+          {
+            "ResourceType": "launch-template",
+            "Tags": [
+              {
+                "Key": "Name",
+                "Value": "TestStack/WindowsFleet-windows-fleet/LaunchTemplate",
+              },
+            ],
+          },
+        ],
+      },
+      "Type": "AWS::EC2::LaunchTemplate",
+    },
+    "WindowsFleetwindowsfleetLaunchTemplateProfile9F36A454": {
+      "Properties": {
+        "Roles": [
+          {
+            "Ref": "WindowsFleetwindowsfleetRoleC5484228",
+          },
+        ],
+      },
+      "Type": "AWS::IAM::InstanceProfile",
+    },
+    "WindowsFleetwindowsfleetRoleC5484228": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "ec2.amazonaws.com",
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "ManagedPolicyArns": [
+          {
+            "Fn::Join": [
+              "",
+              [
+                "arn:",
+                {
+                  "Ref": "AWS::Partition",
+                },
+                ":iam::aws:policy/AmazonSSMManagedInstanceCore",
+              ],
+            ],
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Role",
+    },
+    "WindowsFleetwindowsfleetRoleDefaultPolicy5FE270DB": {
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "s3:GetObject*",
+                "s3:GetBucket*",
+                "s3:List*",
+                "s3:DeleteObject*",
+                "s3:PutObject",
+                "s3:PutObjectLegalHold",
+                "s3:PutObjectRetention",
+                "s3:PutObjectTagging",
+                "s3:PutObjectVersionTagging",
+                "s3:Abort*",
+              ],
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "ArtifactBucket7410C9EF",
+                    "Arn",
+                  ],
+                },
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      {
+                        "Fn::GetAtt": [
+                          "ArtifactBucket7410C9EF",
+                          "Arn",
+                        ],
+                      },
+                      "/*",
+                    ],
+                  ],
+                },
+              ],
+            },
+            {
+              "Action": "ec2:AttachVolume",
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition",
+                      },
+                      ":ec2:us-east-2:",
+                      {
+                        "Ref": "AWS::AccountId",
+                      },
+                      ":volume/",
+                      {
+                        "Ref": "WindowsFleetwindowsfleetVolumev100EF597E57",
+                      },
+                    ],
+                  ],
+                },
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition",
+                      },
+                      ":ec2:us-east-2:",
+                      {
+                        "Ref": "AWS::AccountId",
+                      },
+                      ":instance/*",
+                    ],
+                  ],
+                },
+              ],
+            },
+            {
+              "Action": "ec2:DetachVolume",
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition",
+                      },
+                      ":ec2:us-east-2:",
+                      {
+                        "Ref": "AWS::AccountId",
+                      },
+                      ":volume/",
+                      {
+                        "Ref": "WindowsFleetwindowsfleetVolumev100EF597E57",
+                      },
+                    ],
+                  ],
+                },
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition",
+                      },
+                      ":ec2:us-east-2:",
+                      {
+                        "Ref": "AWS::AccountId",
+                      },
+                      ":instance/*",
+                    ],
+                  ],
+                },
+              ],
+            },
+            {
+              "Action": "ec2:AttachVolume",
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition",
+                      },
+                      ":ec2:us-east-2:",
+                      {
+                        "Ref": "AWS::AccountId",
+                      },
+                      ":volume/",
+                      {
+                        "Ref": "WindowsFleetwindowsfleetVolumev10103D01A7D",
+                      },
+                    ],
+                  ],
+                },
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition",
+                      },
+                      ":ec2:us-east-2:",
+                      {
+                        "Ref": "AWS::AccountId",
+                      },
+                      ":instance/*",
+                    ],
+                  ],
+                },
+              ],
+            },
+            {
+              "Action": "ec2:DetachVolume",
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition",
+                      },
+                      ":ec2:us-east-2:",
+                      {
+                        "Ref": "AWS::AccountId",
+                      },
+                      ":volume/",
+                      {
+                        "Ref": "WindowsFleetwindowsfleetVolumev10103D01A7D",
+                      },
+                    ],
+                  ],
+                },
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition",
+                      },
+                      ":ec2:us-east-2:",
+                      {
+                        "Ref": "AWS::AccountId",
+                      },
+                      ":instance/*",
+                    ],
+                  ],
+                },
+              ],
+            },
+            {
+              "Action": "ec2:AttachVolume",
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition",
+                      },
+                      ":ec2:us-east-2:",
+                      {
+                        "Ref": "AWS::AccountId",
+                      },
+                      ":volume/",
+                      {
+                        "Ref": "WindowsFleetwindowsfleetVolumev1102F0552A1",
+                      },
+                    ],
+                  ],
+                },
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition",
+                      },
+                      ":ec2:us-east-2:",
+                      {
+                        "Ref": "AWS::AccountId",
+                      },
+                      ":instance/*",
+                    ],
+                  ],
+                },
+              ],
+            },
+            {
+              "Action": "ec2:DetachVolume",
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition",
+                      },
+                      ":ec2:us-east-2:",
+                      {
+                        "Ref": "AWS::AccountId",
+                      },
+                      ":volume/",
+                      {
+                        "Ref": "WindowsFleetwindowsfleetVolumev1102F0552A1",
+                      },
+                    ],
+                  ],
+                },
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition",
+                      },
+                      ":ec2:us-east-2:",
+                      {
+                        "Ref": "AWS::AccountId",
+                      },
+                      ":instance/*",
+                    ],
+                  ],
+                },
+              ],
+            },
+            {
+              "Action": "ec2:AttachVolume",
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition",
+                      },
+                      ":ec2:us-east-2:",
+                      {
+                        "Ref": "AWS::AccountId",
+                      },
+                      ":volume/",
+                      {
+                        "Ref": "WindowsFleetwindowsfleetVolumev111A1A28139",
+                      },
+                    ],
+                  ],
+                },
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition",
+                      },
+                      ":ec2:us-east-2:",
+                      {
+                        "Ref": "AWS::AccountId",
+                      },
+                      ":instance/*",
+                    ],
+                  ],
+                },
+              ],
+            },
+            {
+              "Action": "ec2:DetachVolume",
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition",
+                      },
+                      ":ec2:us-east-2:",
+                      {
+                        "Ref": "AWS::AccountId",
+                      },
+                      ":volume/",
+                      {
+                        "Ref": "WindowsFleetwindowsfleetVolumev111A1A28139",
+                      },
+                    ],
+                  ],
+                },
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition",
+                      },
+                      ":ec2:us-east-2:",
+                      {
+                        "Ref": "AWS::AccountId",
+                      },
+                      ":instance/*",
+                    ],
+                  ],
+                },
+              ],
+            },
+            {
+              "Action": "ec2:DescribeVolumes",
+              "Effect": "Allow",
+              "Resource": "*",
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "PolicyName": "WindowsFleetwindowsfleetRoleDefaultPolicy5FE270DB",
+        "Roles": [
+          {
+            "Ref": "WindowsFleetwindowsfleetRoleC5484228",
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Policy",
+    },
+    "WindowsFleetwindowsfleetSecurityGroup12D0DAF2": {
+      "Properties": {
+        "GroupDescription": "TestStack/WindowsFleet-windows-fleet/SecurityGroup",
+        "SecurityGroupEgress": [
+          {
+            "CidrIp": "0.0.0.0/0",
+            "Description": "Allow all outbound traffic by default",
+            "IpProtocol": "-1",
+          },
+        ],
+        "VpcId": {
+          "Ref": "Vpc8378EB38",
+        },
+      },
+      "Type": "AWS::EC2::SecurityGroup",
+    },
+    "WindowsFleetwindowsfleetSecurityGroupfromTestStackJenkinsControllerServiceSecurityGroupFCB7D6F822A2F8089C": {
+      "Properties": {
+        "Description": "from TestStackJenkinsControllerServiceSecurityGroupFCB7D6F8:22",
+        "FromPort": 22,
+        "GroupId": {
+          "Fn::GetAtt": [
+            "WindowsFleetwindowsfleetSecurityGroup12D0DAF2",
+            "GroupId",
+          ],
+        },
+        "IpProtocol": "tcp",
+        "SourceSecurityGroupId": {
+          "Fn::GetAtt": [
+            "JenkinsControllerServiceSecurityGroup8CBE094C",
+            "GroupId",
+          ],
+        },
+        "ToPort": 22,
+      },
+      "Type": "AWS::EC2::SecurityGroupIngress",
+    },
+    "WindowsFleetwindowsfleetVolumev100EF597E57": {
+      "DeletionPolicy": "Delete",
+      "Properties": {
+        "AvailabilityZone": {
+          "Fn::Select": [
+            0,
+            {
+              "Fn::GetAZs": "",
+            },
+          ],
+        },
+        "Encrypted": true,
+        "MultiAttachEnabled": false,
+        "Size": 100,
+        "Tags": [
+          {
+            "Key": "Kind",
+            "Value": "TestStack-WindowsFleet-windows-fleet",
+          },
+          {
+            "Key": "Name",
+            "Value": "TestStack-WindowsFleet-windows-fleet-0-0",
+          },
+        ],
+        "VolumeType": "gp3",
+      },
+      "Type": "AWS::EC2::Volume",
+      "UpdateReplacePolicy": "Delete",
+    },
+    "WindowsFleetwindowsfleetVolumev10103D01A7D": {
+      "DeletionPolicy": "Delete",
+      "Properties": {
+        "AvailabilityZone": {
+          "Fn::Select": [
+            0,
+            {
+              "Fn::GetAZs": "",
+            },
+          ],
+        },
+        "Encrypted": true,
+        "MultiAttachEnabled": false,
+        "Size": 100,
+        "Tags": [
+          {
+            "Key": "Kind",
+            "Value": "TestStack-WindowsFleet-windows-fleet",
+          },
+          {
+            "Key": "Name",
+            "Value": "TestStack-WindowsFleet-windows-fleet-0-1",
+          },
+        ],
+        "VolumeType": "gp3",
+      },
+      "Type": "AWS::EC2::Volume",
+      "UpdateReplacePolicy": "Delete",
+    },
+    "WindowsFleetwindowsfleetVolumev1102F0552A1": {
+      "DeletionPolicy": "Delete",
+      "Properties": {
+        "AvailabilityZone": {
+          "Fn::Select": [
+            1,
+            {
+              "Fn::GetAZs": "",
+            },
+          ],
+        },
+        "Encrypted": true,
+        "MultiAttachEnabled": false,
+        "Size": 100,
+        "Tags": [
+          {
+            "Key": "Kind",
+            "Value": "TestStack-WindowsFleet-windows-fleet",
+          },
+          {
+            "Key": "Name",
+            "Value": "TestStack-WindowsFleet-windows-fleet-1-0",
+          },
+        ],
+        "VolumeType": "gp3",
+      },
+      "Type": "AWS::EC2::Volume",
+      "UpdateReplacePolicy": "Delete",
+    },
+    "WindowsFleetwindowsfleetVolumev111A1A28139": {
+      "DeletionPolicy": "Delete",
+      "Properties": {
+        "AvailabilityZone": {
+          "Fn::Select": [
+            1,
+            {
+              "Fn::GetAZs": "",
+            },
+          ],
+        },
+        "Encrypted": true,
+        "MultiAttachEnabled": false,
+        "Size": 100,
+        "Tags": [
+          {
+            "Key": "Kind",
+            "Value": "TestStack-WindowsFleet-windows-fleet",
+          },
+          {
+            "Key": "Name",
+            "Value": "TestStack-WindowsFleet-windows-fleet-1-1",
+          },
+        ],
+        "VolumeType": "gp3",
+      },
+      "Type": "AWS::EC2::Volume",
+      "UpdateReplacePolicy": "Delete",
     },
   },
   "Rules": {
