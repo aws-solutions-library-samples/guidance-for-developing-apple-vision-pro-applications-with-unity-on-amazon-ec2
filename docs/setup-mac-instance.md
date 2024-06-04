@@ -12,7 +12,7 @@ You can connect your instance (like SSH) via the session manager of AWS Systems 
 ### 2. Set password for ec2-user
 You need GUI access such as Apple Remote Desktop (ARD) in the following steps. To use ARD, you have to set password for the user you use in ARD session.
 
-You can set password by [the below command](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-mac-instances.html#connect-to-mac-instance) (execute it on the previous SSH session):
+You can set password by [the below command](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/connect-to-mac-instance.html#mac-instance-vnc) (execute it on the previous SSH session):
 
 ```sh
 sudo passwd ec2-user
@@ -44,17 +44,17 @@ When connected to the instance, you have to enter username and password as below
 * username: ec2-user
 * password: the password you entered on step 2
 
-If you want to change the screen resolution, please refer to this document: [Modify macOS screen resolution on Mac instances](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-mac-instances.html#mac-screen-resolution)
+If you want to change the screen resolution, please refer to this document: [Modify macOS screen resolution on Mac instances](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/connect-to-mac-instance.html#mac-screen-resolution)
 
 ### 5. Install Xcode
 You need Xcode installed for building iOS apps. Follow this instruction ([Install Xcode and accept license](https://catalog.us-east-1.prod.workshops.aws/workshops/43e96ac6-6d4f-4d99-af97-3ac2a5987391/en-US/020-build-farms/060-labs-unity-mac/015-environment-and-ec2-mac/040-ec2-mac-setup/040-install-xcode-and-accept-license)
 ) and complete the installation:
 
 1. Install Xcode (You have to login to your Apple account)
-2. Launch Xcode and approve the license
+2. Launch Xcode and accept the license
 
 ### 6. (Optional) Create an AMI
-You do not have to repeat all the steps above every time you provisioned new mac instances.
+You do not have to repeat all the steps above every time you provision a new mac instance.
 Instead, you can create an [Amazon Machine Image (AMI)](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AMIs.html) from your existing instance and reuse it when launching another instance.
 
 To create an AMI, please follow this document: [Create an AMI from an Amazon EC2 Instance](https://docs.aws.amazon.com/toolkit-for-visual-studio/latest/user-guide/tkv-create-ami-from-instance.html). When you create an AMI, you can toggle `No reboot` checkbox, but it is recommended to keep it unchecked because `No reboot` sometimes results in unstable behavior. It usually takes about an hour to create an AMI from a mac instance.
