@@ -111,7 +111,9 @@ export interface AgentEC2FleetWindowsProps extends AgentEC2FleetPropsCommon {}
  * Fleet of EC2 instances for Jenkins agents.
  * The number of instances is supposed to be controlled by Jenkins EC2 Fleet plugin.
  */
-export class AgentEC2Fleet extends Construct {
+export class AgentEC2Fleet extends Construct implements iam.IGrantable {
+  public readonly grantPrincipal: iam.IPrincipal;
+
   public readonly fleetAsgName: string;
   public readonly launchTemplate: ec2.LaunchTemplate;
 
@@ -209,6 +211,7 @@ export class AgentEC2Fleet extends Construct {
       vpcSubnets: { subnets },
     });
 
+
     if (dataVolumeSize != null) {
       const kind = `${cdk.Stack.of(this).stackName}-${id}`;
       const volumesPerAz = Math.ceil(props.fleetMaxSize / subnets.length);
@@ -248,6 +251,7 @@ export class AgentEC2Fleet extends Construct {
       );
     }
 
+    this.grantPrincipal = fleet.role;
     this.launchTemplate = launchTemplate;
     this.fleetAsgName = fleet.autoScalingGroupName;
   }
