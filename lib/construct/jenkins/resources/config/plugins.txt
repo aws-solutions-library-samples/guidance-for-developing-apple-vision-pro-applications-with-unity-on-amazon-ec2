@@ -4,7 +4,7 @@ git:latest
 docker-plugin:latest
 docker-workflow:latest
 timestamper:latest
-ec2-fleet:3.1.0
-artifact-manager-s3:670.v0558a_cb_c82c2
-jobcacher:323.vcb_cb_98b_4e96a
-amazon-ecr:1.107.ve50d37906739
+ec2-fleet:latest
+artifact-manager-s3:latest
+jobcacher:latest
+amazon-ecr:latest

@@ -282,6 +282,16 @@ To add a Jenkins agent with a WebSocket connection, add a node from `System Conf
 
 ![websocket connection](docs/imgs/websocket.png)
 
+### Managing plugin versions
+We use the latest versions for all the plugins we use as a initial configuration ([`plugins.txt`](./lib/construct/jenkins/resources/config/plugins.txt)), because it sometimes fails a deployment if we fixed those versions due to version mismatch. However, we recommend to fix those versions after the initial deployment, because otherwise they will be updated every time you deploy the CDK project and may result in a breaking behavior.
+
+You can fix the versions in `plugins.txt` by replacing `latest` to some specific version string. e.g.:
+
+```diff
+- ec2-fleet:latest
++ ec2-fleet:3.1.0
+```
+
 ## How it works
 This project requires several architectural considerations, which we will cover in this section.
 
