@@ -17,13 +17,6 @@ List the top-level sections of the README template, along with a hyperlink to th
 6. [Next Steps](#next-steps)
 7. [Cleanup](#cleanup)
 
-##### Optional
-
-1. [FAQ, known issues, additional considerations, and limitations](#faq-known-issues-additional-considerations-and-limitations-optional)
-2. [Revisions](#revisions-optional)
-3. [Notices](#notices-optional)
-4. [Authors](#authors-optional)
-
 
 #### Overview 
 
@@ -95,7 +88,7 @@ The following table provides a sample cost breakdown for deploying this guidance
 | Amazon EFS |	1GB storage | 	$0.20 |
 | TOTAL | estimate |	$688 |
 
-##### Prerequisites 
+#### Prerequisites 
 
 Before you begin deploying this guidance, ensure you have the following prerequisites in place:
 
@@ -124,7 +117,7 @@ First, prepare an environment where AWS CDK can be executed. This environment mu
 
 If your environment meets the above conditions, it can be used on local terminals, AWS Cloud9, EC2 instances, etc. 
 
-##### iOS Development Requirements
+####  iOS Development Requirements
 
 1. Apple Developer Account: Required for signing and deploying Vision Pro applications.
 2. Xcode: Latest version compatible with Vision Pro development.
@@ -177,7 +170,7 @@ cdk bootstrap performs initial setup to use CDK in your environment. This is nec
 
 The AWS services used for this guidance are supported in all AWS regions where Amazon EC2 Mac instances are available. Please check the AWS Regional Services List for the most up-to-date information.
 
-##### Deployment Steps 
+#### Deployment Steps 
 
 We assume that you have already built a build pipeline, but for detailed instructions on how to build it, please refer to the following link: Build Pipeline CDK Project Deployment Steps. You can deploy using AWS CDK, and it only takes a few CLI commands to deploy.
 
@@ -237,7 +230,7 @@ By opening the URL in JenkinsControllerServiceServiceURL output, you can now acc
 
 You can also configure to deploy EC2 Mac instances or a Unity accelerator instance. For further details, please refer to the document here.
 
-##### Deployment Validation  
+#### Deployment Validation  
 
 To validate the deployment:
 
@@ -257,14 +250,14 @@ To run the Guidance:
 
 Expected output: A successfully built Xcode archive for your Vision Pro application. Please refer to the blog article for further details.
 
-##### Next Steps 
+#### Next Steps 
 
 * Customize the Unity project and build settings to fit your specific Vision Pro application needs.
 * Integrate additional testing steps in the Jenkins pipeline.
 * Implement automatic deployment to TestFlight or the App Store.
 * Optimize the build process by fine-tuning EC2 instance types and sizes.
 
-##### Cleanup 
+#### Cleanup 
 
 When deleting resources, please follow these steps:
 First, set the number of instances in the Jenkins EC2 Fleet to 0. To do this, go to the Jenkins cloud management page (Dashboard → Manage Jenkins → Nodes → Configure Clouds) and set the Minimum Cluster Size of EC2 Fleet to 0.
