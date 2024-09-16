@@ -17,6 +17,7 @@ test('Snapshot test', () => {
   const stack = new JenkinsUnityBuildStack(app, 'TestStack', {
     env: {
       region: 'us-east-2',
+      description : "Guidance for Developing Apple Vision Pro Applications with Unity on Amazon EC2 (SO9527)"
     },
     allowedCidrs: ['127.0.0.1/32'],
     licenseServerBaseUrl: 'http://10.0.0.100:8080',
