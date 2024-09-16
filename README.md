@@ -7,15 +7,15 @@ AWS blog: [Implementing a Build Pipeline for Unity Mobile Apps](https://aws.amaz
 List the top-level sections of the README template, along with a hyperlink to the specific section.
 
 
-1. [Overview](#overview-required)
+1. [Overview](#overview)
     * [Cost](#cost)
-2. [Prerequisites](#prerequisites-required)
-    * [Operating System](#operating-system-required)
-3. [Deployment Steps](#deployment-steps-required)
-4. [Deployment Validation](#deployment-validation-required)
-5. [Running the Guidance](#running-the-guidance-required)
-6. [Next Steps](#next-steps-required)
-7. [Cleanup](#cleanup-required)
+2. [Prerequisites](#prerequisites)
+    * [Operating System](#operating-system)
+3. [Deployment Steps](#deployment-steps)
+4. [Deployment Validation](#deployment-validation)
+5. [Running the Guidance](#running-the-guidance)
+6. [Next Steps](#next-steps)
+7. [Cleanup](#cleanup)
 
 ##### Optional
 
@@ -37,7 +37,7 @@ Below is an architecture diagram of the Unity build pipeline for Apple Vision Pr
 
 ##### Architecture diagram and workflow steps
 
-![architecture](assets/Reference-Architecture.png)
+![architecture](docs/imgs/Reference-Architecture.png)
 
 
 
