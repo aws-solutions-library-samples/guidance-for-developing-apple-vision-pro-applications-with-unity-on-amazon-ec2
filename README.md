@@ -1,4 +1,4 @@
-# Guidance for developing Apple Vision Pro applications with Unity on Amazon EC2 on AWS 
+# Guidance for developing Apple Vision Pro / iOS applications with Unity on Amazon EC2 on AWS 
 
 AWS blog: [Implementing a Build Pipeline for Unity Mobile Apps](https://aws.amazon.com/blogs/gametech/implementing-a-build-pipeline-for-unity-mobile-apps/)
 
@@ -20,13 +20,14 @@ List the top-level sections of the README template, along with a hyperlink to th
 
 #### Overview 
 
-This guidance describes architectural considerations and configuration steps for developing and building Unity-based Apple Vision Pro applications using AWS services. It demonstrates how to implement a resilient, scalable, cost efficient and secure build pipeline on AWS, leveraging services such as Amazon EC2, Amazon ECS, and Amazon S3.
+This guidance describes architectural considerations and configuration steps for developing and building Unity-based Apple Vision Pro / iOS applications using AWS services. It demonstrates how to implement a resilient, scalable, cost efficient and secure build pipeline on AWS, leveraging services such as Amazon EC2, Amazon ECS, and Amazon S3.
 
-The intended audience of this guidance are DevOps engineers, Cloud architects, system administrators, and platform engineers who would like to get hands-on experience architecting cloud-native applications for Apple Vision Pro in the AWS Cloud and are familiar with Unity and iOS development.
+The intended audience of this guidance are DevOps engineers, Cloud architects, system administrators, and platform engineers who would like to get hands-on experience architecting cloud-native applications for Apple Vision Pro  / iOS in the AWS Cloud and are familiar with Unity development.
+
 
 #### Architecture overview
 
-Below is an architecture diagram of the Unity build pipeline for Apple Vision Pro applications using AWS services.
+Below is an architecture diagram of the Unity build pipeline for Apple Vision Pro / iOS applications using AWS services.
 
 ##### Architecture diagram and workflow steps
 
@@ -46,30 +47,35 @@ Below is an architecture diagram of the Unity build pipeline for Apple Vision Pr
 
 Following this architecture, you should be able to:
 
-* Develop and build Unity applications for Apple Vision Pro using AWS services
-* Create an infrastructure that provides a scalable and cost-effective build pipeline for Vision Pro applications
+
+* Develop and build Unity applications for Apple Vision Pro / iOS using AWS services
+* Create an infrastructure that provides a scalable and cost-effective build pipeline for Vision Pro / iOS applications
+
+
 
 #### AWS services used in this Guidance
 
-| AWS service |	Role |	Description |
+| AWS service |    Role |    Description |
 | --------------------| ----------------- | -------------------------------|
-| Amazon EC2 |	Core service |	Hosts Linux and Mac instances for Unity builds and iOS compilation |
-| Amazon ECS |	Core service |	Runs the Jenkins Controller on Fargate |
-| Amazon S3	| Core service |	Stores build artifacts and intermediary files |
-| Amazon VPC |	Core Service |	Provides network isolation and security |
-| Amazon Autoscaling |	Core Service |	Provides flexifility and cost efficiency | 
-| Systems Manager |	Supporting service |	Manages EC2 instances and provides secure access |
-| NAT Gateway |	Supporting service |	Enables outbound internet access for private resources |
-| Elastic Load Balancing |	Supporting service |	Provides load balancing for the Jenkins Controller |
+| Amazon EC2 |    Core service |    Hosts Linux and Mac instances for Unity builds and iOS compilation |
+| Amazon ECS |    Core service |    Runs the Jenkins Controller on Fargate |
+| Amazon S3    | Core service |    Stores build artifacts and intermediary files |
+| Amazon VPC |    Core Service |    Provides network isolation and security |
+| Amazon Autoscaling |    Core Service |    Provides flexifility and cost efficiency | 
+| Systems Manager |    Supporting service |    Manages EC2 instances and provides secure access |
+| NAT Gateway |    Supporting service |    Enables outbound internet access for private resources |
+| Elastic Load Balancing |    Supporting service |    Provides load balancing for the Jenkins Controller |
+
 
 #### Plan your deployment
 
-This guidance is based on using Amazon EC2 instances to host Unity builds and iOS compilation. It leverages Amazon ECS Fargate to run the Jenkins Controller for orchestrating the build pipeline and Amazon Autoscaling to adjust solution flexibility. You can extend the solutionby using containers to build Unity images, different EC2 Linux instances to adjust assets compilation phase and different EC2 Mac instances in combination with regular capacity adjustments for optimal cost control, security and build speed. 
+This guidance is based on using Amazon EC2 instances to host Unity builds and iOS compilation. It leverages Amazon ECS Fargate to run the Jenkins Controller for orchestrating the build pipeline and Amazon Autoscaling to adjust solution flexibility. You can extend the solutionby using containers to build Unity images, different EC2 Linux instances to adjust assets compilation phase and different EC2 Mac instances in combination with regular capacity adjustments for optimal cost control, security and build speed.
 
 #### Cost 
 
 You are responsible for the cost of the AWS services used while running this solution guidance. As of July 2024, the cost for running this guidance with the default settings in the US East (N. Virginia) Region is approximately $688 per month for processing (1000 builds).
 We recommend creating a Budget through AWS Cost Explorer to help manage costs. Prices are subject to change. For full details, refer to the pricing webpage for each AWS service used in this Guidance.
+
 
 ##### Estimated monthly cost breakdown
 
@@ -119,9 +125,9 @@ If your environment meets the above conditions, it can be used on local terminal
 
 ####  iOS Development Requirements
 
-1. Apple Developer Account: Required for signing and deploying Vision Pro applications.
-2. Xcode: Latest version compatible with Vision Pro development.
-3. Provisioning profiles and certificates for iOS/Vision Pro development.
+1. Apple Developer Account: Required for signing and deploying Vision Pro / iOS applications.
+2. Xcode: Latest version compatible with Vision Pro / iOS development.
+3. Provisioning profiles and certificates for Vision Pro / iOS development.
 
 ##### Networking
 
@@ -131,10 +137,13 @@ Ensure you have the necessary network access to create and manage AWS resources,
 
 Verify that your AWS account has sufficient service quotas, especially for:
 
+
 * Amazon EC2 instances (including Mac instances)
 * Amazon ECS tasks
 * VPCs and subnets
 * NAT Gateways
+
+
 
 ##### Security
 
@@ -143,11 +152,12 @@ Verify that your AWS account has sufficient service quotas, especially for:
 
 ##### Knowledge Prerequisites
 
-* Basic understanding of Unity development for Apple Vision Pro.
+* Basic understanding of Unity development for Apple Vision Pro / iOS.
 * Familiarity with AWS services, especially EC2, ECS, and S3.
 * Experience with CI/CD pipelines, preferably Jenkins.
 
 By ensuring these prerequisites are met, you'll be well-prepared to deploy and use this guidance effectively.
+
 
 ##### Preparing to Use CDK
 
@@ -234,25 +244,36 @@ You can also configure to deploy EC2 Mac instances or a Unity accelerator instan
 
 To validate the deployment:
 
-1. Open the CloudFormation console and verify the status of the stack named "UnityVisionProBuildPipeline".
+
+1. Open the CloudFormation console and verify the status of the stack named "JenkinsUnityBuildStack".
 2. Check the ECS console to ensure the Jenkins master task is running.
 3. Verify that the EC2 instances (Linux and Mac) are created and running.
 4. Access the Jenkins UI using the URL provided in the CloudFormation outputs.
 
+
+
 ##### Running the Guidance 
 
 To run the Guidance:
+
 
 1. In the Jenkins UI, navigate to the pipeline you created.
 2. Click "Build Now" to start the build process.
 3. Monitor the build progress in the Jenkins console output.
 4. Once complete, you can download the built artifacts from Jenkins.
 
-Expected output: A successfully built Xcode archive for your Vision Pro application. Please refer to the blog article for further details.
+Expected output: A successfully built Xcode archive for your Vision Pro / iOS application. Please refer to the blog article for further details.
+
+If you want to test the pipeline with a sample Unity project including Jenkinsfile, you can use the following:
+
+* Vision Pro sample app: https://github.com/aws-samples/unity-vision-os-sample-app
+* iOS sample app: https://github.com/tmokmss/com.unity.multiplayer.samples.coop
+
+
 
 #### Next Steps 
 
-* Customize the Unity project and build settings to fit your specific Vision Pro application needs.
+* Customize the Unity project and build settings to fit your specific Vision Pro / iOS application needs.
 * Integrate additional testing steps in the Jenkins pipeline.
 * Implement automatic deployment to TestFlight or the App Store.
 * Optimize the build process by fine-tuning EC2 instance types and sizes.
@@ -263,11 +284,15 @@ When deleting resources, please follow these steps:
 First, set the number of instances in the Jenkins EC2 Fleet to 0. To do this, go to the Jenkins cloud management page (Dashboard → Manage Jenkins → Nodes → Configure Clouds) and set the Minimum Cluster Size of EC2 Fleet to 0.
 After confirming that all Linux/Windows Agents have been removed from the Jenkins GUI, execute the following CDK command:
 
+
 ```shell
 npx cdk destroy --all
 ```
 
 Also, we've configured some resources not to be deleted automatically. Please follow these steps to delete them manually:
 
+
 * EC2 Mac Dedicated host: You cannot release the Dedicated host for 24 hours after creating it, and for 1-3 hours (Pending state) after terminating the Mac instance (reference). Please try after sufficient time has passed. To release, select the host on this page and click Actions → Release host.
+
+
 
